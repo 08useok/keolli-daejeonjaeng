@@ -60,17 +60,17 @@ const ELITE_RABBIT_SHEET='assets/elite_rabbit_sheet.png';
 // Reserved user-supplied enemy sheets for the next Empire of Cats expansion.
 const SQUIRREL_G_SHEET='assets/squirrel_g_sheet.png';
 const KANG_ROO_SHEET='assets/kang_roo_sheet.png';
-const data={bases:{ally:{hp:2000,max:2000,x:90},enemy:{hp:1000,max:1000,x:10}},units:{cyan:{"hp": 180, "atk": 200, "interval": 3.4, "speed": 4.3, "range": 30, "cost": 260, "cooldown": 9, "knockbacks": 3, "projectile": true, "splash": 0.5, "flight": 0.6},blue:{"hp": 240, "atk": 38, "interval": 0.4, "speed": 13, "range": 4, "cost": 100, "cooldown": 3, "knockbacks": 3, "attackDuration": 0.3},purple:{"hp": 600, "atk": 90, "interval": 1.6, "speed": 5, "range": 6, "cost": 180, "cooldown": 6, "knockbacks": 3, "projectile": true, "splash": 1.5, "redStrong": true},peng:{"hp": 1300, "atk": 80, "interval": 0.8, "speed": 7, "range": 5, "reward": 180, "knockbacks": 3, "attackDuration": 0.55, "windup": 0.26666666666666666},gory:{"hp": 1000, "atk": 80, "interval": 0.5333333333333333, "speed": 8, "range": 5, "reward": 220, "knockbacks": 3, "attackDuration": 0.5, "windup": 0.26666666666666666, "area": true},baa:{"hp": 800, "atk": 50, "interval": 1.1, "speed": 4.5, "range": 3.7, "reward": 100, "knockbacks": 3, "attackDuration": 0.8, "windup": 0.4666666666666667},seal:{"hp": 2500, "atk": 150, "interval": 0.7666666666666667, "speed": 5, "range": 5.7, "reward": 450, "knockbacks": 1, "attackDuration": 0.6, "windup": 0.26666666666666666, "area": true, "trait": "red"},croco:{"hp": 70, "atk": 30, "interval": 0.6, "speed": 7.5, "range": 3.7, "reward": 30, "knockbacks": 1, "attackDuration": 0.5, "windup": 0.26666666666666666},red:{hp:450,atk:15,interval:1.2,speed:6,range:4.5,cost:30,cooldown:1,knockbacks:3},orange:{hp:220,atk:100,interval:2.4,speed:4.5,range:16,cost:150,cooldown:6.5,knockbacks:3,projectile:true,splash:3.5},yellow:{hp:900,atk:45,interval:1.8,speed:5,range:4,cost:125,cooldown:5,knockbacks:1},green:{hp:280,atk:65,interval:2.8,speed:5.5,range:12,cost:175,cooldown:7,knockbacks:3,boomerang:true},dog:{hp:200,atk:50,interval:1.4,speed:5,range:4,reward:40,knockbacks:3},snache:{hp:220,atk:85,interval:1.1,speed:7,range:4,reward:70,knockbacks:3},guys:{hp:420,atk:120,interval:1,speed:4.8,range:4.2,reward:110,knockbacks:1,attackDuration:.9},pigge:{trait:"red",hp:2400,atk:130,interval:1.8,speed:2.5,range:5,reward:400,knockbacks:2,attackDuration:28/30,windup:14/30,area:true},hippo:{hp:1600,atk:150,interval:2.2,speed:2.8,range:5,reward:200,knockbacks:1,attackDuration:.8,area:true}},income:[{max:1000,rate:20,cost:100},{max:1200,rate:25,cost:150},{max:1400,rate:30,cost:200},{max:1600,rate:36,cost:300},{max:1800,rate:42,cost:400},{max:2000,rate:50,cost:null}]};
+const data={bases:{ally:{hp:2000,max:2000,x:90},enemy:{hp:1000,max:1000,x:10}},units:{cyan:{"hp": 180, "atk": 200, "interval": 3.4, "speed": 4.3, "range": 30, "cost": 260, "cooldown": 9, "knockbacks": 3, "projectile": true, "splash": 0.5, "flight": 0.6, "floatStrong": true},blue:{"hp": 240, "atk": 38, "interval": 0.4, "speed": 13, "range": 4, "cost": 100, "cooldown": 3, "knockbacks": 3, "attackDuration": 0.3},purple:{"hp": 600, "atk": 90, "interval": 1.6, "speed": 5, "range": 6, "cost": 180, "cooldown": 6, "knockbacks": 3, "projectile": true, "splash": 1.5, "redStrong": true},peng:{"hp": 1300, "atk": 80, "interval": 0.8, "speed": 7, "range": 5, "reward": 180, "knockbacks": 3, "attackDuration": 0.55, "windup": 0.26666666666666666},gory:{"hp": 1000, "atk": 80, "interval": 0.5333333333333333, "speed": 8, "range": 5, "reward": 220, "knockbacks": 3, "attackDuration": 0.5, "windup": 0.26666666666666666, "area": true},baa:{"hp": 800, "atk": 50, "interval": 1.1, "speed": 4.5, "range": 3.7, "reward": 100, "knockbacks": 3, "attackDuration": 0.8, "windup": 0.4666666666666667},seal:{"hp": 2500, "atk": 150, "interval": 0.7666666666666667, "speed": 5, "range": 5.7, "reward": 450, "knockbacks": 1, "attackDuration": 0.6, "windup": 0.26666666666666666, "area": true, "trait": "red"},croco:{"hp": 70, "atk": 30, "interval": 0.6, "speed": 7.5, "range": 3.7, "reward": 30, "knockbacks": 1, "attackDuration": 0.5, "windup": 0.26666666666666666},red:{hp:450,atk:15,interval:1.2,speed:6,range:4.5,cost:30,cooldown:1,knockbacks:3},orange:{hp:220,atk:100,interval:2.4,speed:4.5,range:16,cost:150,cooldown:6.5,knockbacks:3,projectile:true,splash:3.5},yellow:{hp:900,atk:45,interval:1.8,speed:5,range:4,cost:125,cooldown:5,knockbacks:1},green:{hp:280,atk:65,interval:2.8,speed:5.5,range:12,cost:175,cooldown:7,knockbacks:3,boomerang:true},dog:{hp:200,atk:50,interval:1.4,speed:5,range:4,reward:40,knockbacks:3},snache:{hp:220,atk:85,interval:1.1,speed:7,range:4,reward:70,knockbacks:3},guys:{hp:420,atk:120,interval:1,speed:4.8,range:4.2,reward:110,knockbacks:1,attackDuration:.9},pigge:{trait:"red",hp:2400,atk:130,interval:1.8,speed:2.5,range:5,reward:400,knockbacks:2,attackDuration:28/30,windup:14/30,area:true},hippo:{hp:1600,atk:150,interval:2.2,speed:2.8,range:5,reward:200,knockbacks:1,attackDuration:.8,area:true}},income:[{max:1000,rate:20,cost:100},{max:1200,rate:25,cost:150},{max:1400,rate:30,cost:200},{max:1600,rate:36,cost:300},{max:1800,rate:42,cost:400},{max:2000,rate:50,cost:null}]};
 data.units.leboin={hp:4000,atk:654,interval:187/30,speed:2.5,range:13.5,reward:650,knockbacks:1,attackDuration:.9,windup:8/30,area:true};
 const MOOTH_SHEET='assets/mooth_sheet.png';
 data.units.rabbit={trait:"red",hp:320,atk:60,interval:.9,speed:9,range:4,reward:70,knockbacks:3,attackDuration:.45,windup:.2};
 data.units.squirrel={hp:300,atk:45,interval:1.05,speed:8.5,range:4.2,reward:85,knockbacks:3,attackDuration:.55,windup:.25};
 data.units.kangaroo={hp:4000,atk:250,interval:1.2,speed:10,range:5.5,reward:700,knockbacks:1,attackDuration:.85,windup:.53};
-data.units.mooth={hp:5000,atk:300,interval:2.8,speed:3.2,range:12,reward:850,knockbacks:1,attackDuration:1.1,windup:.55,area:true};
+data.units.mooth={trait:"floating",hp:5000,atk:300,interval:2.8,speed:3.2,range:12,reward:850,knockbacks:1,attackDuration:1.1,windup:.55,area:true};
 data.units.pink={hp:520,atk:125,interval:1.9,speed:6,range:23,engageRange:4.5,cost:225,cooldown:7,knockbacks:3,attackDuration:.7,windup:.3,area:true};
 data.units.rhino={hp:5200,atk:420,interval:2.1,speed:5.5,range:5.2,reward:900,knockbacks:2,attackDuration:.9,windup:.45,area:true};
 data.units.bear={hp:6500,atk:520,interval:2.4,speed:4.5,range:8.5,reward:1050,knockbacks:2,attackDuration:1,windup:.5,area:true};
-data.units.face={hp:18000,atk:850,interval:3.4,speed:1.8,range:14,reward:2500,knockbacks:3,attackDuration:1.2,windup:.65,area:true};
+data.units.face={trait:"floating",hp:18000,atk:850,interval:3.4,speed:1.8,range:14,reward:2500,knockbacks:3,attackDuration:1.2,windup:.65,area:true};
 const domCache=new Map();const $=s=>{let el=domCache.get(s);if(!el){el=document.querySelector(s);domCache.set(s,el)}return el}, unitsEl=$('#units');let game, last=0;
 function syncBasePositions(){
  const field=$('#field').getBoundingClientRect();if(!field.width)return;
@@ -127,6 +127,8 @@ function damage(v,amount,from){
  if(game.ended||v.hp<=0||v.kbTime>0)return;
  if(from?.stats?.redStrong&&data.units[v.type].trait==='red')amount*=from.stats.redDamage||2;
  if(v.stats?.redStrong&&from&&data.units[from.type].trait==='red')amount*=v.stats.redResist||.5;
+ if(from?.stats?.floatStrong&&data.units[v.type].trait==='floating')amount*=from.stats.floatDamage||2;
+ if(v.stats?.floatStrong&&from&&data.units[from.type].trait==='floating')amount*=v.stats.floatResist||.5;
  v.hp=Math.max(0,v.hp-amount);v.flashTime=.1;v.el.classList.add('damage-flash');
  v.el.querySelector('i').style.setProperty('width',Math.max(0,v.hp/v.max)*100+'%');
  if(v.hp===0){
@@ -457,20 +459,20 @@ try{
 function saveTraining(){try{localStorage.setItem('red-battle-training-v1',JSON.stringify(training));trainingSaveFailed=false}catch{trainingSaveFailed=true}}
 function unitStats(type,level=training.levels[type]||1){const d=data.units[type],stats={...d,hp:Math.round(d.hp*(1+.1*(level-1))),atk:Math.round(d.atk*(1+.1*(level-1)))};if(level<10)return stats;stats.evolved=true;stats.range=d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='yellow')stats.hp=Math.round(stats.hp*1.25);if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=3;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);return stats}
 function allyUnlocked(t){return t==='red'||cleared.some(i=>i>=UNLOCK_AT[t])}
-const DECK_SIZE=5;
+const DECK_SIZE=10;
 let deck=['red'];
 try{
  const raw=localStorage.getItem('red-battle-deck-v1');
- if(raw){const saved=JSON.parse(raw);if(Array.isArray(saved))deck=[...new Set(['red',...saved.filter(t=>ALLIES.includes(t)&&t!=='red')])].slice(0,DECK_SIZE)}
+ if(raw){const saved=JSON.parse(raw);if(Array.isArray(saved))deck=[...new Set(saved.filter(t=>ALLIES.includes(t)))].slice(0,DECK_SIZE)}
 }catch{}
 function saveDeck(){try{localStorage.setItem('red-battle-deck-v1',JSON.stringify(deck))}catch{}}
 function toggleDeck(t){
- if(t==='red'||!allyUnlocked(t))return;
+ if(!allyUnlocked(t))return;
  if(deck.includes(t))deck=deck.filter(x=>x!==t);
  else if(deck.length<DECK_SIZE)deck.push(t);
  saveDeck();renderTraining();render();
 }
-function renderDeckButtons(){for(const t of ALLIES)$(t==='red'?'#spawnBtn':'#'+t+'Btn').hidden=!deck.includes(t)}
+function renderDeckButtons(){const tutorialActive=game&&game.tutorial<6;for(const t of ALLIES)$(t==='red'?'#spawnBtn':'#'+t+'Btn').hidden=!deck.includes(t)&&!(t==='red'&&tutorialActive)}
 let speedTickets=0;
 try{const raw=localStorage.getItem('red-battle-speed-v1');const n=parseInt(raw,10);if(Number.isInteger(n)&&n>=0)speedTickets=n}catch{}
 function saveSpeedTickets(){try{localStorage.setItem('red-battle-speed-v1',String(speedTickets))}catch{}}
@@ -502,12 +504,12 @@ function renderBaseUpgrade(){
  grid.append(card);
 }
 function awardXP(){const reward=cleared.includes(selectedStage)?Math.floor(stageXP(selectedStage)/2):stageXP(selectedStage);training.xp+=reward;saveTraining();return reward}
-function renderUnitLevels(){for(const t of ALLIES){const b=$(t==='red'?'#spawnBtn':'#'+t+'Btn'),d=unitStats(t),e=d.evolved;b.querySelector('strong').textContent=UNIT_NAMES[t]+(e?' 2진':'')+' Lv.'+training.levels[t];b.title=`${ROLES[t]} · 체력 ${d.hp} · 공격력 ${d.atk} · 사거리 ${Math.round(d.range)} · 공격 주기 ${d.interval.toFixed(2)}초 · 이동 ${d.speed} · ${d.cost}원${t==='purple'?' · 빨간 적에게 강함':''}${e?' · 스틱맨 2진':''}`}}
+function renderUnitLevels(){for(const t of ALLIES){const b=$(t==='red'?'#spawnBtn':'#'+t+'Btn'),d=unitStats(t),e=d.evolved;b.querySelector('strong').textContent=UNIT_NAMES[t]+(e?' 2진':'')+' Lv.'+training.levels[t];b.title=`${ROLES[t]} · 체력 ${d.hp} · 공격력 ${d.atk} · 사거리 ${Math.round(d.range)} · 공격 주기 ${d.interval.toFixed(2)}초 · 이동 ${d.speed} · ${d.cost}원${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'?' · 떠다니는 적에게 강함':''}${e?' · 스틱맨 2진':''}`}}
 function renderTraining(){
  $('#xpText').textContent=training.xp+' XP';$('#trainingGrid').innerHTML='';
  $('#deckText').textContent=`출전 덱 ${deck.length} / ${DECK_SIZE} · 전투에는 덱에 넣은 아군만 나옵니다`;
- for(const t of ALLIES){const l=training.levels[t],d=unitStats(t),next=unitStats(t,Math.min(10,l+1)),unlocked=allyUnlocked(t),inDeck=deck.includes(t),evolved=l===10,card=document.createElement('article');card.className='training-card';card.innerHTML=`${profileMarkup(t,evolved)}<h3 style="color:${COLORS[t]}">${UNIT_NAMES[t]}${evolved?' 2진':''} <small>Lv.${l} / 10</small></h3><p class="profile-copy"><strong>${ROLES[t]}</strong>${t==='purple'?' · 빨간 적에게 강함':''}<br>${evolved?PROFILE_TEXT_EVOLVED[t]:PROFILE_TEXT[t]}${evolved?'<br><strong>2진 효과: '+EVOLUTION_TEXT[t]+' · 사거리 20% 증가</strong>':''}</p><p>체력 ${d.hp}${l<10?' → '+next.hp:''}<br>공격력 ${d.atk}${l<10?' → '+next.atk:''}</p>`;const b=document.createElement('button');b.textContent=!unlocked?STAGES[UNLOCK_AT[t]].name+' 클리어로 해금':l===10?'2진 진화 완료':upgradeCost(t)+' XP · 강화';b.disabled=!unlocked||l>=10||training.xp<upgradeCost(t);b.onclick=()=>upgradeCharacter(t);card.append(b);
-  if(unlocked){const db=document.createElement('button');db.className='deck-btn';if(t==='red'){db.textContent='항상 출전';db.disabled=true}else{db.textContent=inDeck?'덱에서 제외':deck.length>=DECK_SIZE?'덱 가득참':'덱에 추가';db.disabled=!inDeck&&deck.length>=DECK_SIZE;db.classList.toggle('active',inDeck);db.onclick=()=>toggleDeck(t)}card.append(db)}
+ for(const t of ALLIES){const l=training.levels[t],d=unitStats(t),next=unitStats(t,Math.min(10,l+1)),unlocked=allyUnlocked(t),inDeck=deck.includes(t),evolved=l===10,card=document.createElement('article');card.className='training-card';card.innerHTML=`${profileMarkup(t,evolved)}<h3 style="color:${COLORS[t]}">${UNIT_NAMES[t]}${evolved?' 2진':''} <small>Lv.${l} / 10</small></h3><p class="profile-copy"><strong>${ROLES[t]}</strong>${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'?' · 떠다니는 적에게 강함':''}<br>${evolved?PROFILE_TEXT_EVOLVED[t]:PROFILE_TEXT[t]}${evolved?'<br><strong>2진 효과: '+EVOLUTION_TEXT[t]+' · 사거리 20% 증가</strong>':''}</p><p>체력 ${d.hp}${l<10?' → '+next.hp:''}<br>공격력 ${d.atk}${l<10?' → '+next.atk:''}</p>`;const b=document.createElement('button');b.textContent=!unlocked?STAGES[UNLOCK_AT[t]].name+' 클리어로 해금':l===10?'2진 진화 완료':upgradeCost(t)+' XP · 강화';b.disabled=!unlocked||l>=10||training.xp<upgradeCost(t);b.onclick=()=>upgradeCharacter(t);card.append(b);
+  if(unlocked){const db=document.createElement('button');db.className='deck-btn';db.textContent=inDeck?'덱에서 제외':deck.length>=DECK_SIZE?'덱 가득참':'덱에 추가';db.disabled=!inDeck&&deck.length>=DECK_SIZE;db.classList.toggle('active',inDeck);db.onclick=()=>toggleDeck(t);card.append(db)}
   $('#trainingGrid').append(card)}
  $('#saveWarning').textContent=trainingSaveFailed?'브라우저 저장을 사용할 수 없습니다. 이번 플레이에서만 유지됩니다.':'';
 }
