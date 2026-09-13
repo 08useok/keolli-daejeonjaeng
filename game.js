@@ -493,5 +493,9 @@ function renderTraining(){
  $('#saveWarning').textContent=trainingSaveFailed?'브라우저 저장을 사용할 수 없습니다. 이번 플레이에서만 유지됩니다.':'';
 }
 
+function saveAll(){saveProgress();saveTraining();saveDeck();saveSpeedTickets()}
+addEventListener('pagehide',saveAll);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveAll()});
+
 reset();openStages();requestAnimationFrame(loop);
 
