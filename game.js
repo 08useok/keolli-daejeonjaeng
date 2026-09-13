@@ -90,7 +90,7 @@ function addUnit(type){
  game.units.push(u);drawUnit(u);u.el.style.left=`calc(${u.x}% - 21px)`;
  if(ally){game.money-=d.cost;game[cooldownKey(type)]=d.cooldown;if(game.tutorial===2){game.tutorial=3;tutorial()}}render();
 }
-function drawUnit(u){let e=document.createElement('div'),evolved=u.ally&&u.stats?.evolved;e.className='unit '+u.type+(u.ally?' ally-art':'')+(evolved?' evolved':'');e.style.setProperty('--unit-color',COLORS?.[u.type]||'#fff');e.innerHTML='<div class="bar"><i style="width:100%"></i></div>'+(u.ally?'<span class="ally-shadow"></span><span class="ally-sprite"></span>'+(evolved?'<span class="evolved-stick"><i class="head"></i><i class="body"></i><i class="arm a"></i><i class="arm b"></i><i class="leg a"></i><i class="leg b"></i></span>':'')+(u.type==='pink'?'<span class="pink-ribbon"><i></i></span>':''):'<span class="dog-shadow"></span><span class="dog-sprite"></span>');e.setAttribute('aria-label',UNIT_NAMES[u.type]+(evolved?' 2진':''));u.el=e;unitsEl.append(e);if(!u.ally){const sheet={rabbit:ELITE_RABBIT_SHEET,squirrel:SQUIRREL_G_SHEET,kangaroo:KANG_ROO_SHEET,mooth:MOOTH_SHEET,rhino:RHINO_SHEET,bear:BEAR_SHEET,face:FACE_SHEET}[u.type];if(sheet)e.querySelector('.dog-sprite').style.backgroundImage=`url(${sheet})`}if(u.ally)animateAlly(u);else animateDog(u)}
+function drawUnit(u){let e=document.createElement('div'),evolved=u.ally&&u.stats?.evolved;e.className='unit '+u.type+(u.ally?' ally-art':'')+(evolved?' evolved':'');e.style.setProperty('--unit-color',COLORS?.[u.type]||'#fff');e.innerHTML='<div class="bar"><i style="width:100%"></i></div>'+(u.ally?'<span class="ally-shadow"></span><span class="ally-sprite"></span>'+(evolved?'<span class="evolved-sprite"></span>':'')+(u.type==='pink'&&!evolved?'<span class="pink-ribbon"><i></i></span>':''):'<span class="dog-shadow"></span><span class="dog-sprite"></span>');e.setAttribute('aria-label',UNIT_NAMES[u.type]+(evolved?' 2진':''));u.el=e;unitsEl.append(e);if(!u.ally){const sheet={rabbit:ELITE_RABBIT_SHEET,squirrel:SQUIRREL_G_SHEET,kangaroo:KANG_ROO_SHEET,mooth:MOOTH_SHEET,rhino:RHINO_SHEET,bear:BEAR_SHEET,face:FACE_SHEET}[u.type];if(sheet)e.querySelector('.dog-sprite').style.backgroundImage=`url(${sheet})`}if(u.ally)animateAlly(u);else animateDog(u)}
 function target(u){let foes=game.units.filter(v=>v.hp>0&&v.kbTime<=0&&!v.emerging&&v.ally!==u.ally);let dir=u.ally?-1:1;return foes.filter(v=>dir*(v.x-u.x)>=-1).sort((a,b)=>Math.abs(a.x-u.x)-Math.abs(b.x-u.x))[0]}
 // Canonical knockback counts include death. Red keeps its original two live hitbacks.
 const HITBACK_DURATION=20/30;
@@ -400,8 +400,17 @@ $('#nextStageBtn').onclick=()=>{if(game.ended&&selectedStage<STAGES.length-1&&is
 window.addEventListener('resize',syncBasePositions);
 
 
+const EVOLVED_CELL_W=1536/7*.75,EVOLVED_CELL_H=1024/8*.75;
 function animateAlly(u){
  const state=u.hurtTime>0?'hurt':u.attackTime>0?'attack':'walk';
+ if(u.stats?.evolved){
+  const sprite=u.el.querySelector('.evolved-sprite'),row=ALLIES.indexOf(u.type);
+  const duration=data.units[u.type].attackDuration||.56;
+  const col=u.hurtTime>0?6:u.attackTime>0?3+Math.min(2,Math.max(0,Math.floor((duration-u.attackTime)/duration*3))):Math.floor(u.animTime/.16)%3;
+  sprite.style.backgroundPosition=`${-col*EVOLVED_CELL_W}px ${-row*EVOLVED_CELL_H}px`;
+  u.el.dataset.animation=state;
+  return;
+ }
  const sprite=u.el.querySelector('.ally-sprite');
  if(u.type==='cyan'||u.type==='blue'){
   const cell=77.6125;
