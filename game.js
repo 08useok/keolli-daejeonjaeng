@@ -427,7 +427,17 @@ const PROFILE_SHEET='assets/profile_sheet.png';
 const PROFILE_TEXT={red:'가장 먼저 전선에 뛰어든 기본 전투원. 단순하지만 어떤 전투에서도 믿을 만하다.',orange:'멀리서 과즙을 던져 모여 있는 적을 한꺼번에 공격한다.',yellow:'튼튼한 몸으로 앞줄을 지키며 가까운 적에게 전기를 방출한다.',green:'왕복하는 부메랑으로 같은 적을 두 번 공격할 수 있다.',cyan:'아주 먼 거리에서 넓은 범위를 노리는 장거리 전투원.',blue:'빠른 이동과 연속 공격으로 빈틈을 놓치지 않는 속공 전투원.',purple:'빨간 적을 상대하도록 특별히 훈련된 색상 특화 전투원.',pink:'가까이 접근한 뒤 긴 광역 판정으로 뒤쪽의 적까지 휩쓴다.'};
 const EVOLUTION_TEXT={red:'강타',orange:'과즙 범위 확대',yellow:'추가 체력',green:'귀환 부메랑 강화',cyan:'광역 범위 확대',blue:'공격 속도 증가',purple:'빨간 적 특화 강화',pink:'광역 공격력 증가'};
 const PROFILE_TEXT_EVOLVED={red:'수많은 전투를 거치며 맨몸으로도 강력한 일격을 날릴 수 있게 되었다. 이제는 단순한 몸빵이 아니라 한 방을 노리는 타격형 전투원.',orange:'더 많은 과즙을 담아 던지게 되면서 폭발 범위가 눈에 띄게 넓어졌다.',yellow:'두꺼워진 몸으로 더 오래 버티며 최전선을 든든하게 지킨다.',green:'부메랑을 던지는 손목 힘이 강해져 돌아올 때 더 강력한 일격을 남긴다.',cyan:'조준 실력이 늘어 폭발 범위가 한층 넓어진 저격수로 거듭났다.',blue:'손이 더 빨라져 눈 깜짝할 사이에 연타를 꽂아 넣는다.',purple:'빨간 적의 약점을 완벽히 파악해 압도적인 피해를 입히고, 받는 피해는 최소화한다.',pink:'리본을 휘두르는 힘이 강해져 광역 공격의 위력이 한층 강력해졌다.'};
-function profileMarkup(type,evolved){const i=ALLIES.indexOf(type),col=i%4,row=Math.floor(i/4)+(evolved?2:0),pos=[0,33.333,66.667,100];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${PROFILE_SHEET});background-position:${pos[col]}% ${pos[row]}%"></div>`}
+const PROFILE_CALIB={
+ red:{base:{size:541,x:1,y:-7},evolved:{size:486,x:7,y:-241}},
+ orange:{base:{size:520,x:-136,y:-5},evolved:{size:486,x:-121,y:-241}},
+ yellow:{base:{size:494,x:-246,y:-1},evolved:{size:486,x:-244,y:-241}},
+ green:{base:{size:488,x:-364,y:0},evolved:{size:486,x:-362,y:-241}},
+ cyan:{base:{size:494,x:1,y:-120},evolved:{size:488,x:2,y:-363}},
+ blue:{base:{size:538,x:-133,y:-135},evolved:{size:492,x:-120,y:-367}},
+ purple:{base:{size:504,x:-253,y:-124},evolved:{size:488,x:-242,y:-363}},
+ pink:{base:{size:534,x:-407,y:-131},evolved:{size:492,x:-366,y:-367}}
+};
+function profileMarkup(type,evolved){const c=PROFILE_CALIB[type][evolved?'evolved':'base'];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
 let training={xp:0,baseLevel:1,levels:{red:1,orange:1,yellow:1,green:1,cyan:1,blue:1,purple:1,pink:1}},trainingSaveFailed=false;
 function stageXP(i){return 200+i*50}
 try{
