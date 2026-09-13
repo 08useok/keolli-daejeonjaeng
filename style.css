@@ -17,7 +17,6 @@ body { overflow:auto; }
 #field { flex:1; min-height:180px; height:auto; }
 .controls { flex:0 0 106px; }
 #pauseNotice { position:absolute; top:45%; left:50%; transform:translate(-50%,-50%); background:#132139ed; border:2px solid #9bb3cc; padding:18px 30px; border-radius:14px; z-index:8; }
-.face { position:absolute; top:4px; left:8px; color:#252025; font-size:18px; letter-spacing:4px; }
 .speech { box-shadow:0 10px 40px #0005; font-size:1rem; padding:20px; }
 .speech small { color:#916339; font-weight:800; }
 #skipBtn { background:#d8c9ab; color:#574935; margin-right:8px; }
