@@ -1,0 +1,177 @@
+[
+  {
+    "hash": "aeac6aa125",
+    "filename": "dog_atlas.png",
+    "bytes": 895440,
+    "occurrences": 2,
+    "htmlBytesRemoved": 2387844
+  },
+  {
+    "hash": "278fef4871",
+    "filename": "snache_dog-sprite.png",
+    "bytes": 136696,
+    "occurrences": 2,
+    "htmlBytesRemoved": 364516
+  },
+  {
+    "hash": "8ac5e7d263",
+    "filename": "guys_dog-sprite.png",
+    "bytes": 60559,
+    "occurrences": 2,
+    "htmlBytesRemoved": 161488
+  },
+  {
+    "hash": "17e3ce7cbe",
+    "filename": "hippo_dog-sprite.png",
+    "bytes": 46218,
+    "occurrences": 2,
+    "htmlBytesRemoved": 123238
+  },
+  {
+    "hash": "4784601a1a",
+    "filename": "pigge_dog-sprite.png",
+    "bytes": 74169,
+    "occurrences": 2,
+    "htmlBytesRemoved": 197774
+  },
+  {
+    "hash": "8ca39b70af",
+    "filename": "ally_atlas.png",
+    "bytes": 750971,
+    "occurrences": 1,
+    "htmlBytesRemoved": 1001297
+  },
+  {
+    "hash": "510b6aa38b",
+    "filename": "peng_dog-sprite.png",
+    "bytes": 64815,
+    "occurrences": 1,
+    "htmlBytesRemoved": 86416
+  },
+  {
+    "hash": "cf4f482289",
+    "filename": "gory_dog-sprite.png",
+    "bytes": 43172,
+    "occurrences": 1,
+    "htmlBytesRemoved": 57560
+  },
+  {
+    "hash": "59f2439bfe",
+    "filename": "baa_dog-sprite.png",
+    "bytes": 37519,
+    "occurrences": 1,
+    "htmlBytesRemoved": 50025
+  },
+  {
+    "hash": "9ee9fc5d8b",
+    "filename": "seal_dog-sprite.png",
+    "bytes": 59484,
+    "occurrences": 1,
+    "htmlBytesRemoved": 79308
+  },
+  {
+    "hash": "a50732f931",
+    "filename": "croco_dog-sprite.png",
+    "bytes": 42443,
+    "occurrences": 1,
+    "htmlBytesRemoved": 56587
+  },
+  {
+    "hash": "1065a36f16",
+    "filename": "boomerang.png",
+    "bytes": 550465,
+    "occurrences": 1,
+    "htmlBytesRemoved": 733958
+  },
+  {
+    "hash": "256d8df4aa",
+    "filename": "unitcyan_ally-sprite.png",
+    "bytes": 190003,
+    "occurrences": 1,
+    "htmlBytesRemoved": 253331
+  },
+  {
+    "hash": "6ca82ccc24",
+    "filename": "unitblue_ally-sprite.png",
+    "bytes": 176147,
+    "occurrences": 1,
+    "htmlBytesRemoved": 234855
+  },
+  {
+    "hash": "6609940e2c",
+    "filename": "leboin_dog-sprite.png",
+    "bytes": 35420,
+    "occurrences": 1,
+    "htmlBytesRemoved": 47222
+  },
+  {
+    "hash": "e3807ea930",
+    "filename": "ability_icon.png",
+    "bytes": 6358,
+    "occurrences": 2,
+    "htmlBytesRemoved": 16958
+  },
+  {
+    "hash": "512466d108",
+    "filename": "boss_wave.png",
+    "bytes": 9851,
+    "occurrences": 1,
+    "htmlBytesRemoved": 13138
+  },
+  {
+    "hash": "1d5151807e",
+    "filename": "rhino_sheet.png",
+    "bytes": 97431,
+    "occurrences": 1,
+    "htmlBytesRemoved": 129908
+  },
+  {
+    "hash": "3e6339268e",
+    "filename": "bear_sheet.png",
+    "bytes": 76634,
+    "occurrences": 1,
+    "htmlBytesRemoved": 102181
+  },
+  {
+    "hash": "285086ea38",
+    "filename": "face_sheet.png",
+    "bytes": 37614,
+    "occurrences": 1,
+    "htmlBytesRemoved": 50153
+  },
+  {
+    "hash": "9b985b093c",
+    "filename": "elite_rabbit_sheet.png",
+    "bytes": 50544,
+    "occurrences": 1,
+    "htmlBytesRemoved": 67385
+  },
+  {
+    "hash": "0d598f307a",
+    "filename": "squirrel_g_sheet.png",
+    "bytes": 36342,
+    "occurrences": 1,
+    "htmlBytesRemoved": 48451
+  },
+  {
+    "hash": "caf5434cf9",
+    "filename": "kang_roo_sheet.png",
+    "bytes": 54521,
+    "occurrences": 1,
+    "htmlBytesRemoved": 72693
+  },
+  {
+    "hash": "a8bd1909ad",
+    "filename": "mooth_sheet.png",
+    "bytes": 70852,
+    "occurrences": 1,
+    "htmlBytesRemoved": 94472
+  },
+  {
+    "hash": "3359af3ef6",
+    "filename": "profile_sheet.png",
+    "bytes": 1241248,
+    "occurrences": 1,
+    "htmlBytesRemoved": 1654998
+  }
+]
