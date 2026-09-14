@@ -405,6 +405,7 @@ window.addEventListener('resize',syncBasePositions);
 
 
 const EVOLVED_CELL_W=1536/7*.75,EVOLVED_CELL_H=1024/8*.75;
+const WIDE_THROW_TYPES=new Set(['orange','yellow','green','purple']);
 function animateAlly(u){
  const state=u.hurtTime>0?'hurt':u.attackTime>0?'attack':'walk';
  if(u.stats?.evolved){
@@ -416,17 +417,32 @@ function animateAlly(u){
   return;
  }
  const sprite=u.el.querySelector('.ally-sprite');
+ // The source art draws the thrown-projectile pose spanning cols 3+4 as one wide
+ // picture (it splits the object down the middle at the col boundary). Reveal both
+ // cells together at the impact instant instead of cropping it in half.
  if(u.type==='cyan'||u.type==='blue'){
   const cell=77.6125;
   const duration=data.units[u.type].attackDuration||.56;
   const col=u.hurtTime>0?6:u.attackTime>0?3+Math.min(2,Math.max(0,Math.floor((duration-u.attackTime)/duration*3))):Math.floor(u.animTime/(u.type==='blue'?.075:.16))%3;
-  sprite.style.backgroundPosition=`${-col*cell}px 0px`;
+  if(u.type==='cyan'&&col===3){
+   sprite.style.width=cell+'px';sprite.style.backgroundPosition=`${-2*cell}px 0px`;
+  }else if(u.type==='cyan'&&col===4){
+   sprite.style.width=(cell*2)+'px';sprite.style.backgroundPosition=`${-3*cell}px 0px`;
+  }else{
+   sprite.style.width=cell+'px';sprite.style.backgroundPosition=`${-col*cell}px 0px`;
+  }
   u.el.querySelector('.ally-shadow').style.backgroundPosition='-543.2875px -77.6125px';
  }else{
   const row={red:0,orange:1,yellow:2,green:3,purple:1,pink:0}[u.type],cell=77.6125;
   const duration=data.units[u.type].attackDuration||.56;
   const col=u.hurtTime>0?6:u.attackTime>0?3+Math.min(2,Math.max(0,Math.floor((duration-u.attackTime)/duration*3))):Math.floor(u.animTime/.16)%3;
-  sprite.style.backgroundPosition=`${-col*cell}px ${-row*cell}px`;
+  if(WIDE_THROW_TYPES.has(u.type)&&col===3){
+   sprite.style.width=cell+'px';sprite.style.backgroundPosition=`${-2*cell}px ${-row*cell}px`;
+  }else if(WIDE_THROW_TYPES.has(u.type)&&col===4){
+   sprite.style.width=(cell*2)+'px';sprite.style.backgroundPosition=`${-3*cell}px ${-row*cell}px`;
+  }else{
+   sprite.style.width=cell+'px';sprite.style.backgroundPosition=`${-col*cell}px ${-row*cell}px`;
+  }
   u.el.querySelector('.ally-shadow').style.backgroundPosition=`${-7*cell}px ${-row*cell}px`;
  }
  u.el.dataset.animation=state;
