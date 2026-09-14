@@ -128,7 +128,7 @@ body { overflow:auto; }
 .pink-ribbon:before,.pink-ribbon:after{content:"";position:absolute;top:1px;width:9px;height:10px;background:#f42f91;border:2px solid #8f245c;border-radius:70% 25% 65% 30%}
 .pink-ribbon:before{right:6px;rotate:-25deg}.pink-ribbon:after{left:6px;rotate:25deg;scale:-1 1}
 .pink-ribbon i{position:absolute;z-index:2;left:4px;top:4px;width:7px;height:7px;background:#ff8fc5;border:2px solid #8f245c;border-radius:50%;box-sizing:border-box}
-.unit.pink[data-animation="attack"] .pink-ribbon{animation:ribbonAttack .2s ease-in-out infinite alternate}.unit.pink[data-animation="hurt"] .pink-ribbon,.unit.pink.knocked-back .pink-ribbon{animation:none;rotate:32deg;translate:3px 2px}
+.unit.pink[data-animation="attack"] .pink-ribbon{animation:ribbonAttack .2s ease-in-out infinite alternate}.unit.pink[data-animation="hurt"] .pink-ribbon,.unit.pink.knocked-back .pink-ribbon,.unit.pink.boss-knocked .pink-ribbon{animation:none;rotate:32deg;translate:3px 2px}
 @keyframes ribbonWalk{from{translate:0 0;rotate:-3deg}to{translate:0 -2px;rotate:4deg}}@keyframes ribbonAttack{from{rotate:-10deg;translate:-1px 0}to{rotate:18deg;translate:2px -1px}}
 .unit.evolved .ally-sprite{display:none}
 .evolved-sprite{position:absolute;z-index:2;left:-61.3px;bottom:-3px;width:164.5714px;height:96px;background-image:url(assets/evolved_sheet.png);background-size:1152px 768px;background-repeat:no-repeat;pointer-events:none}

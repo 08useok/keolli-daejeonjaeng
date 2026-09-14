@@ -405,7 +405,7 @@ window.addEventListener('resize',syncBasePositions);
 
 
 const EVOLVED_CELL_W=1536/7*.75,EVOLVED_CELL_H=1024/8*.75;
-const WIDE_THROW_TYPES=new Set(['orange','yellow','green','purple']);
+const WIDE_THROW_TYPES=new Set(['orange','yellow','purple']);
 function animateAlly(u){
  const state=u.hurtTime>0?'hurt':u.attackTime>0?'attack':'walk';
  if(u.stats?.evolved){
