@@ -124,7 +124,7 @@ body { overflow:auto; }
 #field.boss-shake{animation:bossShake .42s linear}
 .boss-knocked .ally-sprite{rotate:28deg;transform-origin:50% 85%}
 .pink-btn i{background:#ff73b8}.unit.pink .ally-sprite{filter:hue-rotate(305deg) saturate(1.25) brightness(1.12)}
-.pink-ribbon{position:absolute;z-index:5;left:25px;bottom:53px;width:13px;height:13px;pointer-events:none;filter:drop-shadow(0 1px 0 #a72c69);transform-origin:50% 80%;animation:ribbonWalk .48s ease-in-out infinite alternate}
+.pink-ribbon{position:absolute;z-index:5;left:25px;bottom:47px;width:13px;height:13px;pointer-events:none;filter:drop-shadow(0 1px 0 #a72c69);transform-origin:50% 80%;animation:ribbonWalk .48s ease-in-out infinite alternate}
 .pink-ribbon:before,.pink-ribbon:after{content:"";position:absolute;top:1px;width:9px;height:10px;background:#f42f91;border:2px solid #8f245c;border-radius:70% 25% 65% 30%}
 .pink-ribbon:before{right:6px;rotate:-25deg}.pink-ribbon:after{left:6px;rotate:25deg;scale:-1 1}
 .pink-ribbon i{position:absolute;z-index:2;left:4px;top:4px;width:7px;height:7px;background:#ff8fc5;border:2px solid #8f245c;border-radius:50%;box-sizing:border-box}
