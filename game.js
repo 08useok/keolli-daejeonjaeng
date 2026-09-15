@@ -71,6 +71,24 @@ data.units.pink={hp:520,atk:125,interval:1.9,speed:6,range:23,engageRange:4.5,co
 data.units.rhino={hp:5200,atk:420,interval:2.1,speed:5.5,range:5.2,reward:900,knockbacks:2,attackDuration:.9,windup:.45,area:true};
 data.units.bear={hp:6500,atk:520,interval:2.4,speed:4.5,range:8.5,reward:1050,knockbacks:2,attackDuration:1,windup:.5,area:true};
 data.units.face={trait:"floating",hp:18000,atk:850,interval:3.4,speed:1.8,range:14,reward:2500,knockbacks:3,attackDuration:1.2,windup:.65,area:true};
+const NEWCHAR_SHEET='assets/new_chars_sheet.png';
+data.units.crimson={hp:900,atk:650,interval:2.8,speed:5,range:7,cost:300,cooldown:10,knockbacks:3,forceKnockback:true};
+data.units.gold={hp:600,atk:180,interval:3.6,speed:5,range:21,cost:425,cooldown:15,knockbacks:3,multiHit:3};
+data.units.ivory={hp:650,atk:380,interval:3,speed:5,range:20,cost:350,cooldown:13,knockbacks:3,area:true,slowPct:.3,slowDuration:2};
+data.units.chartreuse={hp:600,atk:95,interval:2.4,speed:5,range:16,cost:325,cooldown:12,knockbacks:3,multiHit:5};
+data.units.mint={hp:650,atk:340,interval:3.4,speed:5,range:17.5,cost:375,cooldown:14,knockbacks:3,area:true,freezeChance:.25,freezeDuration:1.5};
+data.units.azure={hp:800,atk:520,interval:3.2,speed:6.5,range:9,cost:400,cooldown:14,knockbacks:2,dash:true};
+data.units.crystal={hp:700,atk:460,interval:3.8,speed:5,range:22.5,cost:450,cooldown:16,knockbacks:3,pierce:3,critChance:.15,critMult:2,floatStrong:true};
+data.units.lavender={hp:500,atk:260,interval:4,speed:5,range:23.5,cost:400,cooldown:15,knockbacks:3,area:true,atkDownPct:.3,atkDownDuration:4};
+data.units.salmon={hp:450,atk:430,interval:4.2,speed:5,range:26,cost:475,cooldown:17,knockbacks:3,pull:true};
+data.units.raspberry={hp:400,atk:450,interval:4.5,speed:3,range:30,cost:500,cooldown:18,knockbacks:3,windup:.8,damageTiers:[{max:10,dmg:450},{max:17.5,dmg:750},{max:25,dmg:1200},{max:999,dmg:1600}]};
+const ALLIES=['red','orange','yellow','green','cyan','blue','purple','pink','crimson','gold','ivory','chartreuse','mint','azure','crystal','lavender','salmon','raspberry'];
+const NEW_ALLY_TYPES=['crimson','gold','ivory','chartreuse','mint','azure','crystal','lavender','salmon','raspberry'];
+const GENERIC_CD_TYPES=['cyan','blue','purple','pink',...NEW_ALLY_TYPES];
+const ALWAYS_UNLOCKED=new Set(['red',...NEW_ALLY_TYPES]);
+const UNLOCK_AT={red:-1,orange:2,yellow:5,green:6,cyan:12,blue:15,purple:18,pink:37,crimson:-1,gold:-1,ivory:-1,chartreuse:-1,mint:-1,azure:-1,crystal:-1,lavender:-1,salmon:-1,raspberry:-1};
+const ROLES={red:'기본 근접',orange:'중거리 범위',yellow:'방어형 전기',green:'왕복 부메랑',cyan:'초장거리 저격',blue:'고속 연타',purple:'근접 빨간 적 특화',pink:'근거리 광역',crimson:'근거리 강타',gold:'분열 광역형',ivory:'원거리 둔화형',chartreuse:'중거리 연사형',mint:'중거리 정지형',azure:'돌진 광역형',crystal:'관통 치명타형',lavender:'장거리 약화형',salmon:'초장거리 끌어오기',raspberry:'초장거리 저격형'};
+const COLORS={red:'#ff7272',orange:'#ffb452',yellow:'#ffe46d',green:'#83e595',cyan:'#53e5ef',blue:'#629aff',purple:'#c893ff',pink:'#ff73b8',crimson:'#dc143c',gold:'#ffd700',ivory:'#fffff0',chartreuse:'#7fff00',mint:'#98ff98',azure:'#007fff',crystal:'#ace5ee',lavender:'#b57edc',salmon:'#fa8072',raspberry:'#e30b5c'};
 const domCache=new Map();const $=s=>{let el=domCache.get(s);if(!el){el=document.querySelector(s);domCache.set(s,el)}return el}, unitsEl=$('#units');let game, last=0;
 function syncBasePositions(){
  const field=$('#field').getBoundingClientRect();if(!field.width)return;
@@ -92,17 +110,18 @@ function addUnit(type){
  game.units.push(u);drawUnit(u);u.el.style.left=`calc(${u.x}% - 21px)`;
  if(ally){game.money-=d.cost;game[cooldownKey(type)]=d.cooldown;if(game.tutorial===2){game.tutorial=3;tutorial()}}render();
 }
-function drawUnit(u){let e=document.createElement('div'),evolved=u.ally&&u.stats?.evolved;e.className='unit '+u.type+(u.ally?' ally-art':'')+(evolved?' evolved':'');e.style.setProperty('--unit-color',COLORS?.[u.type]||'#fff');e.innerHTML='<div class="bar"><i style="width:100%"></i></div>'+(u.ally?'<span class="ally-shadow"></span><span class="ally-sprite"></span>'+(evolved?'<span class="evolved-sprite"></span>':'')+(u.type==='pink'&&!evolved?'<span class="pink-ribbon"><i></i></span>':''):'<span class="dog-shadow"></span><span class="dog-sprite"></span>');e.setAttribute('aria-label',UNIT_NAMES[u.type]+(evolved?' 2진':''));u.el=e;unitsEl.append(e);if(!u.ally){const sheet={rabbit:ELITE_RABBIT_SHEET,squirrel:SQUIRREL_G_SHEET,kangaroo:KANG_ROO_SHEET,mooth:MOOTH_SHEET,rhino:RHINO_SHEET,bear:BEAR_SHEET,face:FACE_SHEET}[u.type];if(sheet)e.querySelector('.dog-sprite').style.backgroundImage=`url(${sheet})`}if(u.ally)animateAlly(u);else animateDog(u)}
+function drawUnit(u){let e=document.createElement('div'),evolved=u.ally&&u.stats?.evolved,legacyAlly=u.ally&&!NEW_ATLASES[u.type];e.className='unit '+u.type+(u.ally?' ally-art':'')+(evolved?' evolved':'');e.style.setProperty('--unit-color',COLORS?.[u.type]||'#fff');e.innerHTML='<div class="bar"><i style="width:100%"></i></div>'+(legacyAlly?'<span class="ally-shadow"></span><span class="ally-sprite"></span>'+(evolved?'<span class="evolved-sprite"></span>':'')+(u.type==='pink'&&!evolved?'<span class="pink-ribbon"><i></i></span>':''):'<span class="dog-shadow"></span><span class="dog-sprite"></span>');e.setAttribute('aria-label',UNIT_NAMES[u.type]+(evolved?' 2진':''));u.el=e;unitsEl.append(e);const sheet={rabbit:ELITE_RABBIT_SHEET,squirrel:SQUIRREL_G_SHEET,kangaroo:KANG_ROO_SHEET,mooth:MOOTH_SHEET,rhino:RHINO_SHEET,bear:BEAR_SHEET,face:FACE_SHEET}[u.type]||NEW_ATLASES[u.type]?.sheet;if(sheet)e.querySelector('.dog-sprite').style.backgroundImage=`url(${sheet})`;if(legacyAlly)animateAlly(u);else animateDog(u)}
 function target(u){let foes=game.units.filter(v=>v.hp>0&&v.kbTime<=0&&!v.emerging&&v.ally!==u.ally);let dir=u.ally?-1:1;return foes.filter(v=>dir*(v.x-u.x)>=-1).sort((a,b)=>Math.abs(a.x-u.x)-Math.abs(b.x-u.x))[0]}
 // Canonical knockback counts include death. Red keeps its original two live hitbacks.
 const HITBACK_DURATION=20/30;
 // Shorter displacement tuned to this compact battlefield.
 const HITBACK_DISTANCE=6;
+function animateUnit(u){if(u.ally&&!NEW_ATLASES[u.type])animateAlly(u);else animateDog(u)}
 function startHitback(u){
  u.kbTime=HITBACK_DURATION;u.hurtTime=HITBACK_DURATION;
  u.kbStart=u.x;u.kbEnd=Math.max(0,Math.min(100,u.x+(u.ally?1:-1)*HITBACK_DISTANCE));
  u.attackTime=0;u.atkCd=0;u.pendingAttack=null;
- u.el.classList.add('knocked-back');if(u.ally)animateAlly(u);else animateDog(u);
+ u.el.classList.add('knocked-back');animateUnit(u);
 }
 function tickHitback(u,dt){
  u.kbTime=Math.max(0,u.kbTime-dt);u.hurtTime=u.kbTime;
@@ -110,7 +129,7 @@ function tickHitback(u,dt){
  u.x=u.kbStart+(u.kbEnd-u.kbStart)*(1-(1-progress)**2);
  u.el.style.left=`calc(${u.x}% - 21px)`;
  u.el.style.translate=`0 ${-Math.sin(progress*Math.PI)*18}px`;
- if(u.ally)animateAlly(u);else animateDog(u);
+ animateUnit(u);
  if(u.kbTime===0){u.el.classList.remove('knocked-back');u.el.style.translate='0 0'}
 }
 const BOSS_KNOCKBACK_DURATION=.8;
@@ -122,15 +141,20 @@ function triggerBossShockwave(){
 }
 function tickBossKnockback(u,dt){
  u.bossKbTime=Math.max(0,u.bossKbTime-dt);const progress=1-u.bossKbTime/BOSS_KNOCKBACK_DURATION;
- u.x=u.bossKbStart+(u.bossKbEnd-u.bossKbStart)*(1-(1-progress)**3);u.el.style.left=`calc(${u.x}% - 21px)`;u.el.style.translate=`0 ${-Math.sin(progress*Math.PI)*12}px`;animateAlly(u);
+ u.x=u.bossKbStart+(u.bossKbEnd-u.bossKbStart)*(1-(1-progress)**3);u.el.style.left=`calc(${u.x}% - 21px)`;u.el.style.translate=`0 ${-Math.sin(progress*Math.PI)*12}px`;animateUnit(u);
  if(u.bossKbTime===0){u.el.classList.remove('boss-knocked');u.el.style.translate='0 0'}
 }
+const BOSS_HP_THRESHOLD=2000;
 function damage(v,amount,from){
  if(game.ended||v.hp<=0||v.kbTime>0)return;
  if(from?.stats?.redStrong&&data.units[v.type].trait==='red')amount*=from.stats.redDamage||2;
  if(v.stats?.redStrong&&from&&data.units[from.type].trait==='red')amount*=v.stats.redResist||.5;
  if(from?.stats?.floatStrong&&data.units[v.type].trait==='floating')amount*=from.stats.floatDamage||2;
  if(v.stats?.floatStrong&&from&&data.units[from.type].trait==='floating')amount*=v.stats.floatResist||.5;
+ if(from?.atkDownUntil>game.elapsed)amount*=from.atkDownMult;
+ if(from?.stats?.critChance&&Math.random()<from.stats.critChance)amount*=from.stats.critMult||2;
+ const isBoss=v.max>=BOSS_HP_THRESHOLD;
+ if(from?.stats?.pull&&isBoss)amount*=1.3;
  v.hp=Math.max(0,v.hp-amount);v.flashTime=.1;v.el.classList.add('damage-flash');
  v.el.querySelector('i').style.setProperty('width',Math.max(0,v.hp/v.max)*100+'%');
  if(v.hp===0){
@@ -138,10 +162,17 @@ function damage(v,amount,from){
   game.units.splice(game.units.indexOf(v),1);
   startHitback(v);v.el.classList.add('defeated');game.defeated.push(v);return;
  }
- const total=data.units[v.type].knockbacks;
- // Consume every crossed threshold, but play only one hitback for a single blow.
- const crossed=Math.min(total-1,Math.floor((v.max-v.hp)*total/v.max+1e-9));
- if(crossed>v.kb){v.kb=crossed;startHitback(v)}
+ if(from?.stats?.slowPct){v.slowUntil=game.elapsed+from.stats.slowDuration;v.slowPct=from.stats.slowPct}
+ if(from?.stats?.freezeChance&&Math.random()<from.stats.freezeChance)v.freezeUntil=Math.max(v.freezeUntil||0,game.elapsed+from.stats.freezeDuration);
+ if(from?.stats?.atkDownPct){v.atkDownUntil=game.elapsed+from.stats.atkDownDuration;v.atkDownMult=1-from.stats.atkDownPct}
+ if(from?.stats?.pull&&!isBoss){const dir=Math.sign(from.x-v.x)||(from.ally?-1:1);v.x=Math.max(0,Math.min(100,v.x+dir*(from.stats.pullDistance||3)));v.el.style.left=`calc(${v.x}% - 21px)`}
+ if(from?.stats?.forceKnockback&&!isBoss){startHitback(v)}
+ else{
+  const total=data.units[v.type].knockbacks;
+  // Consume every crossed threshold, but play only one hitback for a single blow.
+  const crossed=Math.min(total-1,Math.floor((v.max-v.hp)*total/v.max+1e-9));
+  if(crossed>v.kb){v.kb=crossed;startHitback(v)}
+ }
 }
 function launchBoomerang(u){
  const el=document.createElement('span');el.className='boomerang';unitsEl.append(el);
@@ -183,11 +214,33 @@ function updateJuice(dt){
   const base=data.bases.enemy;if(Math.abs(base.frontX-p.end)<=p.radius){base.hp=Math.max(0,base.hp-p.damage);if(!base.hp){finish(true);return}}
  }
 }
+function tierDamage(tiers,dist){for(const t of tiers)if(dist<=t.max)return t.dmg;return tiers[tiers.length-1].dmg}
 function resolveAttack(u,t){
  const d=u.stats||data.units[u.type],dir=u.ally?-1:1;
  const inRange=v=>v&&v.hp>0&&v.kbTime<=0&&v.ally!==u.ally&&dir*(v.x-u.x)>=-1&&Math.abs(v.x-u.x)<=d.range;
- if(d.area){for(const v of [...game.units])if(inRange(v))damage(v,d.atk,u)}
- else{const victim=inRange(t)?t:target(u);if(inRange(victim)){damage(victim,d.atk,u);return}}
+ if(d.dash){
+  const farX=u.x+dir*d.range,lo=Math.min(u.x,farX),hi=Math.max(u.x,farX);
+  for(const v of [...game.units])if(v.hp>0&&v.kbTime<=0&&v.ally!==u.ally&&v.x>=lo&&v.x<=hi)damage(v,d.atk,u);
+ }else if(d.pierce){
+  const targets=game.units.filter(inRange).sort((a,b)=>Math.abs(a.x-u.x)-Math.abs(b.x-u.x)).slice(0,d.pierce);
+  for(const v of targets)damage(v,d.atk,u);
+ }else if(d.area){for(const v of [...game.units])if(inRange(v))damage(v,d.atk,u)}
+ else if(d.multiHit){
+  let remaining=d.multiHit,victim=inRange(t)?t:target(u);
+  while(remaining>0&&victim&&inRange(victim)){damage(victim,d.atk,u);remaining--;if(victim.hp<=0&&remaining>0)victim=target(u)}
+  if(remaining<d.multiHit)return;
+ }else{
+  const victim=inRange(t)?t:target(u);
+  if(inRange(victim)){
+   const distV=Math.abs(victim.x-u.x),atk=d.damageTiers?tierDamage(d.damageTiers,distV):d.atk;
+   damage(victim,atk,u);
+   if(d.condPierceDist&&distV>=d.condPierceDist){
+    const behind=game.units.filter(v=>v!==victim&&inRange(v)&&Math.abs(v.x-u.x)>distV).sort((a,b)=>Math.abs(a.x-u.x)-Math.abs(b.x-u.x))[0];
+    if(behind)damage(behind,atk,u);
+   }
+   return;
+  }
+ }
  const base=u.ally?data.bases.enemy:data.bases.ally;
  if(Math.abs(base.frontX-u.x)<=(d.engageRange??d.range)){base.hp=Math.max(0,base.hp-d.atk);if(!base.hp)finish(u.ally)}
 }
@@ -201,7 +254,31 @@ function update(dt){
  updateBoomerangs(dt);if(game.ended){render();return}updateJuice(dt);if(game.ended){render();return}
  for(const v of [...game.defeated]){tickHitback(v,dt);v.el.style.opacity=v.kbTime/HITBACK_DURATION;if(v.kbTime===0){v.el.remove();game.defeated.splice(game.defeated.indexOf(v),1)}}
  game.noticeTime=Math.max(0,(game.noticeTime||0)-dt);game.elapsed+=dt;game.money=Math.min(data.income[game.level].max,game.money+data.income[game.level].rate*dt);updateStageSpawns(dt);
-game.spawnCd=Math.max(0,game.spawnCd-dt);game.orangeCd=Math.max(0,game.orangeCd-dt);game.yellowCd=Math.max(0,game.yellowCd-dt);game.greenCd=Math.max(0,game.greenCd-dt);for(const t of ['cyan','blue','purple','pink'])game[cooldownKey(t)]=Math.max(0,unitCooldown(t)-dt);for(const u of [...game.units]){if(game.ended)break;if(u.hp<=0)continue;u.flashTime=Math.max(0,u.flashTime-dt);u.el.classList.toggle('damage-flash',u.flashTime>0);if(u.bossKbTime>0){tickBossKnockback(u,dt);continue}if(u.kbTime>0){tickHitback(u,dt);continue}if(u.pendingAttack){u.pendingAttack.remaining-=dt;if(u.pendingAttack.remaining<=0){u.pendingAttack=null;resolveAttack(u);if(game.ended)break}}u.atkCd-=dt;u.animTime+=dt;u.attackTime=Math.max(0,u.attackTime-dt);u.hurtTime=Math.max(0,u.hurtTime-dt);let d=u.stats||data.units[u.type];if(!u.ally&&(u.emerging||u.x<data.bases.enemy.frontX)){u.emerging=true;u.x=Math.min(data.bases.enemy.frontX,u.x+d.speed*dt);if(u.x>=data.bases.enemy.frontX)u.emerging=false;u.el.style.left=`calc(${u.x}% - 21px)`;animateDog(u);continue}if(u.ally&&(u.emerging||u.x>data.bases.ally.frontX)){u.emerging=true;u.x=Math.max(data.bases.ally.frontX,u.x-d.speed*dt);if(u.x<=data.bases.ally.frontX)u.emerging=false;u.el.style.left=`calc(${u.x}% - 21px)`;animateAlly(u);continue}let t=target(u),dist=t?Math.abs(t.x-u.x):Infinity;if(t&&dist<=(d.engageRange??d.range)){if(u.atkCd<=0)attack(u,t)}else{let baseDist=u.ally?u.x-data.bases.enemy.frontX:data.bases.ally.frontX-u.x;if(!t&&baseDist<=(d.engageRange??d.range)){if(u.atkCd<=0)attack(u)}else if(u.ally||(!u.attackTime&&!u.hurtTime))u.x+=(u.ally?-1:1)*d.speed*dt}u.x=Math.max(0,Math.min(100,u.x));u.el.style.left=`calc(${u.x}% - 21px)`;if(u.ally)animateAlly(u);else animateDog(u)}render()}
+game.spawnCd=Math.max(0,game.spawnCd-dt);game.orangeCd=Math.max(0,game.orangeCd-dt);game.yellowCd=Math.max(0,game.yellowCd-dt);game.greenCd=Math.max(0,game.greenCd-dt);for(const t of GENERIC_CD_TYPES)game[cooldownKey(t)]=Math.max(0,unitCooldown(t)-dt);
+ for(const u of [...game.units]){
+  if(game.ended)break;if(u.hp<=0)continue;
+  u.flashTime=Math.max(0,u.flashTime-dt);u.el.classList.toggle('damage-flash',u.flashTime>0);
+  if(u.bossKbTime>0){tickBossKnockback(u,dt);continue}
+  if(u.kbTime>0){tickHitback(u,dt);continue}
+  if(u.freezeUntil>game.elapsed){animateUnit(u);continue}
+  if(u.pendingAttack){u.pendingAttack.remaining-=dt;if(u.pendingAttack.remaining<=0){u.pendingAttack=null;resolveAttack(u);if(game.ended)break}}
+  u.atkCd-=dt;u.animTime+=dt;u.attackTime=Math.max(0,u.attackTime-dt);u.hurtTime=Math.max(0,u.hurtTime-dt);
+  let d=u.stats||data.units[u.type];
+  const spd=d.speed*(u.slowUntil>game.elapsed?(1-u.slowPct):1);
+  if(!u.ally&&(u.emerging||u.x<data.bases.enemy.frontX)){u.emerging=true;u.x=Math.min(data.bases.enemy.frontX,u.x+spd*dt);if(u.x>=data.bases.enemy.frontX)u.emerging=false;u.el.style.left=`calc(${u.x}% - 21px)`;animateDog(u);continue}
+  if(u.ally&&(u.emerging||u.x>data.bases.ally.frontX)){u.emerging=true;u.x=Math.max(data.bases.ally.frontX,u.x-spd*dt);if(u.x<=data.bases.ally.frontX)u.emerging=false;u.el.style.left=`calc(${u.x}% - 21px)`;animateUnit(u);continue}
+  let t=target(u),dist=t?Math.abs(t.x-u.x):Infinity;
+  if(t&&dist<=(d.engageRange??d.range)){if(u.atkCd<=0)attack(u,t)}
+  else{
+   let baseDist=u.ally?u.x-data.bases.enemy.frontX:data.bases.ally.frontX-u.x;
+   if(!t&&baseDist<=(d.engageRange??d.range)){if(u.atkCd<=0)attack(u)}
+   else if(u.ally||(!u.attackTime&&!u.hurtTime))u.x+=(u.ally?-1:1)*spd*dt
+  }
+  u.x=Math.max(0,Math.min(100,u.x));u.el.style.left=`calc(${u.x}% - 21px)`;
+  animateUnit(u)
+ }
+ render()
+}
 function render(){renderDeckButtons();renderSpeedButton();renderNewButtons();renderGreenButton();renderOrangeButton();renderYellowButton();renderUnitLevels();$('#battleNotice').classList.toggle('hidden',!(game.noticeTime>0));$('#pauseBtn').disabled=!game.running||game.ended;$('#pauseBtn').textContent=game.paused?'계속하기':'일시정지';$('#pauseNotice').classList.toggle('hidden',!game.paused);$('#timer').textContent=`${STAGES[selectedStage].name} · ${Math.floor(game.elapsed)}초`;let l=data.income[game.level];$('#money').textContent=`${Math.floor(game.money)}원`;$('#enemyHp').textContent=data.bases.enemy.hp;$('#allyHp').textContent=data.bases.ally.hp;for(let [name,b] of Object.entries(data.bases))$(`#${name}Base span`).style.width=(b.hp/b.max*100)+'%';let sb=$('#spawnBtn'),ib=$('#incomeBtn'),canSpawn=!game.ended&&!game.paused&&(game.running||game.tutorial===2),canUpgrade=!game.ended&&!game.paused&&(game.running||game.tutorial===4);sb.disabled=game.money<data.units.red.cost||game.spawnCd>0||!canSpawn;sb.querySelector('small').textContent=data.units.red.cost+'원';sb.querySelector('em').style.display=game.spawnCd?'block':'none';sb.querySelector('em').style.transform=`scaleY(${game.spawnCd/data.units.red.cooldown})`;ib.disabled=!canUpgrade||game.level===5||game.money<(l.cost||0);ib.innerHTML=game.level===5?'수입 Lv.MAX':`수입 업그레이드<br><small>${l.cost}원</small>`}
 function renderOrangeButton(){
  const button=$('#orangeBtn'),d=data.units.orange,unlocked=orangeUnlocked();
@@ -220,7 +297,7 @@ function renderYellowButton(){
 function loop(t){const raw=last?Math.min(.05,(t-last)/1000):0;last=t;const dt=raw*(game.speedMultiplier||1);if(game&&!game.ended&&!game.paused){if(game.running)update(dt);else if(game.tutorial===2||game.tutorial===4){game.money=Math.min(data.income[game.level].max,game.money+data.income[game.level].rate*dt);render()}}requestAnimationFrame(loop)}
 function highlight(sel){document.querySelectorAll('.tutorial-target').forEach(e=>e.classList.remove('tutorial-target'));if(sel)$(sel).classList.add('tutorial-target');$('#game').classList.toggle('guiding',!!sel)}
 function tutorial(){let text=$('#tutorialText'),next=$('#nextBtn'),box=$('#tutorial');let steps=[['오른쪽은 아군의 성입니다.','#allyBase'],['왼쪽의 적 성을 파괴하면 승리합니다!','#enemyBase'],['돈을 사용해서 레드를 생성해 보세요!','#spawnBtn'],['돈은 시간이 지나면 자동으로 모입니다. 적을 쓰러뜨려도 돈을 얻습니다!','#money'],['수입을 업그레이드하면 더 많은 돈을 더 빠르게 모을 수 있습니다!','#incomeBtn'],['캐릭터와 적은 자동으로 이동하고 공격합니다. 레드를 계속 생성해 적 성을 파괴하세요!','']];if(game.tutorial>=steps.length){box.classList.add('hidden');highlight();game.running=true;return}box.classList.remove('hidden');text.textContent=steps[game.tutorial][0];highlight(steps[game.tutorial][1]);next.style.display=(game.tutorial===2||game.tutorial===4)?'none':'inline-block'}
-$('#nextBtn').onclick=()=>{game.tutorial++;tutorial();render()};$('#spawnBtn').onclick=()=>addUnit('red');$('#orangeBtn').onclick=()=>addUnit('orange');$('#yellowBtn').onclick=()=>addUnit('yellow');$('#greenBtn').onclick=()=>addUnit('green');for(const t of ['cyan','blue','purple','pink'])$('#'+t+'Btn').onclick=()=>addUnit(t);$('#incomeBtn').onclick=()=>{let l=data.income[game.level];if(!game.ended&&!game.paused&&(game.running||game.tutorial===4)&&l.cost!==null&&game.money>=l.cost){game.money-=l.cost;game.level++;if(game.tutorial===4){game.tutorial++;tutorial()}render()}};function finish(win){if(game.ended)return;const xpReward=win?awardXP():0;const speedDropped=win&&selectedStage>=18&&Math.random()<0.1;if(speedDropped){speedTickets++;saveSpeedTickets();renderSpeedButton()}game.ended=true;game.running=false;highlight();$('#result').classList.remove('hidden');$('#resultTitle').textContent=win?STAGES[selectedStage].name+' 정복 완료!':'패배...';if(win&&!cleared.includes(selectedStage)){cleared.push(selectedStage);saveProgress()}$('#nextStageBtn').classList.toggle('hidden',!win||selectedStage===STAGES.length-1);$('#resultDetail').textContent=win?(selectedStage===STAGES.length-1?STAGES.length+'개 스테이지를 모두 정복했어요!':STAGES[selectedStage+1].name+' 스테이지가 열렸어요!'):'수입을 올리고 아군을 모아서 다시 도전하세요.';if(win&&selectedStage===2)$('#resultDetail').textContent+=' 오렌지가 해금됐어요!';if(win&&selectedStage===5)$('#resultDetail').textContent+=' 옐로우가 해금됐어요!';if(win&&selectedStage===6)$('#resultDetail').textContent+=' 그린이 해금됐어요!';if(win){for(const t of ['cyan','blue','purple'])if(selectedStage===UNLOCK_AT[t])$('#resultDetail').textContent+=' '+UNIT_NAMES[t]+' 해금!';$('#resultDetail').textContent+=` 보상 +${xpReward} XP`;}if(speedDropped)$('#resultDetail').textContent+=' 2배속권 획득!';renderNewButtons();renderOrangeButton();renderYellowButton();renderGreenButton()}$('#restartBtn').onclick=reset;
+$('#nextBtn').onclick=()=>{game.tutorial++;tutorial();render()};$('#spawnBtn').onclick=()=>addUnit('red');$('#orangeBtn').onclick=()=>addUnit('orange');$('#yellowBtn').onclick=()=>addUnit('yellow');$('#greenBtn').onclick=()=>addUnit('green');for(const t of GENERIC_CD_TYPES)$('#'+t+'Btn').onclick=()=>addUnit(t);$('#incomeBtn').onclick=()=>{let l=data.income[game.level];if(!game.ended&&!game.paused&&(game.running||game.tutorial===4)&&l.cost!==null&&game.money>=l.cost){game.money-=l.cost;game.level++;if(game.tutorial===4){game.tutorial++;tutorial()}render()}};function finish(win){if(game.ended)return;const xpReward=win?awardXP():0;const speedDropped=win&&selectedStage>=18&&Math.random()<0.1;if(speedDropped){speedTickets++;saveSpeedTickets();renderSpeedButton()}game.ended=true;game.running=false;highlight();$('#result').classList.remove('hidden');$('#resultTitle').textContent=win?STAGES[selectedStage].name+' 정복 완료!':'패배...';if(win&&!cleared.includes(selectedStage)){cleared.push(selectedStage);saveProgress()}$('#nextStageBtn').classList.toggle('hidden',!win||selectedStage===STAGES.length-1);$('#resultDetail').textContent=win?(selectedStage===STAGES.length-1?STAGES.length+'개 스테이지를 모두 정복했어요!':STAGES[selectedStage+1].name+' 스테이지가 열렸어요!'):'수입을 올리고 아군을 모아서 다시 도전하세요.';if(win&&selectedStage===2)$('#resultDetail').textContent+=' 오렌지가 해금됐어요!';if(win&&selectedStage===5)$('#resultDetail').textContent+=' 옐로우가 해금됐어요!';if(win&&selectedStage===6)$('#resultDetail').textContent+=' 그린이 해금됐어요!';if(win){for(const t of ['cyan','blue','purple'])if(selectedStage===UNLOCK_AT[t])$('#resultDetail').textContent+=' '+UNIT_NAMES[t]+' 해금!';$('#resultDetail').textContent+=` 보상 +${xpReward} XP`;}if(speedDropped)$('#resultDetail').textContent+=' 2배속권 획득!';renderNewButtons();renderOrangeButton();renderYellowButton();renderGreenButton()}$('#restartBtn').onclick=reset;
 $('#skipBtn').onclick=()=>{game.tutorial=6;tutorial();render()};
 $('#pauseBtn').onclick=()=>{if(game.running&&!game.ended){game.paused=!game.paused;render()}};
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&game.running&&!game.ended){game.paused=true;render()}});
@@ -257,7 +334,7 @@ function animateSnache(u){
  u.el.dataset.animation=u.hurtTime>0?'hurt':attacking?'attack':'walk';
 }
 
-const UNIT_NAMES={pink:'핑크',rhino:'투뿔소',bear:'곰선생',face:'대갈이군',cyan:'시안',blue:'블루',purple:'퍼플',peng:'재키펭',gory:'고릴라저씨',baa:'메에메에',seal:'바다레오파드',croco:'아거',leboin:'빠옹',rabbit:'엘리트래빗',squirrel:'다람G',kangaroo:'캥거류',mooth:'나나나난나방',red:'레드',orange:'오렌지',green:'그린',yellow:'옐로우',dog:'멍뭉이',snache:'낼름이',guys:'놈놈놈',hippo:'하마양',pigge:'돼지새끼'};
+const UNIT_NAMES={pink:'핑크',rhino:'투뿔소',bear:'곰선생',face:'대갈이군',cyan:'시안',blue:'블루',purple:'퍼플',peng:'재키펭',gory:'고릴라저씨',baa:'메에메에',seal:'바다레오파드',croco:'아거',leboin:'빠옹',rabbit:'엘리트래빗',squirrel:'다람G',kangaroo:'캥거류',mooth:'나나나난나방',red:'레드',orange:'오렌지',green:'그린',yellow:'옐로우',dog:'멍뭉이',snache:'낼름이',guys:'놈놈놈',hippo:'하마양',pigge:'돼지새끼',crimson:'크림슨',gold:'골드',ivory:'아이보리',chartreuse:'샤르트뢰즈',mint:'민트',azure:'애저',crystal:'크리스탈',lavender:'라벤더',salmon:'살몬',raspberry:'라즈베리'};
 // Every rule sourced from each stage's wiki Battleground section: {type, at:{t:seconds}|{hp:percent}, delay:[min,max] (omit for a one-shot), count (omit = infinite), boss:true (adds the shockwave+banner, only where the wiki says "spawns as the boss")}.
 const STAGE_SPAWNS={
 0:[{type:'dog',at:{t:0},count:1},{type:'dog',at:{t:20},delay:[6,10]}],
@@ -328,7 +405,7 @@ function updateStageSpawns(dt){
   }
  }
 }
-function renderNewButtons(){for(const type of ['cyan','blue','purple','pink']){
+function renderNewButtons(){for(const type of GENERIC_CD_TYPES){
  const b=$('#'+type+'Btn'),d=data.units[type],unlocked=allyUnlocked(type),cd=unitCooldown(type);
  b.disabled=!unlocked||!game.running||game.paused||game.ended||game.money<d.cost||cd>0;
  b.querySelector('small').textContent=unlocked?`${d.cost}원`:STAGES[UNLOCK_AT[type]].name+' 클리어 시 해금';
@@ -351,6 +428,16 @@ seal:{"scale": 0.78, "left": -22, "walk": [[1, 2, 112, 79], [116, 1, 111, 80], [
 croco:{"scale": 0.72, "left": -10, "walk": [[1, 28, 85, 42], [89, 28, 85, 42], [178, 28, 85, 42], [266, 28, 85, 42], [354, 28, 86, 42]], "attack": [[1, 98, 86, 40], [89, 70, 86, 69], [178, 70, 86, 69], [266, 70, 86, 69], [353, 102, 88, 37]], "hurt": [[89, 141, 86, 114]]},
 
  pigge:{scale:.8,left:-20,walk:[[4,1,103,77],[4,79,103,76],[4,157,103,76],[115,5,104,73],[112,80,109,76],[115,158,104,75]],attack:[[225,1,126,104],[225,107,126,67],[225,177,126,67]],hurt:[[355,3,124,65],[368,72,103,65]]},
+ crimson:{scale:.65,left:-7,sheet:NEWCHAR_SHEET,walk:[[50,2,85,104]],attack:[[50,2,85,104]]},
+ gold:{scale:.7,left:-8,sheet:NEWCHAR_SHEET,walk:[[52,106,82,106]],attack:[[52,106,82,106]]},
+ ivory:{scale:.7,left:-8,sheet:NEWCHAR_SHEET,walk:[[52,212,82,106]],attack:[[52,212,82,106]]},
+ chartreuse:{scale:.7,left:-7,sheet:NEWCHAR_SHEET,walk:[[52,318,81,106]],attack:[[52,318,81,106]]},
+ mint:{scale:.7,left:-8,sheet:NEWCHAR_SHEET,walk:[[51,424,82,106]],attack:[[51,424,82,106]]},
+ azure:{scale:.55,left:-13,sheet:NEWCHAR_SHEET,walk:[[40,530,125,106]],attack:[[40,530,125,106]]},
+ crystal:{scale:.7,left:-8,sheet:NEWCHAR_SHEET,walk:[[51,636,82,106]],attack:[[51,636,82,106]]},
+ lavender:{scale:.7,left:-8,sheet:NEWCHAR_SHEET,walk:[[49,742,83,106]],attack:[[49,742,83,106]]},
+ salmon:{scale:.7,left:-9,sheet:NEWCHAR_SHEET,walk:[[48,848,86,106]],attack:[[48,848,86,106]]},
+ raspberry:{scale:.7,left:-9,sheet:NEWCHAR_SHEET,walk:[[49,954,86,82]],attack:[[49,954,86,82]]},
  guys:{scale:1,left:0,walk:[[30,40,43,32],[90,40,42,32],[150,40,43,32],[210,40,43,32],[270,40,43,32]],attack:[[30,100,43,32],[90,100,48,32],[150,100,51,32],[210,100,54,32],[270,87,63,45],[30,147,64,45],[100,154,56,38],[160,154,56,38],[220,161,43,31]],hurt:[[33,221,41,31]]},
  hippo:{scale:.9,left:-26,walk:[[1,24,105,78],[113,24,105,78],[226,24,104,78]],attack:[[337,4,99,98],[1,104,99,101],[113,118,110,87],[225,140,109,65],[338,127,104,78]]}
 };
@@ -374,7 +461,7 @@ function animateAtlas(u){
  // Gory's raised-fists sprite is its actual hitback pose; Peng uses an upright pose.
  const visualState=state==='hurt'&&u.type==='gory'?'attack':state==='hurt'&&(['peng'].includes(u.type)||!atlas.hurt)?'walk':state;
  const frames=atlas[visualState];
- const duration=data.units[u.type].attackDuration;
+ const duration=data.units[u.type].attackDuration||.56;
  let index=visualState==='attack'?Math.min(frames.length-1,Math.max(0,Math.floor((duration-u.attackTime)/duration*frames.length))):visualState==='walk'?Math.floor(u.animTime/.14)%frames.length:0;
  if(visualState==='attack'&&u.type==='peng'){
   // Play all seven attack drawings across the complete animation. Damage still lands at windup.
@@ -457,14 +544,10 @@ function animateAlly(u){
  u.el.dataset.animation=state;
 }
 
-const ALLIES=['red','orange','yellow','green','cyan','blue','purple','pink'];
-const UNLOCK_AT={red:-1,orange:2,yellow:5,green:6,cyan:12,blue:15,purple:18,pink:37};
-const ROLES={red:'기본 근접',orange:'중거리 범위',yellow:'방어형 전기',green:'왕복 부메랑',cyan:'초장거리 저격',blue:'고속 연타',purple:'근접 빨간 적 특화',pink:'근거리 광역'};
-const COLORS={red:'#ff7272',orange:'#ffb452',yellow:'#ffe46d',green:'#83e595',cyan:'#53e5ef',blue:'#629aff',purple:'#c893ff',pink:'#ff73b8'};
 const PROFILE_SHEET='assets/profile_sheet.png';
-const PROFILE_TEXT={red:'가장 먼저 전선에 뛰어든 기본 전투원. 단순하지만 어떤 전투에서도 믿을 만하다.',orange:'멀리서 과즙을 던져 모여 있는 적을 한꺼번에 공격한다.',yellow:'튼튼한 몸으로 앞줄을 지키며 가까운 적에게 전기를 방출한다.',green:'왕복하는 부메랑으로 같은 적을 두 번 공격할 수 있다.',cyan:'아주 먼 거리에서 넓은 범위를 노리는 장거리 전투원.',blue:'빠른 이동과 연속 공격으로 빈틈을 놓치지 않는 속공 전투원.',purple:'빨간 적을 상대하도록 특별히 훈련된 색상 특화 전투원.',pink:'가까이 접근한 뒤 긴 광역 판정으로 뒤쪽의 적까지 휩쓴다.'};
-const EVOLUTION_TEXT={red:'강타',orange:'과즙 범위 확대',yellow:'추가 체력',green:'귀환 부메랑 강화',cyan:'광역 범위 확대',blue:'공격 속도 증가',purple:'빨간 적 특화 강화',pink:'광역 공격력 증가'};
-const PROFILE_TEXT_EVOLVED={red:'수많은 전투를 거치며 맨몸으로도 강력한 일격을 날릴 수 있게 되었다. 이제는 단순한 몸빵이 아니라 한 방을 노리는 타격형 전투원.',orange:'더 많은 과즙을 담아 던지게 되면서 폭발 범위가 눈에 띄게 넓어졌다.',yellow:'두꺼워진 몸으로 더 오래 버티며 최전선을 든든하게 지킨다.',green:'부메랑을 던지는 손목 힘이 강해져 돌아올 때 더 강력한 일격을 남긴다.',cyan:'조준 실력이 늘어 폭발 범위가 한층 넓어진 저격수로 거듭났다.',blue:'손이 더 빨라져 눈 깜짝할 사이에 연타를 꽂아 넣는다.',purple:'빨간 적의 약점을 완벽히 파악해 압도적인 피해를 입히고, 받는 피해는 최소화한다.',pink:'리본을 휘두르는 힘이 강해져 광역 공격의 위력이 한층 강력해졌다.'};
+const PROFILE_TEXT={red:'가장 먼저 전선에 뛰어든 기본 전투원. 단순하지만 어떤 전투에서도 믿을 만하다.',orange:'멀리서 과즙을 던져 모여 있는 적을 한꺼번에 공격한다.',yellow:'튼튼한 몸으로 앞줄을 지키며 가까운 적에게 전기를 방출한다.',green:'왕복하는 부메랑으로 같은 적을 두 번 공격할 수 있다.',cyan:'아주 먼 거리에서 넓은 범위를 노리는 장거리 전투원.',blue:'빠른 이동과 연속 공격으로 빈틈을 놓치지 않는 속공 전투원.',purple:'빨간 적을 상대하도록 특별히 훈련된 색상 특화 전투원.',pink:'가까이 접근한 뒤 긴 광역 판정으로 뒤쪽의 적까지 휩쓴다.',crimson:'적 앞까지 달려가 강력한 펀치를 꽂는다. 맞은 적은 짧게 밀려난다.',gold:'금광석을 던져 비행 중 세 조각으로 퍼뜨린다. 조각들은 적중 시 금괴로 변해 각각 피해를 준다.',ivory:'아이스크림을 던져 범위 피해를 주고, 맞은 적의 이동 속도를 늦춘다.',chartreuse:'주머니를 열어 콩알탄 다섯 발을 빠르게 퍼붓는다.',mint:'민트 아이스크림을 터뜨려 주변을 공격하며, 확률적으로 적을 얼려 움직임을 멈춘다.',azure:'서핑보드를 타고 전방으로 돌진하며 경로의 모든 적을 휩쓴다.',crystal:'날카로운 크리스탈 조각으로 앞줄의 적을 꿰뚫는다. 가끔 강력한 치명타가 터진다.',lavender:'향수 구름을 퍼뜨려 범위 안의 적을 공격하고 공격력을 약화시킨다.',salmon:'낚싯바늘을 멀리 던져 적을 맞히고 아군 쪽으로 끌어당긴다.',raspberry:'아주 먼 거리에서 저격한다. 멀리 있는 적일수록 총알이 가속해 피해가 커진다.'};
+const EVOLUTION_TEXT={red:'강타',orange:'과즙 범위 확대',yellow:'추가 체력',green:'귀환 부메랑 강화',cyan:'광역 범위 확대',blue:'공격 속도 증가',purple:'빨간 적 특화 강화',pink:'광역 공격력 증가',crimson:'강타 위력 증가',gold:'파편 피해 증가',ivory:'둔화 효과 강화',chartreuse:'연사 피해 증가',mint:'빙결 확률 증가',azure:'돌진 피해 증가',crystal:'플로팅 특화 강화',lavender:'약화 효과 강화',salmon:'끌어오기 강화',raspberry:'사거리 확장 및 관통'};
+const PROFILE_TEXT_EVOLVED={red:'수많은 전투를 거치며 맨몸으로도 강력한 일격을 날릴 수 있게 되었다. 이제는 단순한 몸빵이 아니라 한 방을 노리는 타격형 전투원.',orange:'더 많은 과즙을 담아 던지게 되면서 폭발 범위가 눈에 띄게 넓어졌다.',yellow:'두꺼워진 몸으로 더 오래 버티며 최전선을 든든하게 지킨다.',green:'부메랑을 던지는 손목 힘이 강해져 돌아올 때 더 강력한 일격을 남긴다.',cyan:'조준 실력이 늘어 폭발 범위가 한층 넓어진 저격수로 거듭났다.',blue:'손이 더 빨라져 눈 깜짝할 사이에 연타를 꽂아 넣는다.',purple:'빨간 적의 약점을 완벽히 파악해 압도적인 피해를 입히고, 받는 피해는 최소화한다.',pink:'리본을 휘두르는 힘이 강해져 광역 공격의 위력이 한층 강력해졌다.',crimson:'주먹에 실리는 힘이 늘어나 강타의 위력이 한층 강해졌다.',gold:'더 많은 금맥을 다뤄본 경험으로 파편 하나하나의 피해가 늘어났다.',ivory:'차가운 냉기가 짙어져 적을 더 오래, 더 강하게 둔화시킨다.',chartreuse:'손놀림이 빨라져 콩알탄 한 발 한 발의 위력이 늘어났다.',mint:'냉기가 응축되어 적을 얼릴 확률이 크게 늘어났다.',azure:'파도의 기세가 거세져 돌진 한 방의 위력이 늘어났다.',crystal:'결정 순도가 높아져 플로팅 적을 상대로 한층 압도적인 위력을 낸다.',lavender:'향이 짙어져 적의 공격력을 더 크게 떨어뜨린다.',salmon:'손맛이 늘어 적을 더 강하게 끌어당긴다.',raspberry:'조준 실력이 늘어 사거리가 늘고, 먼 거리에서는 뒤쪽 적까지 꿰뚫는다.'};
 const PROFILE_CALIB={
  red:{base:{size:541,x:1,y:-7},evolved:{size:486,x:7,y:-241}},
  orange:{base:{size:520,x:-136,y:-5},evolved:{size:486,x:-121,y:-241}},
@@ -475,7 +558,12 @@ const PROFILE_CALIB={
  purple:{base:{size:504,x:-253,y:-124},evolved:{size:488,x:-242,y:-363}},
  pink:{base:{size:534,x:-407,y:-131},evolved:{size:492,x:-366,y:-367}}
 };
-function profileMarkup(type,evolved){const c=PROFILE_CALIB[type][evolved?'evolved':'base'];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
+const NEW_PROFILE_SHEET='assets/new_chars_profiles.png';
+const NEW_PROFILE_ORDER=['crimson','gold','ivory','chartreuse','mint','azure','crystal','lavender','salmon','raspberry'];
+function profileMarkup(type,evolved){
+ const idx=NEW_PROFILE_ORDER.indexOf(type);
+ if(idx>=0){const col=idx%5,row=Math.floor(idx/5);return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${NEW_PROFILE_SHEET});background-size:500% 200%;background-position:${col/4*100}% ${row*100}%"></div>`}
+ const c=PROFILE_CALIB[type][evolved?'evolved':'base'];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
 let training={xp:0,baseLevel:1,levels:{red:1,orange:1,yellow:1,green:1,cyan:1,blue:1,purple:1,pink:1}},trainingSaveFailed=false;
 function stageXP(i){return 200+i*50}
 try{
@@ -484,8 +572,19 @@ try{
  else{training.xp=cleared.reduce((sum,i)=>sum+stageXP(i),0);saveTraining()}
 }catch{trainingSaveFailed=true}
 function saveTraining(){try{localStorage.setItem('red-battle-training-v1',JSON.stringify(training));trainingSaveFailed=false}catch{trainingSaveFailed=true}}
-function unitStats(type,level=training.levels[type]||1){const d=data.units[type],stats={...d,hp:Math.round(d.hp*(1+.1*(level-1))),atk:Math.round(d.atk*(1+.1*(level-1)))};if(level<10)return stats;stats.evolved=true;stats.range=d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='yellow')stats.hp=Math.round(stats.hp*1.25);if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=3;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);return stats}
-function allyUnlocked(t){return t==='red'||cleared.some(i=>i>=UNLOCK_AT[t])}
+function unitStats(type,level=training.levels[type]||1){const d=data.units[type],stats={...d,hp:Math.round(d.hp*(1+.1*(level-1))),atk:Math.round(d.atk*(1+.1*(level-1)))};if(level<10)return stats;stats.evolved=true;stats.range=type==='raspberry'?d.range*1.1:d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='yellow')stats.hp=Math.round(stats.hp*1.25);if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=3;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);
+ if(type==='crimson')stats.atk=Math.round(stats.atk*1.2);
+ if(type==='gold')stats.atk=Math.round(stats.atk*1.2);
+ if(type==='ivory'){stats.slowPct=.45;stats.slowDuration=d.slowDuration+.5}
+ if(type==='chartreuse')stats.atk=Math.round(stats.atk*1.2);
+ if(type==='mint')stats.freezeChance=.4;
+ if(type==='azure')stats.atk=Math.round(stats.atk*1.2);
+ if(type==='crystal'){stats.floatDamage=3;stats.floatResist=.4}
+ if(type==='lavender')stats.atkDownPct=.45;
+ if(type==='salmon')stats.pullDistance=5;
+ if(type==='raspberry'){stats.condPierceDist=25;stats.condPierceCount=1;stats.damageTiers=d.damageTiers.map(t=>({...t}))}
+ return stats}
+function allyUnlocked(t){return ALWAYS_UNLOCKED.has(t)||cleared.some(i=>i>=UNLOCK_AT[t])}
 const DECK_SIZE=10;
 let deck=['red'];
 try{
@@ -531,11 +630,11 @@ function renderBaseUpgrade(){
  grid.append(card);
 }
 function awardXP(){const reward=cleared.includes(selectedStage)?Math.floor(stageXP(selectedStage)/2):stageXP(selectedStage);training.xp+=reward;saveTraining();return reward}
-function renderUnitLevels(){for(const t of ALLIES){const b=$(t==='red'?'#spawnBtn':'#'+t+'Btn'),d=unitStats(t),e=d.evolved;b.querySelector('strong').textContent=UNIT_NAMES[t]+(e?' 2진':'')+' Lv.'+training.levels[t];b.title=`${ROLES[t]} · 체력 ${d.hp} · 공격력 ${d.atk} · 사거리 ${Math.round(d.range)} · 공격 주기 ${d.interval.toFixed(2)}초 · 이동 ${d.speed} · ${d.cost}원${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'?' · 떠다니는 적에게 강함':''}${e?' · 스틱맨 2진':''}`}}
+function renderUnitLevels(){for(const t of ALLIES){const b=$(t==='red'?'#spawnBtn':'#'+t+'Btn'),d=unitStats(t),e=d.evolved;b.querySelector('strong').textContent=UNIT_NAMES[t]+(e?' 2진':'')+' Lv.'+training.levels[t];b.title=`${ROLES[t]} · 체력 ${d.hp} · 공격력 ${d.atk} · 사거리 ${Math.round(d.range)} · 공격 주기 ${d.interval.toFixed(2)}초 · 이동 ${d.speed} · ${d.cost}원${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'||t==='crystal'?' · 떠다니는 적에게 강함':''}${e?' · 스틱맨 2진':''}`}}
 function renderTraining(){
  $('#xpText').textContent=training.xp+' XP';$('#trainingGrid').innerHTML='';
  $('#deckText').textContent=`출전 덱 ${deck.length} / ${DECK_SIZE} · 전투에는 덱에 넣은 아군만 나옵니다`;
- for(const t of ALLIES){const l=training.levels[t],d=unitStats(t),next=unitStats(t,Math.min(10,l+1)),unlocked=allyUnlocked(t),inDeck=deck.includes(t),evolved=l===10,card=document.createElement('article');card.className='training-card';card.innerHTML=`${profileMarkup(t,evolved)}<h3 style="color:${COLORS[t]}">${UNIT_NAMES[t]}${evolved?' 2진':''} <small>Lv.${l} / 10</small></h3><p class="profile-copy"><strong>${ROLES[t]}</strong>${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'?' · 떠다니는 적에게 강함':''}<br>${evolved?PROFILE_TEXT_EVOLVED[t]:PROFILE_TEXT[t]}${evolved?'<br><strong>2진 효과: '+EVOLUTION_TEXT[t]+' · 사거리 20% 증가</strong>':''}</p><p>체력 ${d.hp}${l<10?' → '+next.hp:''}<br>공격력 ${d.atk}${l<10?' → '+next.atk:''}</p>`;const b=document.createElement('button');b.textContent=!unlocked?STAGES[UNLOCK_AT[t]].name+' 클리어로 해금':l===10?'2진 진화 완료':upgradeCost(t)+' XP · 강화';b.disabled=!unlocked||l>=10||training.xp<upgradeCost(t);b.onclick=()=>upgradeCharacter(t);card.append(b);
+ for(const t of ALLIES){const l=training.levels[t],d=unitStats(t),next=unitStats(t,Math.min(10,l+1)),unlocked=allyUnlocked(t),inDeck=deck.includes(t),evolved=l===10,card=document.createElement('article');card.className='training-card';card.innerHTML=`${profileMarkup(t,evolved)}<h3 style="color:${COLORS[t]}">${UNIT_NAMES[t]}${evolved?' 2진':''} <small>Lv.${l} / 10</small></h3><p class="profile-copy"><strong>${ROLES[t]}</strong>${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'||t==='crystal'?' · 떠다니는 적에게 강함':''}<br>${evolved?PROFILE_TEXT_EVOLVED[t]:PROFILE_TEXT[t]}${evolved?'<br><strong>2진 효과: '+EVOLUTION_TEXT[t]+' · 사거리 20% 증가</strong>':''}</p><p>체력 ${d.hp}${l<10?' → '+next.hp:''}<br>공격력 ${d.atk}${l<10?' → '+next.atk:''}</p>`;const b=document.createElement('button');b.textContent=!unlocked?STAGES[UNLOCK_AT[t]].name+' 클리어로 해금':l===10?'2진 진화 완료':upgradeCost(t)+' XP · 강화';b.disabled=!unlocked||l>=10||training.xp<upgradeCost(t);b.onclick=()=>upgradeCharacter(t);card.append(b);
   if(unlocked){const db=document.createElement('button');db.className='deck-btn';db.textContent=inDeck?'덱에서 제외':deck.length>=DECK_SIZE?'덱 가득참':'덱에 추가';db.disabled=!inDeck&&deck.length>=DECK_SIZE;db.classList.toggle('active',inDeck);db.onclick=()=>toggleDeck(t);card.append(db)}
   $('#trainingGrid').append(card)}
  $('#saveWarning').textContent=trainingSaveFailed?'브라우저 저장을 사용할 수 없습니다. 이번 플레이에서만 유지됩니다.':'';
@@ -544,6 +643,101 @@ function renderTraining(){
 function saveAll(){saveProgress();saveTraining();saveDeck();saveSpeedTickets()}
 addEventListener('pagehide',saveAll);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveAll()});
+
+// Order is rough difficulty progression from Korea to the Moon; used only for codex browsing.
+const ENEMY_ORDER=['dog','snache','guys','hippo','pigge','peng','gory','baa','croco','rabbit','squirrel','seal','leboin','kangaroo','mooth','rhino','bear','face'];
+const ENEMY_TEXT={
+ dog:'가장 먼저 마주치는 흔한 잡병. 느리지 않은 속도로 꾸준히 밀려온다.',
+ snache:'혀를 길게 뻗어 공격하는 정찰병. 멍뭉이보다 빠르게 접근해 온다.',
+ guys:'세 마리가 함께 몰려다니며 공격력이 제법 매섭다. 다만 한 방이면 크게 휘청인다.',
+ hippo:'두툼한 몸집으로 범위 공격을 가하는 초반 보스급 적. 은근히 단단하다.',
+ pigge:'빨간 몸을 가진 범위 공격형 적. 퍼플에게는 약점을 보이지만 그 외엔 위협적이다.',
+ peng:'빠른 몸놀림으로 순식간에 파고드는 펭귄. 공격 주기가 짧아 방심하면 계속 얻어맞는다.',
+ gory:'주먹을 휘둘러 범위 피해를 주는 근육질 적. 공격 속도가 빨라 지속적으로 압박한다.',
+ baa:'평범해 보이지만 묵직한 일격을 날리는 양. 전열에서 은근히 버텨낸다.',
+ croco:'체력은 낮지만 빠르게 달려드는 소형 적. 물량으로 전선을 흔든다.',
+ rabbit:'빨간 몸을 가진 날쌘 토끼. 속도가 빨라 순식간에 성문 앞까지 도달한다.',
+ squirrel:'빠른 발놀림으로 이리저리 움직이는 다람쥐형 적. 공격 빈도가 잦다.',
+ seal:'빨간 몸을 가진 바다표범형 적. 범위 공격 한 방이면 대부분의 아군이 넉백된다.',
+ leboin:'긴 사거리에서 압도적인 한 방을 날리는 강적. 공격 주기가 길어 그 틈을 노려야 한다.',
+ kangaroo:'육중한 몸으로 매우 빠르게 돌진하는 캥거루. 대응이 늦으면 순식간에 성벽까지 밀고 들어온다.',
+ mooth:'공중을 떠다니는 나방형 적. 긴 사거리의 범위 공격을 반복해서 퍼붓는다.',
+ rhino:'뿔로 넓은 범위를 가격하는 보스급 적. 체력과 공격력 모두 만만치 않다.',
+ bear:'느리지만 압도적인 파괴력을 지닌 곰. 사거리도 넓어 미리 대비해야 한다.',
+ face:'공중에 떠서 전장을 압도하는 최종 보스. 넓은 범위와 강력한 한 방으로 아군 전열을 무너뜨린다.'
+};
+function codexTraitBadges(d){const b=[];if(d.trait==='red')b.push('빨간 적');if(d.trait==='floating')b.push('공중');if(d.area||d.splash||d.projectile)b.push('범위 공격');return b}
+let codexTab='ally',codexType='red',codexEvolved=false,codexUnit=null,codexRAF=0,codexLast=0,codexAutoPaused=false;
+function codexEntries(){return codexTab==='ally'?ALLIES:ENEMY_ORDER}
+function buildCodexPreviewUnit(type,ally,evolved){
+ const stats=ally?unitStats(type,evolved?10:1):{...data.units[type]};
+ const u={type,ally,stats,x:50,animTime:0,attackTime:0,attackCd:1.4,hurtTime:0,kbTime:0};
+ drawUnit(u);
+ return u;
+}
+function fitCodexUnit(){
+ const stage=$('#codexPreviewStage'),unit=codexUnit.el,base=2.6;
+ unit.style.transform=`translateX(-50%) scale(${base})`;
+ const stageRect=stage.getBoundingClientRect();
+ const spriteEl=unit.querySelector('.evolved-sprite')||unit.querySelector('.ally-sprite')||unit.querySelector('.dog-sprite');
+ if(!spriteEl)return;
+ const spriteRect=spriteEl.getBoundingClientRect();
+ if(!spriteRect.width||!spriteRect.height)return;
+ const maxH=stageRect.height*.8,maxW=stageRect.width*.85;
+ const scale=Math.min(base,base*maxH/spriteRect.height,base*maxW/spriteRect.width);
+ const xShiftPerScale=(stageRect.left+stageRect.width/2-(spriteRect.left+spriteRect.width/2))/base;
+ unit.style.transform=`translateX(-50%) scale(${scale}) translateX(${xShiftPerScale}px)`;
+}
+function renderCodexPreview(){
+ const ally=codexTab==='ally';
+ $('#codexPreviewStage').innerHTML='';
+ codexUnit=buildCodexPreviewUnit(codexType,ally,ally&&codexEvolved);
+ $('#codexPreviewStage').append(codexUnit.el);
+ fitCodexUnit();
+ $('#codexEvolveToggle').classList.toggle('hidden',!ally);
+ $('#codexEvolveToggle').textContent=codexEvolved?'기본 형태 보기':'2진 진화 보기';
+ const d=data.units[codexType],s=ally?unitStats(codexType,codexEvolved?10:1):d;
+ $('#codexName').textContent=UNIT_NAMES[codexType]+(ally&&codexEvolved?' 2진':'');
+ $('#codexRole').textContent=ally?ROLES[codexType]:(codexTraitBadges(d).join(' · ')||'근접형');
+ $('#codexDesc').innerHTML=ally?(codexEvolved?PROFILE_TEXT_EVOLVED[codexType]+`<br><strong>2진 효과: ${EVOLUTION_TEXT[codexType]} · 사거리 20% 증가</strong>`:PROFILE_TEXT[codexType]):ENEMY_TEXT[codexType];
+ $('#codexStats').innerHTML=`<dt>체력</dt><dd>${s.hp}</dd><dt>공격력</dt><dd>${s.atk}</dd><dt>사거리</dt><dd>${Math.round(s.range)}</dd><dt>공격 주기</dt><dd>${s.interval.toFixed(2)}초</dd><dt>이동 속도</dt><dd>${s.speed}</dd>`+(ally?`<dt>비용</dt><dd>${s.cost}원</dd>`:'');
+}
+function renderCodexGrid(){
+ const grid=$('#codexGrid');grid.innerHTML='';
+ for(const type of codexEntries()){
+  const btn=document.createElement('button');btn.className='codex-card'+(type===codexType?' active':'');btn.textContent=UNIT_NAMES[type];
+  btn.onclick=()=>{codexType=type;codexEvolved=false;renderCodexGrid();renderCodexPreview()};
+  grid.append(btn);
+ }
+}
+function tickCodexPreview(t){
+ codexRAF=requestAnimationFrame(tickCodexPreview);
+ if($('#codexMenu').classList.contains('hidden')){cancelAnimationFrame(codexRAF);codexRAF=0;codexLast=0;return}
+ const dt=codexLast?Math.min(.05,(t-codexLast)/1000):0;codexLast=t;
+ const u=codexUnit;if(!u)return;
+ u.animTime+=dt;
+ if(u.attackTime>0)u.attackTime=Math.max(0,u.attackTime-dt);
+ else{u.attackCd-=dt;if(u.attackCd<=0){const d=data.units[u.type];u.attackTime=d.attackDuration||.56;u.attackCd=(u.stats.interval||d.interval||1.4)+.4}}
+ animateUnit(u);
+}
+function openCodex(tab){
+ codexTab=tab;codexType=tab==='ally'?'red':'dog';codexEvolved=false;
+ $('#codexAllyTab').classList.toggle('active',tab==='ally');
+ $('#codexEnemyTab').classList.toggle('active',tab==='enemy');
+ if(game&&game.running&&!game.ended&&!game.paused){codexAutoPaused=true;game.paused=true;render()}
+ renderCodexGrid();renderCodexPreview();
+ $('#codexMenu').classList.remove('hidden');
+ codexLast=0;if(!codexRAF)codexRAF=requestAnimationFrame(tickCodexPreview);
+}
+function closeCodex(){
+ $('#codexMenu').classList.add('hidden');
+ if(codexAutoPaused&&game&&!game.ended){game.paused=false;codexAutoPaused=false;render()}
+}
+$('#codexBtn').onclick=()=>openCodex('ally');
+$('#codexAllyTab').onclick=()=>openCodex('ally');
+$('#codexEnemyTab').onclick=()=>openCodex('enemy');
+$('#codexEvolveToggle').onclick=()=>{codexEvolved=!codexEvolved;renderCodexPreview()};
+$('#codexCloseBtn').onclick=closeCodex;
 
 reset();openStages();requestAnimationFrame(loop);
 
