@@ -48,10 +48,16 @@ const STAGES=[
  {"name":"하와이","flag":"🌺","hp":30000,"gap":4,"wave":0,"sky":"#7fd6e0","land":"#4f9e6e","desc":"강적 총출동 · 달 직전 마지막 관문"},
  {"name":"달","flag":"🌕","hp":99999,"gap":4,"wave":0,"sky":"#202743","land":"#8b8d99","desc":"최종 보스 대갈이군(The Face)"}
 ];
+// Empire of Cats Chapter 2: same Korea-to-Hawaii roster replayed with the wiki-sourced
+// 150% enemy strength magnification. Moon (the chapter-1 finale) is not repeated.
+const CHAPTER1_LEN=STAGES.length;
+for(let i=0;i<CHAPTER1_LEN-1;i++){const base=STAGES[i];STAGES.push({...base,chapter:2,hp:Math.round(base.hp*1.5),desc:'세계편 2장 재도전 · 모든 적 능력치 150% 강화'});}
 let selectedStage=0,cleared=[];
 try{const saved=JSON.parse(localStorage.getItem('red-battle-progress-v1')||'[]');if(Array.isArray(saved))cleared=[...new Set(saved.filter(x=>Number.isInteger(x)&&x>=0&&x<STAGES.length))]}catch{}
 function saveProgress(){try{localStorage.setItem('red-battle-progress-v1',JSON.stringify(cleared))}catch{}}
 function isUnlocked(i){return i===0||cleared.includes(i-1)||cleared.includes(i)}
+function chapterOf(i){return STAGES[i]?.chapter||1}
+function enemyMagnification(){return chapterOf(selectedStage)===2?1.5:1}
 const RHINO_SHEET='assets/rhino_sheet.png';
 const BEAR_SHEET='assets/bear_sheet.png';
 const FACE_SHEET='assets/face_sheet.png';
@@ -81,6 +87,7 @@ const CRYSTAL_SHEET='assets/crystal_sheet.png';
 const LAVENDER_SHEET='assets/lavender_sheet.png';
 const SALMON_SHEET='assets/salmon_sheet.png';
 const RASPBERRY_SHEET='assets/raspberry_sheet.png';
+const NEWCHAR_EVOLVED_SHEET='assets/new_chars_evolved_sheet.png';
 data.units.crimson={hp:900,atk:650,interval:2.8,speed:5,range:7,cost:300,cooldown:10,knockbacks:3,forceKnockback:true};
 data.units.gold={hp:600,atk:180,interval:3.6,speed:5,range:21,cost:425,cooldown:15,knockbacks:3,multiHit:3};
 data.units.ivory={hp:650,atk:380,interval:3,speed:5,range:20,cost:350,cooldown:13,knockbacks:3,area:true,slowPct:.3,slowDuration:2};
@@ -119,7 +126,7 @@ function addUnit(type){
  game.units.push(u);drawUnit(u);u.el.style.left=`calc(${u.x}% - 21px)`;
  if(ally){game.money-=d.cost;game[cooldownKey(type)]=d.cooldown;if(game.tutorial===2){game.tutorial=3;tutorial()}}render();
 }
-function drawUnit(u){let e=document.createElement('div'),evolved=u.ally&&u.stats?.evolved,legacyAlly=u.ally&&!NEW_ATLASES[u.type];e.className='unit '+u.type+(u.ally?' ally-art':'')+(evolved?' evolved':'');e.style.setProperty('--unit-color',COLORS?.[u.type]||'#fff');e.innerHTML='<div class="bar"><i style="width:100%"></i></div>'+(legacyAlly?'<span class="ally-shadow"></span><span class="ally-sprite"></span>'+(evolved?'<span class="evolved-sprite"></span>':'')+(u.type==='pink'&&!evolved?'<span class="pink-ribbon"><i></i></span>':''):'<span class="dog-shadow"></span><span class="dog-sprite"></span>');e.setAttribute('aria-label',UNIT_NAMES[u.type]+(evolved?' 2진':''));u.el=e;unitsEl.append(e);const sheet={rabbit:ELITE_RABBIT_SHEET,squirrel:SQUIRREL_G_SHEET,kangaroo:KANG_ROO_SHEET,mooth:MOOTH_SHEET,rhino:RHINO_SHEET,bear:BEAR_SHEET,face:FACE_SHEET}[u.type]||NEW_ATLASES[u.type]?.sheet;if(sheet)e.querySelector('.dog-sprite').style.backgroundImage=`url(${sheet})`;if(legacyAlly)animateAlly(u);else animateDog(u)}
+function drawUnit(u){let e=document.createElement('div'),evolved=u.ally&&u.stats?.evolved,legacyAlly=u.ally&&!NEW_ATLASES[u.type];e.className='unit '+u.type+(u.ally?' ally-art':'')+(evolved?' evolved':'');e.style.setProperty('--unit-color',COLORS?.[u.type]||'#fff');e.innerHTML='<div class="bar"><i style="width:100%"></i></div>'+(legacyAlly?'<span class="ally-shadow"></span><span class="ally-sprite"></span>'+(evolved?'<span class="evolved-sprite"></span>':'')+(u.type==='pink'&&!evolved?'<span class="pink-ribbon"><i></i></span>':''):'<span class="dog-shadow"></span><span class="dog-sprite"></span>');e.setAttribute('aria-label',UNIT_NAMES[u.type]+(evolved?' 2진':''));u.el=e;unitsEl.append(e);const newAtlas=NEW_ATLASES[u.type];const sheet={rabbit:ELITE_RABBIT_SHEET,squirrel:SQUIRREL_G_SHEET,kangaroo:KANG_ROO_SHEET,mooth:MOOTH_SHEET,rhino:RHINO_SHEET,bear:BEAR_SHEET,face:FACE_SHEET}[u.type]||(evolved&&newAtlas?.evolved?newAtlas.evolved.sheet:newAtlas?.sheet);if(sheet)e.querySelector('.dog-sprite').style.backgroundImage=`url(${sheet})`;if(legacyAlly)animateAlly(u);else animateDog(u)}
 function target(u){let foes=game.units.filter(v=>v.hp>0&&v.kbTime<=0&&!v.emerging&&v.ally!==u.ally);let dir=u.ally?-1:1;return foes.filter(v=>dir*(v.x-u.x)>=-1).sort((a,b)=>Math.abs(a.x-u.x)-Math.abs(b.x-u.x))[0]}
 // Canonical knockback counts include death. Red keeps its original two live hitbacks.
 const HITBACK_DURATION=20/30;
@@ -167,7 +174,7 @@ function damage(v,amount,from){
  v.hp=Math.max(0,v.hp-amount);v.flashTime=.1;v.el.classList.add('damage-flash');
  v.el.querySelector('i').style.setProperty('width',Math.max(0,v.hp/v.max)*100+'%');
  if(v.hp===0){
-  if(!v.ally)game.money=Math.min(data.income[game.level].max,game.money+data.units[v.type].reward);
+  if(!v.ally)game.money=Math.min(data.income[game.level].max,game.money+Math.round(data.units[v.type].reward*enemyMagnification()));
   game.units.splice(game.units.indexOf(v),1);
   startHitback(v);v.el.classList.add('defeated');game.defeated.push(v);return;
  }
@@ -288,7 +295,7 @@ game.spawnCd=Math.max(0,game.spawnCd-dt);game.orangeCd=Math.max(0,game.orangeCd-
  }
  render()
 }
-function render(){renderDeckButtons();renderSpeedButton();renderNewButtons();renderGreenButton();renderOrangeButton();renderYellowButton();renderUnitLevels();$('#battleNotice').classList.toggle('hidden',!(game.noticeTime>0));$('#pauseBtn').disabled=!game.running||game.ended;$('#pauseBtn').textContent=game.paused?'계속하기':'일시정지';$('#pauseNotice').classList.toggle('hidden',!game.paused);$('#timer').textContent=`${STAGES[selectedStage].name} · ${Math.floor(game.elapsed)}초`;let l=data.income[game.level];$('#money').textContent=`${Math.floor(game.money)}원`;$('#enemyHp').textContent=data.bases.enemy.hp;$('#allyHp').textContent=data.bases.ally.hp;for(let [name,b] of Object.entries(data.bases))$(`#${name}Base span`).style.width=(b.hp/b.max*100)+'%';let sb=$('#spawnBtn'),ib=$('#incomeBtn'),canSpawn=!game.ended&&!game.paused&&(game.running||game.tutorial===2),canUpgrade=!game.ended&&!game.paused&&(game.running||game.tutorial===4);sb.disabled=game.money<data.units.red.cost||game.spawnCd>0||!canSpawn;sb.querySelector('small').textContent=data.units.red.cost+'원';sb.querySelector('em').style.display=game.spawnCd?'block':'none';sb.querySelector('em').style.transform=`scaleY(${game.spawnCd/data.units.red.cooldown})`;ib.disabled=!canUpgrade||game.level===5||game.money<(l.cost||0);ib.innerHTML=game.level===5?'수입 Lv.MAX':`수입 업그레이드<br><small>${l.cost}원</small>`}
+function render(){renderDeckButtons();renderSpeedButton();renderNewButtons();renderGreenButton();renderOrangeButton();renderYellowButton();renderUnitLevels();$('#battleNotice').classList.toggle('hidden',!(game.noticeTime>0));$('#pauseBtn').disabled=!game.running||game.ended;$('#pauseBtn').textContent=game.paused?'계속하기':'일시정지';$('#pauseNotice').classList.toggle('hidden',!game.paused);$('#timer').textContent=`${STAGES[selectedStage].name}${chapterOf(selectedStage)===2?' (2장)':''} · ${Math.floor(game.elapsed)}초`;let l=data.income[game.level];$('#money').textContent=`${Math.floor(game.money)}원`;$('#enemyHp').textContent=data.bases.enemy.hp;$('#allyHp').textContent=data.bases.ally.hp;for(let [name,b] of Object.entries(data.bases))$(`#${name}Base span`).style.width=(b.hp/b.max*100)+'%';let sb=$('#spawnBtn'),ib=$('#incomeBtn'),canSpawn=!game.ended&&!game.paused&&(game.running||game.tutorial===2),canUpgrade=!game.ended&&!game.paused&&(game.running||game.tutorial===4);sb.disabled=game.money<data.units.red.cost||game.spawnCd>0||!canSpawn;sb.querySelector('small').textContent=data.units.red.cost+'원';sb.querySelector('em').style.display=game.spawnCd?'block':'none';sb.querySelector('em').style.transform=`scaleY(${game.spawnCd/data.units.red.cooldown})`;ib.disabled=!canUpgrade||game.level===5||game.money<(l.cost||0);ib.innerHTML=game.level===5?'수입 Lv.MAX':`수입 업그레이드<br><small>${l.cost}원</small>`}
 function renderOrangeButton(){
  const button=$('#orangeBtn'),d=data.units.orange,unlocked=orangeUnlocked();
  button.disabled=!unlocked||!game.running||game.paused||game.ended||game.money<d.cost||game.orangeCd>0;
@@ -395,6 +402,9 @@ const STAGE_SPAWNS={
 46:[{type:'guys',at:{t:0},delay:[0.07,0.07]},{type:'hippo',at:{t:0},delay:[1,2]},{type:'peng',at:{t:0},delay:[1,2]},{type:'gory',at:{t:60},delay:[13.33,30]},{type:'seal',at:{t:80},delay:[26.67,53.33]},{type:'leboin',at:{t:100},delay:[53.33,100]},{type:'kangaroo',at:{t:120},delay:[30,50]},{type:'rhino',at:{t:140},delay:[66.67,86.67]},{type:'bear',at:{t:160},delay:[133.33,266.67]}],
 47:[{type:'dog',at:{t:5},delay:[5,6]},{type:'snache',at:{t:12},delay:[12,13]},{type:'guys',at:{t:9},delay:[9,15]},{type:'rhino',at:{t:28},delay:[28,52]},{type:'bear',at:{t:32},delay:[32,58]},{type:'face',at:{hp:50},count:1,boss:true}]
 };
+// Mirror the same spawn composition/timing onto the Chapter 2 stage indices; only the
+// unitStats() magnification differs at spawn time.
+for(let i=0;i<CHAPTER1_LEN-1;i++){STAGE_SPAWNS[CHAPTER1_LEN+i]=STAGE_SPAWNS[i].map(r=>({...r}))}
 function stageEnemies(i){return [...new Set((STAGE_SPAWNS[i]||[]).map(r=>r.type))]}
 function pickDelay(range){return range[0]+Math.random()*(range[1]-range[0])}
 function updateStageSpawns(dt){
@@ -437,16 +447,16 @@ seal:{"scale": 0.78, "left": -22, "walk": [[1, 2, 112, 79], [116, 1, 111, 80], [
 croco:{"scale": 0.72, "left": -10, "walk": [[1, 28, 85, 42], [89, 28, 85, 42], [178, 28, 85, 42], [266, 28, 85, 42], [354, 28, 86, 42]], "attack": [[1, 98, 86, 40], [89, 70, 86, 69], [178, 70, 86, 69], [266, 70, 86, 69], [353, 102, 88, 37]], "hurt": [[89, 141, 86, 114]]},
 
  pigge:{scale:.8,left:-20,walk:[[4,1,103,77],[4,79,103,76],[4,157,103,76],[115,5,104,73],[112,80,109,76],[115,158,104,75]],attack:[[225,1,126,104],[225,107,126,67],[225,177,126,67]],hurt:[[355,3,124,65],[368,72,103,65]]},
- crimson:{scale:0.65,left:-7,sheet:CRIMSON_SHEET,walk:[[4,3,83,95],[186,6,81,89],[367,6,91,92]],attack:[[556,6,111,89],[722,9,141,86],[1111,6,90,88]],hurt:[[1286,5,112,91]]},
- gold:{scale:0.7,left:-8,sheet:GOLD_SHEET,walk:[[4,4,80,90],[188,4,78,88],[370,4,86,90]],attack:[[551,4,111,90],[724,4,149,90],[1106,4,124,90]],hurt:[[1284,4,115,90]]},
- ivory:{scale:0.7,left:-8,sheet:IVORY_SHEET,walk:[[4,4,80,85],[186,4,79,84],[364,4,93,85]],attack:[[549,4,119,85],[725,4,152,85],[1106,4,91,84]],hurt:[[1283,4,116,84]]},
- chartreuse:{scale:0.7,left:-7,sheet:CHARTREUSE_SHEET,walk:[[4,4,79,77],[188,4,78,77],[367,4,89,77]],attack:[[548,4,136,77],[728,4,146,77],[1107,4,99,76]],hurt:[[1285,4,114,77]]},
- mint:{scale:0.7,left:-8,sheet:MINT_SHEET,walk:[[4,4,80,70],[187,4,80,69],[370,4,89,70]],attack:[[549,4,123,69],[726,4,149,70],[1106,4,91,69]],hurt:[[1285,4,117,70]]},
- azure:{scale:0.55,left:-13,sheet:AZURE_SHEET,walk:[[4,4,123,80],[187,4,123,77],[374,4,121,75]],attack:[[555,4,117,75],[746,4,132,79],[1111,4,124,77]],hurt:[[1299,4,130,77]]},
- crystal:{scale:0.7,left:-8,sheet:CRYSTAL_SHEET,walk:[[4,4,80,74],[186,4,81,74],[370,4,88,75]],attack:[[541,4,87,74],[725,4,116,74],[1108,4,77,72]],hurt:[[1285,4,113,75]]},
- lavender:{scale:0.7,left:-8,sheet:LAVENDER_SHEET,walk:[[4,4,81,70],[184,4,83,70],[366,4,94,70]],attack:[[545,4,136,70],[728,4,152,70],[1105,4,115,70]],hurt:[[1274,4,146,70]]},
- salmon:{scale:0.7,left:-9,sheet:SALMON_SHEET,walk:[[4,4,84,70],[184,4,86,70],[368,4,95,72]],attack:[[540,4,145,72],[726,4,131,72],[1102,4,129,70]],hurt:[[1271,4,148,73]]},
- raspberry:{scale:0.7,left:-9,sheet:RASPBERRY_SHEET,walk:[[4,4,84,81],[184,4,86,81],[368,4,92,81]],attack:[[539,4,144,82],[723,4,146,82],[1108,4,133,83]],hurt:[[1267,4,140,95]]},
+ crimson:{scale:0.65,left:-7,sheet:CRIMSON_SHEET,walk:[[4,3,83,95],[186,6,81,89],[367,6,91,92]],attack:[[556,6,111,89],[722,9,141,86],[1111,6,90,88]],hurt:[[1286,5,112,91]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[55,2,76,104],[235,2,74,104],[414,2,83,104]],attack:[[605,2,107,104],[772,2,133,104],[1158,3,89,103]],hurt:[[1333,4,112,93]]}},
+ gold:{scale:0.7,left:-8,sheet:GOLD_SHEET,walk:[[4,4,80,90],[188,4,78,88],[370,4,86,90]],attack:[[551,4,111,90],[724,4,149,90],[1106,4,124,90]],hurt:[[1284,4,115,90]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[56,106,71,106],[239,106,71,106],[419,106,78,106]],attack:[[601,106,107,106],[773,106,145,106],[1161,106,118,106]],hurt:[[1333,106,114,106]]}},
+ ivory:{scale:0.7,left:-8,sheet:IVORY_SHEET,walk:[[4,4,80,85],[186,4,79,84],[364,4,93,85]],attack:[[549,4,119,85],[725,4,152,85],[1106,4,91,84]],hurt:[[1283,4,116,84]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[40,212,83,106],[232,212,75,106],[413,212,82,106]],attack:[[583,212,131,106],[761,212,164,106],[1149,212,82,106]],hurt:[[1332,212,115,106]]}},
+ chartreuse:{scale:0.7,left:-7,sheet:CHARTREUSE_SHEET,walk:[[4,4,79,77],[188,4,78,77],[367,4,89,77]],attack:[[548,4,136,77],[728,4,146,77],[1107,4,99,76]],hurt:[[1285,4,114,77]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[52,318,70,106],[236,318,71,106],[417,318,78,106]],attack:[[599,318,130,106],[780,318,137,106],[1161,318,88,106]],hurt:[[1334,318,114,106]]}},
+ mint:{scale:0.7,left:-8,sheet:MINT_SHEET,walk:[[4,4,80,70],[187,4,80,69],[370,4,89,70]],attack:[[549,4,123,69],[726,4,149,70],[1106,4,91,69]],hurt:[[1285,4,117,70]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[49,424,74,106],[234,424,73,106],[414,424,81,106]],attack:[[593,424,124,106],[767,424,151,106],[1154,424,82,106]],hurt:[[1333,424,117,106]]}},
+ azure:{scale:0.55,left:-13,sheet:AZURE_SHEET,walk:[[4,4,123,80],[187,4,123,77],[374,4,121,75]],attack:[[555,4,117,75],[746,4,132,79],[1111,4,124,77]],hurt:[[1299,4,130,77]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[41,530,118,106],[224,530,120,106],[409,530,117,106]],attack:[[591,530,117,106],[784,530,125,106],[1148,530,123,106]],hurt:[[1338,530,127,106]]}},
+ crystal:{scale:0.7,left:-8,sheet:CRYSTAL_SHEET,walk:[[4,4,80,74],[186,4,81,74],[370,4,88,75]],attack:[[541,4,87,74],[725,4,116,74],[1108,4,77,72]],hurt:[[1285,4,113,75]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[56,636,70,106],[239,636,67,106],[423,636,74,106]],attack:[[602,636,74,106],[782,636,86,106],[1162,636,72,106]],hurt:[[1334,636,112,106]]}},
+ lavender:{scale:0.7,left:-8,sheet:LAVENDER_SHEET,walk:[[4,4,81,70],[184,4,83,70],[366,4,94,70]],attack:[[545,4,136,70],[728,4,152,70],[1105,4,115,70]],hurt:[[1274,4,146,70]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[55,742,75,106],[233,742,80,106],[413,742,90,106]],attack:[[599,742,125,106],[775,742,150,106],[1157,742,107,106]],hurt:[[1318,742,147,106]]}},
+ salmon:{scale:0.7,left:-9,sheet:SALMON_SHEET,walk:[[4,4,84,70],[184,4,86,70],[368,4,95,72]],attack:[[540,4,145,72],[726,4,131,72],[1102,4,129,70]],hurt:[[1271,4,148,73]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[46,848,78,106],[233,848,74,106],[415,848,80,106]],attack:[[590,848,139,106],[768,848,128,106],[1152,848,124,106]],hurt:[[1315,848,148,106]]}},
+ raspberry:{scale:0.7,left:-9,sheet:RASPBERRY_SHEET,walk:[[4,4,84,81],[184,4,86,81],[368,4,92,81]],attack:[[539,4,144,82],[723,4,146,82],[1108,4,133,83]],hurt:[[1267,4,140,95]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[30,954,95,95],[216,954,93,94],[408,954,88,95]],attack:[[577,954,149,93],[754,954,154,94],[1139,954,148,93]],hurt:[[1319,954,123,93]]}},
  guys:{scale:1,left:0,walk:[[30,40,43,32],[90,40,42,32],[150,40,43,32],[210,40,43,32],[270,40,43,32]],attack:[[30,100,43,32],[90,100,48,32],[150,100,51,32],[210,100,54,32],[270,87,63,45],[30,147,64,45],[100,154,56,38],[160,154,56,38],[220,161,43,31]],hurt:[[33,221,41,31]]},
  hippo:{scale:.9,left:-26,walk:[[1,24,105,78],[113,24,105,78],[226,24,104,78]],attack:[[337,4,99,98],[1,104,99,101],[113,118,110,87],[225,140,109,65],[338,127,104,78]]}
 };
@@ -465,7 +475,8 @@ function animatePigge(u){
  const [x,y,w,h]=frame,el=u.el.querySelector('.dog-sprite');el.style.backgroundPosition=`-${x}px -${y}px`;el.style.width=w+'px';el.style.height=h+'px';el.style.left='-20px';el.style.transform='scale(.8)';el.style.transformOrigin='left bottom';el.style.filter='none';u.el.dataset.animation=state;
 }
 function animateAtlas(u){
- const atlas=NEW_ATLASES[u.type];
+ const baseAtlas=NEW_ATLASES[u.type];
+ const atlas=(u.stats?.evolved&&baseAtlas.evolved)?baseAtlas.evolved:baseAtlas;
  const state=u.hurtTime>0?'hurt':u.attackTime>0?'attack':'walk';
  // Gory's raised-fists sprite is its actual hitback pose; Peng uses an upright pose.
  const visualState=state==='hurt'&&u.type==='gory'?'attack':state==='hurt'&&(['peng'].includes(u.type)||!atlas.hurt)?'walk':state;
@@ -481,17 +492,24 @@ function animateAtlas(u){
  if(visualState==='attack'&&u.type==='leboin')index=(duration-u.attackTime)<data.units.leboin.windup?0:2;
  const [x,y,w,h]=frames[index];const sprite=u.el.querySelector('.dog-sprite');
  sprite.style.backgroundPosition=`-${x}px -${y}px`;
- sprite.style.width=w+'px';sprite.style.height=h+'px';sprite.style.left=atlas.left+'px';
- sprite.style.transform=`scale(${atlas.scale})`;sprite.style.transformOrigin='left bottom';
+ sprite.style.width=w+'px';sprite.style.height=h+'px';sprite.style.left=baseAtlas.left+'px';
+ sprite.style.transform=`scale(${baseAtlas.scale})`;sprite.style.transformOrigin='left bottom';
  sprite.style.filter=state==='hurt'&&!atlas.hurt?'brightness(1.8)':'none';
  u.el.dataset.animation=state;
 }
 
+let stageChapterView=1;
 function renderStageMenu(){renderTraining();renderBaseUpgrade();
  $('#stageGrid').innerHTML='';
- STAGES.forEach((stage,i)=>{const button=document.createElement('button');button.className='stage-card'+(cleared.includes(i)?' cleared':'');button.disabled=!isUnlocked(i);button.title=`등장 적: ${stageEnemies(i).map(type=>UNIT_NAMES[type]).join(' · ')} · 적 성 체력 ${stage.hp}`;button.innerHTML=`<strong>${stage.name}</strong>${cleared.includes(i)?'<small>✓</small>':''}`;button.onclick=()=>{selectedStage=i;reset()};$('#stageGrid').append(button)});
- $('#progressText').textContent=`${cleared.length} / ${STAGES.length} 스테이지 클리어`;
+ const viewStages=STAGES.map((stage,i)=>({stage,i})).filter(o=>chapterOf(o.i)===stageChapterView);
+ viewStages.forEach(({stage,i})=>{const button=document.createElement('button');button.className='stage-card'+(cleared.includes(i)?' cleared':'');button.disabled=!isUnlocked(i);button.title=`등장 적: ${stageEnemies(i).map(type=>UNIT_NAMES[type]).join(' · ')} · 적 성 체력 ${stage.hp}`;button.innerHTML=`<strong>${stage.name}</strong>${cleared.includes(i)?'<small>✓</small>':''}`;button.onclick=()=>{selectedStage=i;reset()};$('#stageGrid').append(button)});
+ $('#chapter1Tab').classList.toggle('active',stageChapterView===1);
+ $('#chapter2Tab').classList.toggle('active',stageChapterView===2);
+ $('#chapterNote').textContent=stageChapterView===2?'한국 ~ 하와이 재도전 · 모든 적 체력·공격력 150% 강화':'';
+ $('#progressText').textContent=`${viewStages.filter(o=>cleared.includes(o.i)).length} / ${viewStages.length} 스테이지 클리어 · 세계편 ${stageChapterView}장`;
 }
+$('#chapter1Tab').onclick=()=>{stageChapterView=1;renderStageMenu()};
+$('#chapter2Tab').onclick=()=>{stageChapterView=2;renderStageMenu()};
 function openStages(){if(game.running&&!game.ended)game.paused=true;highlight();render();renderStageMenu();$('#stageMenu').classList.remove('hidden');$('#resumeBtn').textContent=game.ended?'결과로 돌아가기':'전투로 돌아가기'}
 $('#stagesBtn').onclick=openStages;
 $('#resultStagesBtn').onclick=openStages;
@@ -581,7 +599,7 @@ try{
  else{training.xp=cleared.reduce((sum,i)=>sum+stageXP(i),0);saveTraining()}
 }catch{trainingSaveFailed=true}
 function saveTraining(){try{localStorage.setItem('red-battle-training-v1',JSON.stringify(training));trainingSaveFailed=false}catch{trainingSaveFailed=true}}
-function unitStats(type,level=training.levels[type]||1){const d=data.units[type],stats={...d,hp:Math.round(d.hp*(1+.1*(level-1))),atk:Math.round(d.atk*(1+.1*(level-1)))};if(level<10)return stats;stats.evolved=true;stats.range=type==='raspberry'?d.range*1.1:d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='yellow')stats.hp=Math.round(stats.hp*1.25);if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=3;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);
+function unitStats(type,level=training.levels[type]||1){const d=data.units[type],mag=ALLIES.includes(type)?1:enemyMagnification(),stats={...d,hp:Math.round(d.hp*(1+.1*(level-1))*mag),atk:Math.round(d.atk*(1+.1*(level-1))*mag)};if(level<10)return stats;stats.evolved=true;stats.range=type==='raspberry'?d.range*1.1:d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='yellow')stats.hp=Math.round(stats.hp*1.25);if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=3;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);
  if(type==='crimson')stats.atk=Math.round(stats.atk*1.2);
  if(type==='gold')stats.atk=Math.round(stats.atk*1.2);
  if(type==='ivory'){stats.slowPct=.45;stats.slowDuration=d.slowDuration+.5}
