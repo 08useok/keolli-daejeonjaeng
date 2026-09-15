@@ -71,7 +71,16 @@ data.units.pink={hp:520,atk:125,interval:1.9,speed:6,range:23,engageRange:4.5,co
 data.units.rhino={hp:5200,atk:420,interval:2.1,speed:5.5,range:5.2,reward:900,knockbacks:2,attackDuration:.9,windup:.45,area:true};
 data.units.bear={hp:6500,atk:520,interval:2.4,speed:4.5,range:8.5,reward:1050,knockbacks:2,attackDuration:1,windup:.5,area:true};
 data.units.face={trait:"floating",hp:18000,atk:850,interval:3.4,speed:1.8,range:14,reward:2500,knockbacks:3,attackDuration:1.2,windup:.65,area:true};
-const NEWCHAR_SHEET='assets/new_chars_sheet.png';
+const CRIMSON_SHEET='assets/crimson_sheet.png';
+const GOLD_SHEET='assets/gold_sheet.png';
+const IVORY_SHEET='assets/ivory_sheet.png';
+const CHARTREUSE_SHEET='assets/chartreuse_sheet.png';
+const MINT_SHEET='assets/mint_sheet.png';
+const AZURE_SHEET='assets/azure_sheet.png';
+const CRYSTAL_SHEET='assets/crystal_sheet.png';
+const LAVENDER_SHEET='assets/lavender_sheet.png';
+const SALMON_SHEET='assets/salmon_sheet.png';
+const RASPBERRY_SHEET='assets/raspberry_sheet.png';
 data.units.crimson={hp:900,atk:650,interval:2.8,speed:5,range:7,cost:300,cooldown:10,knockbacks:3,forceKnockback:true};
 data.units.gold={hp:600,atk:180,interval:3.6,speed:5,range:21,cost:425,cooldown:15,knockbacks:3,multiHit:3};
 data.units.ivory={hp:650,atk:380,interval:3,speed:5,range:20,cost:350,cooldown:13,knockbacks:3,area:true,slowPct:.3,slowDuration:2};
@@ -428,16 +437,16 @@ seal:{"scale": 0.78, "left": -22, "walk": [[1, 2, 112, 79], [116, 1, 111, 80], [
 croco:{"scale": 0.72, "left": -10, "walk": [[1, 28, 85, 42], [89, 28, 85, 42], [178, 28, 85, 42], [266, 28, 85, 42], [354, 28, 86, 42]], "attack": [[1, 98, 86, 40], [89, 70, 86, 69], [178, 70, 86, 69], [266, 70, 86, 69], [353, 102, 88, 37]], "hurt": [[89, 141, 86, 114]]},
 
  pigge:{scale:.8,left:-20,walk:[[4,1,103,77],[4,79,103,76],[4,157,103,76],[115,5,104,73],[112,80,109,76],[115,158,104,75]],attack:[[225,1,126,104],[225,107,126,67],[225,177,126,67]],hurt:[[355,3,124,65],[368,72,103,65]]},
- crimson:{scale:0.65,left:-7,sheet:NEWCHAR_SHEET,walk:[[51,3,83,97],[233,6,81,89],[414,6,91,100]],attack:[[603,6,111,89],[769,9,141,86],[1158,6,90,88]],hurt:[[1333,5,112,91]]},
- gold:{scale:0.7,left:-8,sheet:NEWCHAR_SHEET,walk:[[53,106,80,93],[237,106,78,88],[419,106,86,93]],attack:[[600,106,111,93],[773,106,149,93],[1155,106,124,93]],hurt:[[1333,106,115,93]]},
- ivory:{scale:0.7,left:-8,sheet:NEWCHAR_SHEET,walk:[[53,212,80,88],[235,212,79,84],[413,212,93,88]],attack:[[598,212,119,88],[774,212,152,106],[1155,212,91,84]],hurt:[[1332,212,116,84]]},
- chartreuse:{scale:0.7,left:-7,sheet:NEWCHAR_SHEET,walk:[[53,318,79,80],[237,318,78,80],[416,318,89,80]],attack:[[597,318,136,80],[777,318,146,80],[1156,318,99,76]],hurt:[[1334,318,114,80]]},
- mint:{scale:0.7,left:-8,sheet:NEWCHAR_SHEET,walk:[[52,424,80,73],[235,424,80,69],[418,424,89,73]],attack:[[597,424,123,69],[774,424,149,73],[1154,424,91,69]],hurt:[[1333,424,117,73]]},
- azure:{scale:0.55,left:-13,sheet:NEWCHAR_SHEET,walk:[[41,530,123,80],[224,530,123,77],[411,530,121,75]],attack:[[592,530,117,75],[783,530,132,79],[1148,530,124,77]],hurt:[[1336,530,130,77]]},
- crystal:{scale:0.7,left:-8,sheet:NEWCHAR_SHEET,walk:[[52,636,80,74],[234,636,81,74],[418,636,88,78]],attack:[[589,636,87,74],[773,636,116,74],[1156,636,77,72]],hurt:[[1333,636,113,78]]},
- lavender:{scale:0.7,left:-8,sheet:NEWCHAR_SHEET,walk:[[50,742,81,73],[230,742,83,73],[412,742,94,73]],attack:[[591,742,136,73],[774,742,152,106],[1151,742,115,74]],hurt:[[1320,742,146,106]]},
- salmon:{scale:0.7,left:-9,sheet:NEWCHAR_SHEET,walk:[[49,848,84,70],[229,848,86,70],[413,848,95,72]],attack:[[585,848,145,72],[771,848,131,72],[1147,848,129,70]],hurt:[[1316,848,148,76]]},
- raspberry:{scale:0.7,left:-9,sheet:NEWCHAR_SHEET,walk:[[50,954,84,81],[230,954,86,81],[414,954,92,81]],attack:[[585,954,144,82],[769,954,146,82],[1154,954,133,83]],hurt:[[1313,954,140,95]]},
+ crimson:{scale:0.65,left:-7,sheet:CRIMSON_SHEET,walk:[[4,3,83,97],[186,6,81,89],[367,6,91,100]],attack:[[556,6,111,89],[722,9,141,86],[1111,6,90,88]],hurt:[[1286,5,112,91]]},
+ gold:{scale:0.7,left:-8,sheet:GOLD_SHEET,walk:[[4,4,80,93],[188,4,78,88],[370,4,86,93]],attack:[[551,4,111,93],[724,4,149,93],[1106,4,124,93]],hurt:[[1284,4,115,93]]},
+ ivory:{scale:0.7,left:-8,sheet:IVORY_SHEET,walk:[[4,4,80,88],[186,4,79,84],[364,4,93,88]],attack:[[549,4,119,88],[725,4,152,106],[1106,4,91,84]],hurt:[[1283,4,116,84]]},
+ chartreuse:{scale:0.7,left:-7,sheet:CHARTREUSE_SHEET,walk:[[4,4,79,80],[188,4,78,80],[367,4,89,80]],attack:[[548,4,136,80],[728,4,146,80],[1107,4,99,76]],hurt:[[1285,4,114,80]]},
+ mint:{scale:0.7,left:-8,sheet:MINT_SHEET,walk:[[4,4,80,73],[187,4,80,69],[370,4,89,73]],attack:[[549,4,123,69],[726,4,149,73],[1106,4,91,69]],hurt:[[1285,4,117,73]]},
+ azure:{scale:0.55,left:-13,sheet:AZURE_SHEET,walk:[[4,4,123,80],[187,4,123,77],[374,4,121,75]],attack:[[555,4,117,75],[746,4,132,79],[1111,4,124,77]],hurt:[[1299,4,130,77]]},
+ crystal:{scale:0.7,left:-8,sheet:CRYSTAL_SHEET,walk:[[4,4,80,74],[186,4,81,74],[370,4,88,78]],attack:[[541,4,87,74],[725,4,116,74],[1108,4,77,72]],hurt:[[1285,4,113,78]]},
+ lavender:{scale:0.7,left:-8,sheet:LAVENDER_SHEET,walk:[[4,4,81,73],[184,4,83,73],[366,4,94,73]],attack:[[545,4,136,73],[728,4,152,106],[1105,4,115,74]],hurt:[[1274,4,146,106]]},
+ salmon:{scale:0.7,left:-9,sheet:SALMON_SHEET,walk:[[4,4,84,70],[184,4,86,70],[368,4,95,72]],attack:[[540,4,145,72],[726,4,131,72],[1102,4,129,70]],hurt:[[1271,4,148,76]]},
+ raspberry:{scale:0.7,left:-9,sheet:RASPBERRY_SHEET,walk:[[4,4,84,81],[184,4,86,81],[368,4,92,81]],attack:[[539,4,144,82],[723,4,146,82],[1108,4,133,83]],hurt:[[1267,4,140,95]]},
  guys:{scale:1,left:0,walk:[[30,40,43,32],[90,40,42,32],[150,40,43,32],[210,40,43,32],[270,40,43,32]],attack:[[30,100,43,32],[90,100,48,32],[150,100,51,32],[210,100,54,32],[270,87,63,45],[30,147,64,45],[100,154,56,38],[160,154,56,38],[220,161,43,31]],hurt:[[33,221,41,31]]},
  hippo:{scale:.9,left:-26,walk:[[1,24,105,78],[113,24,105,78],[226,24,104,78]],attack:[[337,4,99,98],[1,104,99,101],[113,118,110,87],[225,140,109,65],[338,127,104,78]]}
 };
