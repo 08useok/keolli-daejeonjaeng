@@ -443,9 +443,14 @@ function animateAlly(u){
   }else if(u.type==='green'&&col===3){
    // The raised-boomerang windup frame has a stray sliver of the next (thrown) frame's
    // boomerang bleeding in at its right edge; crop a bit narrower to exclude it.
-   sprite.style.width='68px';sprite.style.backgroundPosition=`${-3*cell}px ${-row*cell}px`;
+   sprite.style.left='-18px';sprite.style.width='68px';sprite.style.backgroundPosition=`${-3*cell}px ${-row*cell}px`;
+  }else if(u.type==='green'&&col===4){
+   // The thrown boomerang's sharp left tip starts a few px before this cell in the source
+   // art; widen the crop leftward so the point isn't sliced into a flat straight edge.
+   const extra=17*.35;
+   sprite.style.left=(-18-extra)+'px';sprite.style.width=(cell+extra)+'px';sprite.style.backgroundPosition=`${-(4*cell-extra)}px ${-row*cell}px`;
   }else{
-   sprite.style.width=cell+'px';sprite.style.backgroundPosition=`${-col*cell}px ${-row*cell}px`;
+   sprite.style.left='-18px';sprite.style.width=cell+'px';sprite.style.backgroundPosition=`${-col*cell}px ${-row*cell}px`;
   }
   u.el.querySelector('.ally-shadow').style.backgroundPosition=`${-7*cell}px ${-row*cell}px`;
  }
