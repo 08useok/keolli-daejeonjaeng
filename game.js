@@ -126,7 +126,7 @@ function addUnit(type){
  game.units.push(u);drawUnit(u);u.el.style.left=`calc(${u.x}% - 21px)`;
  if(ally){game.money-=d.cost;game[cooldownKey(type)]=d.cooldown;if(game.tutorial===2){game.tutorial=3;tutorial()}}render();
 }
-function drawUnit(u){let e=document.createElement('div'),evolved=u.ally&&u.stats?.evolved,legacyAlly=u.ally&&!NEW_ATLASES[u.type];e.className='unit '+u.type+(u.ally?' ally-art':'')+(evolved?' evolved':'');e.style.setProperty('--unit-color',COLORS?.[u.type]||'#fff');e.innerHTML='<div class="bar"><i style="width:100%"></i></div>'+(legacyAlly?'<span class="ally-shadow"></span><span class="ally-sprite"></span>'+(evolved?'<span class="evolved-sprite"></span>':'')+(u.type==='pink'&&!evolved?'<span class="pink-ribbon"><i></i></span>':''):'<span class="dog-shadow"></span><span class="dog-sprite"></span>');e.setAttribute('aria-label',UNIT_NAMES[u.type]+(evolved?' 2진':''));u.el=e;unitsEl.append(e);const newAtlas=NEW_ATLASES[u.type];const sheet={rabbit:ELITE_RABBIT_SHEET,squirrel:SQUIRREL_G_SHEET,kangaroo:KANG_ROO_SHEET,mooth:MOOTH_SHEET,rhino:RHINO_SHEET,bear:BEAR_SHEET,face:FACE_SHEET}[u.type]||(evolved&&newAtlas?.evolved?newAtlas.evolved.sheet:newAtlas?.sheet);if(sheet)e.querySelector('.dog-sprite').style.backgroundImage=`url(${sheet})`;if(legacyAlly)animateAlly(u);else animateDog(u)}
+function drawUnit(u){let e=document.createElement('div'),evolved=u.ally&&u.stats?.evolved,legacyAlly=u.ally&&!NEW_ATLASES[u.type];e.className='unit '+u.type+(u.ally?' ally-art':'')+(evolved?' evolved':'');e.style.setProperty('--unit-color',COLORS?.[u.type]||'#fff');e.innerHTML='<div class="bar"><i style="width:100%"></i></div>'+(legacyAlly?'<span class="ally-shadow"></span><span class="ally-sprite"></span>'+(evolved?'<span class="evolved-sprite"></span>':'')+(u.type==='pink'&&!evolved?'<span class="pink-ribbon"><i></i></span>':''):'<span class="dog-shadow"></span><span class="dog-sprite"></span>'+(u.type==='leboin'?'<span class="dog-sprite-legs"></span>':''));e.setAttribute('aria-label',UNIT_NAMES[u.type]+(evolved?' 2진':''));u.el=e;unitsEl.append(e);const newAtlas=NEW_ATLASES[u.type];const sheet={rabbit:ELITE_RABBIT_SHEET,squirrel:SQUIRREL_G_SHEET,kangaroo:KANG_ROO_SHEET,mooth:MOOTH_SHEET,rhino:RHINO_SHEET,bear:BEAR_SHEET,face:FACE_SHEET}[u.type]||(evolved&&newAtlas?.evolved?newAtlas.evolved.sheet:newAtlas?.sheet);if(sheet)e.querySelector('.dog-sprite').style.backgroundImage=`url(${sheet})`;if(legacyAlly)animateAlly(u);else animateDog(u)}
 function target(u){let foes=game.units.filter(v=>v.hp>0&&v.kbTime<=0&&!v.emerging&&v.ally!==u.ally);let dir=u.ally?-1:1;return foes.filter(v=>dir*(v.x-u.x)>=-1).sort((a,b)=>Math.abs(a.x-u.x)-Math.abs(b.x-u.x))[0]}
 // Canonical knockback counts include death. Red keeps its original two live hitbacks.
 const HITBACK_DURATION=20/30;
@@ -325,6 +325,7 @@ const DOG_FRAMES={walk:[[4,50],[57,50],[110,50]],attack:[[4,125],[57,125],[110,1
 function animateDog(u){
  if(u.type==='pigge'){animatePigge(u);return}
  if(u.type==='snache'){animateSnache(u);return}
+ if(u.type==='leboin'){animateLeboin(u);return}
  if(NEW_ATLASES[u.type]){animateAtlas(u);return}
  const state=u.hurtTime>0?'hurt':u.attackTime>0?'attack':'walk';
  const frames=DOG_FRAMES[state];
@@ -348,6 +349,41 @@ function animateSnache(u){
  sprite.style.left='-10px';
  sprite.style.filter=u.hurtTime>0?'brightness(1.8)':'none';
  u.el.dataset.animation=u.hurtTime>0?'hurt':attacking?'attack':'walk';
+}
+
+// leboin_dog-sprite.png draws this character's head/trunk and its 3-frame walk-cycle
+// legs as separate, disconnected pieces (a head-fixed/legs-cycling rig), not one
+// self-contained pose per frame like the other enemies. Composite them as two layered
+// sprites instead of cropping a single rectangle that can only grab one or the other.
+const LEBOIN_HEAD={x:159,y:0,w:133,h:142,left:-25};
+const LEBOIN_LEGS={x:164,w:140,h:32,left:-27,y:[153,189,223]};
+const LEBOIN_SPRAY={x:1,y:10,w:156,h:147};
+function animateLeboin(u){
+ const scale=.55;
+ const head=u.el.querySelector('.dog-sprite'),legs=u.el.querySelector('.dog-sprite-legs');
+ const state=u.hurtTime>0?'hurt':u.attackTime>0?'attack':'walk';
+ const duration=data.units.leboin.attackDuration;
+ const spraying=state==='attack'&&(duration-u.attackTime)>=data.units.leboin.windup;
+ if(spraying){
+  legs.style.display='none';
+  head.style.left='-16px';head.style.bottom='0px';
+  head.style.width=LEBOIN_SPRAY.w+'px';head.style.height=LEBOIN_SPRAY.h+'px';
+  head.style.backgroundPosition=`-${LEBOIN_SPRAY.x}px -${LEBOIN_SPRAY.y}px`;
+  head.style.transform=`scale(${scale})`;head.style.transformOrigin='left bottom';
+ }else{
+  const legIndex=state==='walk'?Math.floor(u.animTime/.16)%3:0;
+  legs.style.display='block';
+  legs.style.width=LEBOIN_LEGS.w+'px';legs.style.height=LEBOIN_LEGS.h+'px';
+  legs.style.left=LEBOIN_LEGS.left+'px';legs.style.bottom='0px';
+  legs.style.backgroundPosition=`-${LEBOIN_LEGS.x}px -${LEBOIN_LEGS.y[legIndex]}px`;
+  legs.style.transform=`scale(${scale})`;legs.style.transformOrigin='left bottom';
+  head.style.width=LEBOIN_HEAD.w+'px';head.style.height=LEBOIN_HEAD.h+'px';
+  head.style.left=LEBOIN_HEAD.left+'px';head.style.bottom=(LEBOIN_LEGS.h*scale)+'px';
+  head.style.backgroundPosition=`-${LEBOIN_HEAD.x}px -${LEBOIN_HEAD.y}px`;
+  head.style.transform=`scale(${scale})`;head.style.transformOrigin='left bottom';
+  head.style.filter=u.hurtTime>0?'brightness(1.8)':'none';
+ }
+ u.el.dataset.animation=state;
 }
 
 const UNIT_NAMES={pink:'핑크',rhino:'투뿔소',bear:'곰선생',face:'대갈이군',cyan:'시안',blue:'블루',purple:'퍼플',peng:'재키펭',gory:'고릴라저씨',baa:'메에메에',seal:'바다레오파드',croco:'아거',leboin:'빠옹',rabbit:'엘리트래빗',squirrel:'다람G',kangaroo:'캥거류',mooth:'나나나난나방',red:'레드',orange:'오렌지',green:'그린',yellow:'옐로우',dog:'멍뭉이',snache:'낼름이',guys:'놈놈놈',hippo:'하마양',pigge:'돼지새끼',crimson:'크림슨',gold:'골드',ivory:'아이보리',chartreuse:'샤르트뢰즈',mint:'민트',azure:'애저',crystal:'크리스탈',lavender:'라벤더',salmon:'살몬',raspberry:'라즈베리'};
@@ -439,7 +475,6 @@ rabbit:{scale:.72,left:-10,walk:[[7,7,52,68],[79,25,56,50],[153,27,55,48],[235,2
 squirrel:{scale:.68,left:-12,walk:[[18,49,58,45],[97,50,63,44],[175,47,92,50],[257,44,79,50],[343,43,76,51]],attack:[[2,100,74,87],[88,96,74,91],[179,92,80,95],[253,119,88,68]],hurt:[[355,143,63,48]]},
 kangaroo:{scale:.58,left:-24,walk:[[5,1,115,124],[126,1,70,124],[4,129,115,124],[124,129,72,124]],attack:[[199,1,110,124],[202,129,108,124],[312,1,105,124],[313,129,104,124]],hurt:[[126,1,70,124]]},
 mooth:{scale:.7,left:-28,walk:[[7,0,99,128],[126,0,100,128],[247,0,76,128]],attack:[[0,132,123,124],[124,132,121,124],[247,132,119,124],[376,0,136,153]],hurt:[[247,0,76,128]]},
-leboin:{scale:.55,left:-16,walk:[[298,0,103,252],[298,0,103,252],[298,0,103,252]],attack:[[298,0,103,252],[1,10,156,147],[1,10,156,147]],hurt:[[298,0,103,252]]},
 peng:{"scale": 0.72, "left": 0, "walk": [[1, 1, 63, 87], [68, 1, 61, 87], [136, 1, 61, 87], [204, 1, 64, 87], [272, 1, 62, 87], [340, 1, 61, 87], [405, 1, 62, 87]], "attack": [[1, 91, 64, 88], [71, 92, 61, 87], [137, 92, 62, 87], [204, 92, 63, 87], [271, 92, 60, 87], [329, 92, 61, 87], [391, 91, 113, 135]], "hurt": [[1, 185, 86, 63]]},
 gory:{"scale": 0.7, "left": -5, "walk": [[2, 3, 72, 84], [77, 3, 70, 84], [152, 3, 72, 84], [228, 3, 73, 84], [304, 3, 72, 84], [378, 3, 72, 84]], "attack": [[2, 90, 74, 101], [80, 90, 75, 101], [158, 89, 100, 90], [261, 91, 99, 77], [364, 91, 91, 77]], "hurt": [[261, 169, 98, 77]]},
 baa:{"scale": 0.68, "left": -7, "walk": [[6, 1, 86, 75], [99, 1, 85, 75], [190, 1, 87, 75], [280, 1, 85, 75], [371, 1, 85, 75]], "attack": [[1, 79, 86, 75], [92, 79, 85, 75], [180, 77, 118, 77], [301, 78, 88, 76]], "hurt": [[91, 157, 86, 70]]},
@@ -489,7 +524,6 @@ function animateAtlas(u){
   index=Math.min(frames.length-1,Math.floor(elapsed/duration*frames.length));
  }else if(visualState==='attack'&&data.units[u.type].windup){const elapsed=duration-u.attackTime,windup=data.units[u.type].windup,strike={gory:2,baa:2,seal:4,croco:3}[u.type];if(strike!==undefined)index=elapsed<windup?Math.min(strike-1,Math.floor(elapsed/windup*strike)):Math.min(frames.length-1,strike+Math.floor((elapsed-windup)/Math.max(.01,duration-windup)*(frames.length-strike)));}
  if(state==='hurt'&&u.type==='gory')index=0;
- if(visualState==='attack'&&u.type==='leboin')index=(duration-u.attackTime)<data.units.leboin.windup?0:2;
  const [x,y,w,h]=frames[index];const sprite=u.el.querySelector('.dog-sprite');
  sprite.style.backgroundPosition=`-${x}px -${y}px`;
  sprite.style.width=w+'px';sprite.style.height=h+'px';sprite.style.left=baseAtlas.left+'px';
