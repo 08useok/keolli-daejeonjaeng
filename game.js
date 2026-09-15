@@ -340,7 +340,7 @@ rhino:{scale:.55,left:-27,walk:[[0,0,126,84],[128,0,126,84],[256,0,126,84],[384,
 bear:{scale:.58,left:-22,walk:[[0,0,88,130],[94,67,97,183],[190,67,100,183],[443,0,69,128],[0,0,88,130]],attack:[[190,67,100,183],[290,67,126,160],[0,0,88,130]]},
 face:{scale:.62,left:-25,walk:[[0,0,118,130],[121,0,120,130]],attack:[[244,0,125,130],[371,0,126,130]],hurt:[[0,134,155,118]]},
 rabbit:{scale:.72,left:-10,walk:[[7,7,52,68],[79,25,56,50],[153,27,55,48],[235,2,57,75],[292,2,72,75],[376,8,65,69]],attack:[[7,84,72,77],[104,78,64,76],[236,79,58,79],[324,80,116,72]],hurt:[[13,177,92,65]]},
-squirrel:{scale:.68,left:-12,walk:[[20,18,54,52],[99,18,54,52],[178,17,66,53],[259,13,75,57],[340,13,77,57]],attack:[[5,84,79,83],[95,84,79,83],[181,84,79,83],[269,84,80,83]],hurt:[[348,91,69,76]]},
+squirrel:{scale:.68,left:-12,walk:[[18,49,58,45],[97,50,63,44],[175,47,92,50],[257,44,79,50],[343,43,76,51]],attack:[[2,100,74,87],[88,96,74,91],[179,92,80,95],[253,119,88,68]],hurt:[[355,143,63,48]]},
 kangaroo:{scale:.58,left:-24,walk:[[5,1,115,124],[126,1,70,124],[4,129,115,124],[124,129,72,124]],attack:[[199,1,110,124],[202,129,108,124],[312,1,105,124],[313,129,104,124]],hurt:[[126,1,70,124]]},
 mooth:{scale:.7,left:-28,walk:[[7,0,99,128],[126,0,100,128],[247,0,76,128]],attack:[[0,132,123,124],[124,132,121,124],[247,132,119,124],[376,0,136,153]],hurt:[[247,0,76,128]]},
 leboin:{scale:.55,left:-16,walk:[[298,0,103,252],[298,0,103,252],[298,0,103,252]],attack:[[298,0,103,252],[1,10,156,147],[1,10,156,147]],hurt:[[298,0,103,252]]},
@@ -440,6 +440,10 @@ function animateAlly(u){
    sprite.style.width=cell+'px';sprite.style.backgroundPosition=`${-2*cell}px ${-row*cell}px`;
   }else if(WIDE_THROW_TYPES.has(u.type)&&col===4){
    sprite.style.width=(cell*2)+'px';sprite.style.backgroundPosition=`${-3*cell}px ${-row*cell}px`;
+  }else if(u.type==='green'&&col===3){
+   // The raised-boomerang windup frame has a stray sliver of the next (thrown) frame's
+   // boomerang bleeding in at its right edge; crop a bit narrower to exclude it.
+   sprite.style.width='68px';sprite.style.backgroundPosition=`${-3*cell}px ${-row*cell}px`;
   }else{
    sprite.style.width=cell+'px';sprite.style.backgroundPosition=`${-col*cell}px ${-row*cell}px`;
   }
