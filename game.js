@@ -78,8 +78,8 @@ data.units.rhino={hp:5200,atk:420,interval:2.1,speed:5.5,range:5.2,reward:900,kn
 data.units.bear={hp:6500,atk:520,interval:2.4,speed:4.5,range:8.5,reward:1050,knockbacks:2,attackDuration:1,windup:.5,area:true};
 data.units.face={trait:"floating",hp:18000,atk:850,interval:3.4,speed:1.8,range:14,reward:2500,knockbacks:3,attackDuration:1.2,windup:.65,area:true};
 const CRIMSON_SHEET='assets/unitcrimson_ally-sprite.png';
-const GOLD_SHEET='assets/gold_sheet.png';
-const IVORY_SHEET='assets/ivory_sheet.png';
+const GOLD_SHEET='assets/unitgold_ally-sprite.png';
+const IVORY_SHEET='assets/unitivory_ally-sprite.png';
 const CHARTREUSE_SHEET='assets/chartreuse_sheet.png';
 const MINT_SHEET='assets/mint_sheet.png';
 const AZURE_SHEET='assets/azure_sheet.png';
@@ -483,8 +483,8 @@ croco:{"scale": 0.72, "left": -10, "walk": [[1, 28, 85, 42], [89, 28, 85, 42], [
 
  pigge:{scale:.8,left:-20,walk:[[4,1,103,77],[4,79,103,76],[4,157,103,76],[115,5,104,73],[112,80,109,76],[115,158,104,75]],attack:[[225,1,126,104],[225,107,126,67],[225,177,126,67]],hurt:[[355,3,124,65],[368,72,103,65]]},
  crimson:{scale:0.45,left:-30,sheet:CRIMSON_SHEET,walk:[[10,36,136,144],[234,36,136,143],[463,36,140,145]],attack:[[685,36,185,142],[900,36,220,142],[1186,36,138,143]],hurt:[[1401,36,166,150]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[55,2,76,104],[235,2,74,104],[414,2,83,104]],attack:[[605,2,107,104],[772,2,133,104],[1158,3,89,103]],hurt:[[1333,4,112,93]]}},
- gold:{scale:0.7,left:-8,sheet:GOLD_SHEET,walk:[[53,0,80,106],[237,0,78,106],[419,0,86,106]],attack:[[600,0,111,106],[773,0,149,106],[1155,0,124,106]],hurt:[[1333,0,115,106]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[56,106,71,106],[239,106,71,106],[419,106,78,106]],attack:[[601,106,107,106],[773,106,145,106],[1161,106,118,106]],hurt:[[1333,106,114,106]]}},
- ivory:{scale:0.7,left:-8,sheet:IVORY_SHEET,walk:[[53,0,80,106],[235,0,79,106],[413,0,93,106]],attack:[[598,0,119,106],[774,0,152,106],[1155,0,91,106]],hurt:[[1332,0,116,106]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[40,212,83,106],[232,212,75,106],[413,212,82,106]],attack:[[583,212,131,106],[761,212,164,106],[1149,212,82,106]],hurt:[[1332,212,115,106]]}},
+ gold:{scale:0.36,left:-30,sheet:GOLD_SHEET,walk:[[16,268,166,175],[279,267,165,174],[545,267,170,176]],attack:[[799,258,237,185],[1055,267,331,173],[1458,267,167,176]],hurt:[[1707,267,261,185]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[56,106,71,106],[239,106,71,106],[419,106,78,106]],attack:[[601,106,107,106],[773,106,145,106],[1161,106,118,106]],hurt:[[1333,106,114,106]]}},
+ ivory:{scale:0.36,left:-30,sheet:IVORY_SHEET,walk:[[12,285,169,177],[271,285,169,176],[536,285,173,177]],attack:[[754,247,243,214],[1036,284,352,176],[1459,285,169,177]],hurt:[[1711,282,263,186]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[40,212,83,106],[232,212,75,106],[413,212,82,106]],attack:[[583,212,131,106],[761,212,164,106],[1149,212,82,106]],hurt:[[1332,212,115,106]]}},
  chartreuse:{scale:0.7,left:-7,sheet:CHARTREUSE_SHEET,walk:[[53,0,79,106],[237,0,78,106],[416,0,89,106]],attack:[[597,0,136,106],[777,0,146,106],[1156,0,99,106]],hurt:[[1334,0,114,106]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[52,318,70,106],[236,318,71,106],[417,318,78,106]],attack:[[599,318,130,106],[780,318,137,106],[1161,318,88,106]],hurt:[[1334,318,114,106]]}},
  mint:{scale:0.7,left:-8,sheet:MINT_SHEET,walk:[[52,0,80,106],[235,0,80,106],[418,0,89,106]],attack:[[597,0,123,106],[774,0,149,106],[1154,0,91,106]],hurt:[[1333,0,117,106]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[49,424,74,106],[234,424,73,106],[414,424,81,106]],attack:[[593,424,124,106],[767,424,151,106],[1154,424,82,106]],hurt:[[1333,424,117,106]]}},
  azure:{scale:0.55,left:-13,sheet:AZURE_SHEET,walk:[[41,0,123,106],[224,0,123,106],[411,0,121,106]],attack:[[592,0,117,106],[783,0,132,106],[1148,0,124,106]],hurt:[[1336,0,130,106]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[41,530,118,106],[224,530,120,106],[409,530,117,106]],attack:[[591,530,117,106],[784,530,125,106],[1148,530,123,106]],hurt:[[1338,530,127,106]]}},
