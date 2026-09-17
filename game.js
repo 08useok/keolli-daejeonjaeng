@@ -621,9 +621,24 @@ const PROFILE_CALIB={
 };
 const NEW_PROFILE_SHEET='assets/new_chars_profiles.png';
 const NEW_PROFILE_ORDER=['crimson','gold','ivory','chartreuse','mint','azure','crystal','lavender','salmon','raspberry'];
+// The 5x2 grid isn't evenly split across the full square canvas - the artwork sits in a
+// band with large blank margins above/below, so a naive 500%/200% percentage crop cuts
+// off each portrait. Calibrated per-character like PROFILE_CALIB below instead.
+const NEW_PROFILE_CALIB={
+ crimson:{size:627,x:0,y:-156},
+ gold:{size:454,x:-73,y:-84},
+ ivory:{size:622,x:-248,y:-154},
+ chartreuse:{size:630,x:-377,y:-157},
+ mint:{size:624,x:-499,y:-156},
+ azure:{size:557,x:7,y:-304},
+ crystal:{size:561,x:-105,y:-308},
+ lavender:{size:561,x:-217,y:-307},
+ salmon:{size:568,x:-334,y:-312},
+ raspberry:{size:566,x:-446,y:-311}
+};
 function profileMarkup(type,evolved){
  const idx=NEW_PROFILE_ORDER.indexOf(type);
- if(idx>=0){const col=idx%5,row=Math.floor(idx/5);return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${NEW_PROFILE_SHEET});background-size:500% 200%;background-position:${col/4*100}% ${row*100}%"></div>`}
+ if(idx>=0){const c=NEW_PROFILE_CALIB[type];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${NEW_PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
  const c=PROFILE_CALIB[type][evolved?'evolved':'base'];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
 let training={xp:0,baseLevel:1,levels:{red:1,orange:1,yellow:1,green:1,cyan:1,blue:1,purple:1,pink:1}},trainingSaveFailed=false;
 function stageXP(i){return 200+i*50}
