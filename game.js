@@ -80,13 +80,13 @@ data.units.face={trait:"floating",hp:18000,atk:850,interval:3.4,speed:1.8,range:
 const CRIMSON_SHEET='assets/unitcrimson_ally-sprite.png';
 const GOLD_SHEET='assets/unitgold_ally-sprite.png';
 const IVORY_SHEET='assets/unitivory_ally-sprite.png';
-const CHARTREUSE_SHEET='assets/chartreuse_sheet.png';
-const MINT_SHEET='assets/mint_sheet.png';
-const AZURE_SHEET='assets/azure_sheet.png';
-const CRYSTAL_SHEET='assets/crystal_sheet.png';
-const LAVENDER_SHEET='assets/lavender_sheet.png';
-const SALMON_SHEET='assets/salmon_sheet.png';
-const RASPBERRY_SHEET='assets/raspberry_sheet.png';
+const CHARTREUSE_SHEET='assets/unitchartreuse_ally-sprite.png';
+const MINT_SHEET='assets/unitmint_ally-sprite.png';
+const AZURE_SHEET='assets/unitazure_ally-sprite.png';
+const CRYSTAL_SHEET='assets/unitcrystal_ally-sprite.png';
+const LAVENDER_SHEET='assets/unitlavender_ally-sprite.png';
+const SALMON_SHEET='assets/unitsalmon_ally-sprite.png';
+const RASPBERRY_SHEET='assets/unitraspberry_ally-sprite.png';
 const NEWCHAR_EVOLVED_SHEET='assets/new_chars_evolved_sheet.png';
 data.units.crimson={hp:900,atk:650,interval:2.8,speed:5,range:7,cost:300,cooldown:10,knockbacks:3,forceKnockback:true};
 data.units.gold={hp:600,atk:180,interval:3.6,speed:5,range:21,cost:425,cooldown:15,knockbacks:3,multiHit:3};
@@ -485,13 +485,13 @@ croco:{"scale": 0.72, "left": -10, "walk": [[1, 28, 85, 42], [89, 28, 85, 42], [
  crimson:{scale:0.45,left:-30,sheet:CRIMSON_SHEET,walk:[[10,36,136,144],[234,36,136,143],[463,36,140,145]],attack:[[685,36,185,142],[900,36,220,142],[1186,36,138,143]],hurt:[[1401,36,166,150]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[55,2,76,104],[235,2,74,104],[414,2,83,104]],attack:[[605,2,107,104],[772,2,133,104],[1158,3,89,103]],hurt:[[1333,4,112,93]]}},
  gold:{scale:0.36,left:-30,sheet:GOLD_SHEET,walk:[[16,268,166,175],[279,267,165,174],[545,267,170,176]],attack:[[799,258,237,185],[1055,267,331,173],[1458,267,167,176]],hurt:[[1707,267,261,185]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[56,106,71,106],[239,106,71,106],[419,106,78,106]],attack:[[601,106,107,106],[773,106,145,106],[1161,106,118,106]],hurt:[[1333,106,114,106]]}},
  ivory:{scale:0.36,left:-30,sheet:IVORY_SHEET,walk:[[12,285,169,177],[271,285,169,176],[536,285,173,177]],attack:[[754,247,243,214],[1036,284,352,176],[1459,285,169,177]],hurt:[[1711,282,263,186]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[40,212,83,106],[232,212,75,106],[413,212,82,106]],attack:[[583,212,131,106],[761,212,164,106],[1149,212,82,106]],hurt:[[1332,212,115,106]]}},
- chartreuse:{scale:0.7,left:-7,sheet:CHARTREUSE_SHEET,walk:[[53,0,79,106],[237,0,78,106],[416,0,89,106]],attack:[[597,0,136,106],[777,0,146,106],[1156,0,99,106]],hurt:[[1334,0,114,106]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[52,318,70,106],[236,318,71,106],[417,318,78,106]],attack:[[599,318,130,106],[780,318,137,106],[1161,318,88,106]],hurt:[[1334,318,114,106]]}},
- mint:{scale:0.7,left:-8,sheet:MINT_SHEET,walk:[[52,0,80,106],[235,0,80,106],[418,0,89,106]],attack:[[597,0,123,106],[774,0,149,106],[1154,0,91,106]],hurt:[[1333,0,117,106]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[49,424,74,106],[234,424,73,106],[414,424,81,106]],attack:[[593,424,124,106],[767,424,151,106],[1154,424,82,106]],hurt:[[1333,424,117,106]]}},
- azure:{scale:0.55,left:-13,sheet:AZURE_SHEET,walk:[[41,0,123,106],[224,0,123,106],[411,0,121,106]],attack:[[592,0,117,106],[783,0,132,106],[1148,0,124,106]],hurt:[[1336,0,130,106]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[41,530,118,106],[224,530,120,106],[409,530,117,106]],attack:[[591,530,117,106],[784,530,125,106],[1148,530,123,106]],hurt:[[1338,530,127,106]]}},
- crystal:{scale:0.7,left:-8,sheet:CRYSTAL_SHEET,walk:[[52,0,80,106],[234,0,81,106],[418,0,88,106]],attack:[[589,0,87,106],[773,0,116,106],[1156,0,77,106]],hurt:[[1333,0,113,106]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[56,636,70,106],[239,636,67,106],[423,636,74,106]],attack:[[602,636,74,106],[782,636,86,106],[1162,636,72,106]],hurt:[[1334,636,112,106]]}},
- lavender:{scale:0.7,left:-8,sheet:LAVENDER_SHEET,walk:[[50,0,81,106],[230,0,83,106],[412,0,94,106]],attack:[[591,0,136,106],[774,0,152,106],[1151,0,115,106]],hurt:[[1320,0,146,106]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[55,742,75,106],[233,742,80,106],[413,742,90,106]],attack:[[599,742,125,106],[775,742,150,106],[1157,742,107,106]],hurt:[[1318,742,147,106]]}},
- salmon:{scale:0.7,left:-9,sheet:SALMON_SHEET,walk:[[49,0,84,106],[229,0,86,106],[413,0,95,106]],attack:[[585,0,145,106],[771,0,131,106],[1147,0,129,106]],hurt:[[1316,0,148,106]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[46,848,78,106],[233,848,74,106],[415,848,80,106]],attack:[[590,848,139,106],[768,848,128,106],[1152,848,124,106]],hurt:[[1315,848,148,106]]}},
- raspberry:{scale:0.7,left:-9,sheet:RASPBERRY_SHEET,walk:[[50,0,84,81],[230,0,86,81],[414,0,92,81]],attack:[[585,0,144,82],[769,0,146,82],[1154,0,133,83]],hurt:[[1313,0,140,95]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[30,954,95,95],[216,954,93,94],[408,954,88,95]],attack:[[577,954,149,93],[754,954,154,94],[1139,954,148,93]],hurt:[[1319,954,123,93]]}},
+ chartreuse:{scale:0.45,left:-30,sheet:CHARTREUSE_SHEET,walk:[[46,36,140,151],[261,40,138,144],[472,33,146,154]],attack:[[682,36,146,151],[811,39,333,149],[1203,36,135,149]],hurt:[[1414,37,190,151]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[52,318,70,106],[236,318,71,106],[417,318,78,106]],attack:[[599,318,130,106],[780,318,137,106],[1161,318,88,106]],hurt:[[1334,318,114,106]]}},
+ mint:{scale:0.45,left:-30,sheet:MINT_SHEET,walk:[[52,44,130,141],[267,45,129,140],[474,44,135,141]],attack:[[669,33,175,152],[878,47,265,139],[1199,45,127,139]],hurt:[[1408,46,169,142]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[49,424,74,106],[234,424,73,106],[414,424,81,106]],attack:[[593,424,124,106],[767,424,151,106],[1154,424,82,106]],hurt:[[1333,424,117,106]]}},
+ azure:{scale:0.45,left:-30,sheet:AZURE_SHEET,walk:[[47,47,143,156],[253,52,141,149],[453,47,147,156]],attack:[[666,6,180,193],[862,8,320,208],[1226,45,141,155]],hurt:[[1411,47,198,154]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[41,530,118,106],[224,530,120,106],[409,530,117,106]],attack:[[591,530,117,106],[784,530,125,106],[1148,530,123,106]],hurt:[[1338,530,127,106]]}},
+ crystal:{scale:0.45,left:-30,sheet:CRYSTAL_SHEET,walk:[[48,36,142,153],[256,39,142,149],[464,36,144,153]],attack:[[679,36,163,152],[858,36,273,152],[1187,36,141,153]],hurt:[[1400,34,190,155]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[56,636,70,106],[239,636,67,106],[423,636,74,106]],attack:[[602,636,74,106],[782,636,86,106],[1162,636,72,106]],hurt:[[1334,636,112,106]]}},
+ lavender:{scale:0.45,left:-30,sheet:LAVENDER_SHEET,walk:[[52,36,138,151],[264,38,137,148],[471,36,142,151]],attack:[[682,36,167,151],[873,36,257,150],[1191,36,136,150]],hurt:[[1416,36,187,149]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[55,742,75,106],[233,742,80,106],[413,742,90,106]],attack:[[599,742,125,106],[775,742,150,106],[1157,742,107,106]],hurt:[[1318,742,147,106]]}},
+ salmon:{scale:0.45,left:-30,sheet:SALMON_SHEET,walk:[[52,72,130,142],[264,73,129,140],[455,73,133,142]],attack:[[649,7,192,207],[825,74,337,140],[1232,72,129,142]],hurt:[[1428,71,183,144]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[46,848,78,106],[233,848,74,106],[415,848,80,106]],attack:[[590,848,139,106],[768,848,128,106],[1152,848,124,106]],hurt:[[1315,848,148,106]]}},
+ raspberry:{scale:0.45,left:-30,sheet:RASPBERRY_SHEET,walk:[[38,35,139,151],[256,36,136,145],[476,34,142,152]],attack:[[664,37,195,149],[877,37,279,150],[1221,34,139,151]],hurt:[[1453,38,190,148]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,walk:[[30,954,95,95],[216,954,93,94],[408,954,88,95]],attack:[[577,954,149,93],[754,954,154,94],[1139,954,148,93]],hurt:[[1319,954,123,93]]}},
  guys:{scale:1,left:0,walk:[[30,40,43,32],[90,40,42,32],[150,40,43,32],[210,40,43,32],[270,40,43,32]],attack:[[30,100,43,32],[90,100,48,32],[150,100,51,32],[210,100,54,32],[270,87,63,45],[30,147,64,45],[100,154,56,38],[160,154,56,38],[220,161,43,31]],hurt:[[33,221,41,31]]},
  hippo:{scale:.9,left:-26,walk:[[1,24,105,78],[113,24,105,78],[226,24,104,78]],attack:[[337,4,99,98],[1,104,99,101],[113,118,110,87],[225,140,109,65],[338,127,104,78]]}
 };
