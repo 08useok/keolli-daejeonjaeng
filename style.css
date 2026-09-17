@@ -125,6 +125,7 @@ body { overflow:auto; }
 .freeze-badge{position:absolute;display:none;top:-30px;left:50%;transform:translateX(-50%);z-index:5;pointer-events:none}
 .unit.frozen .freeze-badge{display:block}
 .freeze-badge .freeze-icon{width:16px;height:16px}
+.title-icon{width:20px;height:20px;margin-left:6px;vertical-align:-4px}
 .purple-btn strong:after{content:"";display:inline-block;width:17px;height:17px;margin-left:4px;vertical-align:-3px;background:url("assets/ability_icon.png") center/contain no-repeat}
 .training-card:nth-of-type(7) h3:after{content:"";display:inline-block;width:25px;height:25px;margin-left:7px;vertical-align:-6px;background:url("assets/ability_icon.png") center/contain no-repeat}
 
