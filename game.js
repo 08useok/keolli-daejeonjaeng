@@ -123,10 +123,10 @@ function reset(){syncBasePositions();last=0;game={money:0,level:0,units:[],defea
 function addUnit(type){
  if(game.ended)return;
  const d=data.units[type],ally=ALLIES.includes(type);
- if(ally&&(!(game.running||(type==='red'&&game.tutorial===2))||game.paused||unitCooldown(type)>0||game.money<d.cost||!allyUnlocked(type)))return;
+ if(ally&&(!(game.running||(type==='red'&&game.tutorial===2))||game.paused||unitCooldown(type)>0||game.money<unitCost(type)||!allyUnlocked(type)))return;
  const stats=unitStats(type);const u={type,ally,stats,hp:stats.hp,max:stats.hp,x:ally?data.bases.ally.x:data.bases.enemy.x,emerging:true,atkCd:0,kb:0,animTime:0,attackTime:0,hurtTime:0,kbTime:0,flashTime:0};
  game.units.push(u);drawUnit(u);u.el.style.left=`calc(${u.x}% - 21px)`;
- if(ally){game.money-=d.cost;game[cooldownKey(type)]=d.cooldown;if(game.tutorial===2){game.tutorial=3;tutorial()}}render();
+ if(ally){game.money-=unitCost(type);game[cooldownKey(type)]=d.cooldown;if(game.tutorial===2){game.tutorial=3;tutorial()}}render();
 }
 function drawUnit(u){let e=document.createElement('div'),evolved=u.ally&&u.stats?.evolved,legacyAlly=u.ally&&!NEW_ATLASES[u.type];e.className='unit '+u.type+(u.ally?' ally-art':'')+(evolved?' evolved':'');e.style.setProperty('--unit-color',COLORS?.[u.type]||'#fff');e.innerHTML='<div class="bar"><i style="width:100%"></i></div><span class="freeze-badge"><span class="freeze-icon"></span></span>'+(legacyAlly?'<span class="ally-shadow"></span><span class="ally-sprite"></span>'+(evolved?'<span class="evolved-sprite"></span>':'')+(u.type==='pink'&&!evolved?'<span class="pink-ribbon"><i></i></span>':''):'<span class="dog-shadow"></span><span class="dog-sprite"></span>'+(u.type==='leboin'?'<span class="dog-sprite-legs"></span>':''));e.setAttribute('aria-label',UNIT_NAMES[u.type]+(evolved?' 2진':''));u.el=e;unitsEl.append(e);const newAtlas=NEW_ATLASES[u.type];const sheet={rabbit:ELITE_RABBIT_SHEET,squirrel:SQUIRREL_G_SHEET,kangaroo:KANG_ROO_SHEET,mooth:MOOTH_SHEET,rhino:RHINO_SHEET,bear:BEAR_SHEET,face:FACE_SHEET}[u.type]||(evolved&&newAtlas?.evolved?newAtlas.evolved.sheet:newAtlas?.sheet);if(sheet)e.querySelector('.dog-sprite').style.backgroundImage=`url(${sheet})`;if(legacyAlly)animateAlly(u);else animateDog(u)}
 function target(u){let foes=game.units.filter(v=>v.hp>0&&v.kbTime<=0&&!v.emerging&&v.ally!==u.ally);let dir=u.ally?-1:1;return foes.filter(v=>dir*(v.x-u.x)>=-1).sort((a,b)=>Math.abs(a.x-u.x)-Math.abs(b.x-u.x))[0]}
@@ -212,7 +212,7 @@ function updateBoomerangs(dt){
  }
 }
 function renderGreenButton(){
- const b=$('#greenBtn'),d=data.units.green;b.disabled=!greenUnlocked()||!game.running||game.paused||game.ended||game.money<d.cost||game.greenCd>0;
+ const b=$('#greenBtn'),d=data.units.green;b.disabled=!greenUnlocked()||!game.running||game.paused||game.ended||game.money<unitCost("green")||game.greenCd>0;
  b.querySelector('small').textContent=greenUnlocked()?'175원':'일본 클리어 시 해금';b.querySelector('em').style.display=game.greenCd?'block':'none';b.querySelector('em').style.transform=`scaleY(${game.greenCd/d.cooldown})`;
  b.title='체력 280 · 편도당 공격력 65 · 공격 주기 2.8초 · 재출격 7초';
 }
@@ -300,15 +300,15 @@ game.spawnCd=Math.max(0,game.spawnCd-dt);game.orangeCd=Math.max(0,game.orangeCd-
 function render(){renderDeckButtons();renderSpeedButton();renderNewButtons();renderGreenButton();renderOrangeButton();renderYellowButton();renderUnitLevels();$('#battleNotice').classList.toggle('hidden',!(game.noticeTime>0));$('#pauseBtn').disabled=!game.running||game.ended;$('#pauseBtn').textContent=game.paused?'계속하기':'일시정지';$('#pauseNotice').classList.toggle('hidden',!game.paused);$('#timer').textContent=`${STAGES[selectedStage].name}${chapterOf(selectedStage)===2?' (2장)':''} · ${Math.floor(game.elapsed)}초`;let l=data.income[game.level];$('#money').textContent=`${Math.floor(game.money)}원`;$('#enemyHp').textContent=data.bases.enemy.hp;$('#allyHp').textContent=data.bases.ally.hp;for(let [name,b] of Object.entries(data.bases))$(`#${name}Base span`).style.width=(b.hp/b.max*100)+'%';let sb=$('#spawnBtn'),ib=$('#incomeBtn'),canSpawn=!game.ended&&!game.paused&&(game.running||game.tutorial===2),canUpgrade=!game.ended&&!game.paused&&(game.running||game.tutorial===4);sb.disabled=game.money<data.units.red.cost||game.spawnCd>0||!canSpawn;sb.querySelector('small').textContent=data.units.red.cost+'원';sb.querySelector('em').style.display=game.spawnCd?'block':'none';sb.querySelector('em').style.transform=`scaleY(${game.spawnCd/data.units.red.cooldown})`;ib.disabled=!canUpgrade||game.level===5||game.money<(l.cost||0);ib.innerHTML=game.level===5?'수입 Lv.MAX':`수입 업그레이드<br><small>${l.cost}원</small>`}
 function renderOrangeButton(){
  const button=$('#orangeBtn'),d=data.units.orange,unlocked=orangeUnlocked();
- button.disabled=!unlocked||!game.running||game.paused||game.ended||game.money<d.cost||game.orangeCd>0;
- button.querySelector('small').textContent=unlocked?`${d.cost}원`:'중국 클리어 시 해금';
+ button.disabled=!unlocked||!game.running||game.paused||game.ended||game.money<unitCost("orange")||game.orangeCd>0;
+ button.querySelector('small').textContent=unlocked?`${unitCost("orange")}원`:'중국 클리어 시 해금';
  button.querySelector('em').style.display=game.orangeCd>0?'block':'none';button.querySelector('em').style.transform=`scaleY(${game.orangeCd/d.cooldown})`;
  button.title='체력 220 · 공격력 100 · 공격 주기 2.4초 · 재출격 6.5초';
 }
 function renderYellowButton(){
  const button=$('#yellowBtn'),d=data.units.yellow;
- button.disabled=!yellowUnlocked()||!game.running||game.paused||game.ended||game.money<d.cost||game.yellowCd>0;
- button.querySelector('small').textContent=yellowUnlocked()?`${d.cost}원`:'필리핀 클리어 시 해금';
+ button.disabled=!yellowUnlocked()||!game.running||game.paused||game.ended||game.money<unitCost("yellow")||game.yellowCd>0;
+ button.querySelector('small').textContent=yellowUnlocked()?`${unitCost("yellow")}원`:'필리핀 클리어 시 해금';
  button.querySelector('em').style.display=game.yellowCd>0?'block':'none';button.querySelector('em').style.transform=`scaleY(${game.yellowCd/d.cooldown})`;
  button.title='체력 900 · 공격력 45 · 공격 주기 1.8초 · 재출격 5초';
 }
@@ -464,8 +464,8 @@ function updateStageSpawns(dt){
 }
 function renderNewButtons(){for(const type of GENERIC_CD_TYPES){
  const b=$('#'+type+'Btn'),d=data.units[type],unlocked=allyUnlocked(type),cd=unitCooldown(type);
- b.disabled=!unlocked||!game.running||game.paused||game.ended||game.money<d.cost||cd>0;
- b.querySelector('small').textContent=unlocked?`${d.cost}원`:STAGES[UNLOCK_AT[type]].name+(STAGES[UNLOCK_AT[type]].chapter===2?' 2장':'')+' 클리어 시 해금';
+ b.disabled=!unlocked||!game.running||game.paused||game.ended||game.money<unitCost(type)||cd>0;
+ b.querySelector('small').textContent=unlocked?`${unitCost(type)}원`:STAGES[UNLOCK_AT[type]].name+(STAGES[UNLOCK_AT[type]].chapter===2?' 2장':'')+' 클리어 시 해금';
  b.querySelector('em').style.display=cd?'block':'none';b.querySelector('em').style.transform=`scaleY(${cd/d.cooldown})`;
 }}
 
@@ -633,18 +633,33 @@ try{
 function saveTraining(){try{localStorage.setItem('red-battle-training-v1',JSON.stringify(training));trainingSaveFailed=false}catch{trainingSaveFailed=true}}
 // Lv.1~10 keeps the original +10%/level curve; Lv.11~20 grows geometrically toward these Lv.20 values (evolution bonuses apply on top).
 const LV20_TARGET={
- red:{hp:12000,atk:600},orange:{hp:11000,atk:2200},yellow:{hp:24000,atk:1400},green:{hp:13000,atk:1800},
- cyan:{hp:10000,atk:3000},blue:{hp:12000,atk:450},purple:{hp:22000,atk:2100},pink:{hp:20000,atk:2400},
- crimson:{hp:30000,atk:4150},gold:{hp:22000,atk:1500},ivory:{hp:24000,atk:3900},chartreuse:{hp:22000,atk:850},
- mint:{hp:24000,atk:3600},azure:{hp:27000,atk:4000},crystal:{hp:25000,atk:4200},lavender:{hp:20000,atk:3200},
- salmon:{hp:18000,atk:4000},raspberry:{hp:17000,atk:1400}
+ red:{hp:10400,atk:600},
+ orange:{hp:9600,atk:2200},
+ yellow:{hp:25000,atk:1400},
+ green:{hp:11300,atk:1800},
+ cyan:{hp:8700,atk:3000},
+ blue:{hp:10400,atk:450},
+ purple:{hp:19100,atk:2100},
+ pink:{hp:17400,atk:2400},
+ crimson:{hp:26000,atk:4150},
+ gold:{hp:19100,atk:1500},
+ ivory:{hp:20900,atk:3900},
+ chartreuse:{hp:19100,atk:850},
+ mint:{hp:20900,atk:3600},
+ azure:{hp:23500,atk:4000},
+ crystal:{hp:21700,atk:4200},
+ lavender:{hp:17400,atk:3200},
+ salmon:{hp:15650,atk:4000},
+ raspberry:{hp:14800,atk:1200}
 };
 function levelMult(base,target,level){
  const lv=Math.min(level,LV_MAX),m10=1+.1*(LV_EVOLVE-1);
  if(!target||lv<=LV_EVOLVE)return 1+.1*(lv-1);
  return m10*Math.pow(Math.max(target/base,m10)/m10,(lv-LV_EVOLVE)/(LV_MAX-LV_EVOLVE));
 }
-function unitStats(type,level=training.levels[type]||1,form=training.forms?.[type]===1?1:2){const d=data.units[type],T=LV20_TARGET[type],hpM=levelMult(d.hp,T?.hp,level),atkM=levelMult(d.atk,T?.atk,level),mag=ALLIES.includes(type)?1:enemyMagnification(),stats={...d,hp:Math.round(d.hp*hpM*mag),atk:Math.round(d.atk*atkM*mag)};if(d.damageTiers)stats.damageTiers=d.damageTiers.map(t=>({...t,dmg:Math.round(t.dmg*atkM)}));if(level<LV_EVOLVE||form===1)return stats;stats.evolved=true;stats.range=type==='raspberry'?d.range*1.1:d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='yellow')stats.hp=Math.round(stats.hp*1.25);if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=3;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);
+const EVO_ATK_BONUS={red:1.2,pink:1.15,crimson:1.2,gold:1.2,chartreuse:1.2,azure:1.2};// 2진 with a dedicated atk bonus; everyone else gets the generic +15% (hp is always +15%, yellow +20%)
+function unitCost(t){return ALLIES.includes(t)?unitStats(t).cost:data.units[t].cost}
+function unitStats(type,level=training.levels[type]||1,form=training.forms?.[type]===1?1:2){const d=data.units[type],T=LV20_TARGET[type],hpM=levelMult(d.hp,T?.hp,level),atkM=levelMult(d.atk,T?.atk,level),mag=ALLIES.includes(type)?1:enemyMagnification(),stats={...d,hp:Math.round(d.hp*hpM*mag),atk:Math.round(d.atk*atkM*mag)};if(d.damageTiers)stats.damageTiers=d.damageTiers.map(t=>({...t,dmg:Math.round(t.dmg*atkM)}));if(level<LV_EVOLVE||form===1)return stats;stats.evolved=true;stats.cost=d.cost*2;stats.hp=Math.round(stats.hp*(type==='yellow'?1.2:1.15));if(!EVO_ATK_BONUS[type]){const k=1.15;stats.atk=Math.round(stats.atk*k);if(stats.damageTiers)stats.damageTiers=stats.damageTiers.map(t=>({...t,dmg:Math.round(t.dmg*k)}))}stats.range=type==='raspberry'?d.range*1.1:d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=3;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);
  if(type==='crimson')stats.atk=Math.round(stats.atk*1.2);
  if(type==='gold')stats.atk=Math.round(stats.atk*1.2);
  if(type==='ivory'){stats.slowPct=.45;stats.slowDuration=d.slowDuration+.5}
@@ -703,7 +718,7 @@ function renderBaseUpgrade(){
  grid.append(card);
 }
 function awardXP(){const reward=cleared.includes(selectedStage)?Math.floor(stageXP(selectedStage)/2):stageXP(selectedStage);training.xp+=reward;saveTraining();return reward}
-function renderUnitLevels(){for(const t of ALLIES){const b=$(t==='red'?'#spawnBtn':'#'+t+'Btn'),d=unitStats(t),e=d.evolved;b.querySelector('strong').textContent=UNIT_NAMES[t]+(e?' 2진':'')+' Lv.'+training.levels[t];b.title=`${ROLES[t]} · 체력 ${d.hp} · 공격력 ${d.atk} · 사거리 ${Math.round(d.range)} · 공격 주기 ${d.interval.toFixed(2)}초 · 이동 ${d.speed} · ${d.cost}원${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'||t==='crystal'?' · 떠다니는 적에게 강함':''}${e?' · 스틱맨 2진':''}`}}
+function renderUnitLevels(){for(const t of ALLIES){const b=$(t==='red'?'#spawnBtn':'#'+t+'Btn'),d=unitStats(t),e=d.evolved;if(t==='red')b.querySelector('small').textContent=d.cost+'원';b.querySelector('strong').textContent=UNIT_NAMES[t]+(e?' 2진':'')+' Lv.'+training.levels[t];b.title=`${ROLES[t]} · 체력 ${d.hp} · 공격력 ${d.atk} · 사거리 ${Math.round(d.range)} · 공격 주기 ${d.interval.toFixed(2)}초 · 이동 ${d.speed} · ${d.cost}원${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'||t==='crystal'?' · 떠다니는 적에게 강함':''}${e?' · 스틱맨 2진':''}`}}
 function renderTraining(){
  $('#xpText').textContent=training.xp+' XP';$('#trainingGrid').innerHTML='';
  $('#deckText').textContent=`출전 덱 ${deck.length} / ${DECK_SIZE} · 전투에는 덱에 넣은 아군만 나옵니다`;
