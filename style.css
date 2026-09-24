@@ -121,10 +121,16 @@ body { overflow:auto; }
 .unit.leboin .bar{top:-24px;width:76px;left:-9px}
 .ability-icon{width:25px;height:25px;vertical-align:middle;margin-right:6px;border-radius:5px}
 .ability-label{display:inline-flex;align-items:center;color:#ffe98e;font-weight:800}
-.freeze-icon{display:inline-block;background:url(assets/freeze_icon.png) center/contain no-repeat}
-.freeze-badge{position:absolute;display:none;top:-30px;left:50%;transform:translateX(-50%);z-index:5;pointer-events:none}
-.unit.frozen .freeze-badge{display:block}
-.freeze-badge .freeze-icon{width:16px;height:16px}
+.freeze-icon,.slow-icon,.weaken-icon,.crit-icon,.pull-icon{display:inline-block;background:url(assets/freeze_icon.png) center/contain no-repeat}
+.slow-icon{background-image:url(assets/slow_icon.svg)}
+.weaken-icon{background-image:url(assets/weaken_icon.svg)}
+.crit-icon{background-image:url(assets/crit_icon.svg)}
+.pull-icon{background-image:url(assets/pull_icon.svg)}
+.status-badges{position:absolute;display:flex;gap:2px;top:-30px;left:50%;transform:translateX(-50%);z-index:5;pointer-events:none}
+.status-badges>span{display:none;width:16px;height:16px}
+.unit.frozen .st-freeze,.unit.slowed .st-slow,.unit.weakened .st-weaken,.unit.crit-hit .st-crit,.unit.pulled .st-pull{display:inline-block}
+.unit.crit-hit .st-crit,.unit.pulled .st-pull{animation:statusPop .6s ease-out}
+@keyframes statusPop{0%{transform:scale(1.8)}35%{transform:scale(1)}}
 .title-icon{width:20px;height:20px;margin-left:6px;vertical-align:-4px}
 .purple-btn strong:after{content:"";display:inline-block;width:17px;height:17px;margin-left:4px;vertical-align:-3px;background:url("assets/ability_icon.png") center/contain no-repeat}
 .training-card:nth-of-type(7) h3:after{content:"";display:inline-block;width:25px;height:25px;margin-left:7px;vertical-align:-6px;background:url("assets/ability_icon.png") center/contain no-repeat}
