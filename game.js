@@ -484,7 +484,7 @@ function stageEnemies(i){return [...new Set((STAGE_SPAWNS[i]||[]).map(r=>r.type)
 function pickDelay(range){return range[0]+Math.random()*(range[1]-range[0])}
 function updateStageSpawns(dt){
  const hpPct=data.bases.enemy.hp/data.bases.enemy.max*100,cap=maxEnemies(selectedStage);
- let alive=game.units.filter(u=>!u.ally&&u.hp>0).length;
+ let alive=game.units.filter(u=>!u.ally&&u.hp>0).length;const ready=[];
  for(const r of game.spawnRules){
   if(r.count!==undefined&&r.spawned>=r.count)continue;
   if(!r.triggered){
@@ -493,12 +493,16 @@ function updateStageSpawns(dt){
    r.triggered=true;r.clock=0;
   }
   r.clock-=dt;
-  if(r.clock<=0){
-   if(alive>=cap&&!r.boss){r.clock=0;continue}
-   addUnit(r.type,r.boss);r.spawned++;alive++;
-   if(r.boss){triggerBossShockwave();$('#battleNotice').textContent='보스 '+UNIT_NAMES[r.type]+' 등장!';game.noticeTime=3}
-   r.clock+=r.delay?pickDelay(r.delay):1e9;
-  }
+  if(r.clock<=0)ready.push(r);
+ }
+ // At the cap, a held rule's clock keeps running negative, so a freed slot goes to whoever
+ // has waited longest instead of the first rule in the list (Hollywood: cap 2, Hippoe/Pigge every 1~2s).
+ ready.sort((x,y)=>x.clock-y.clock);
+ for(const r of ready){
+  if(alive>=cap&&!r.boss)continue;
+  addUnit(r.type,r.boss);r.spawned++;alive++;
+  if(r.boss){triggerBossShockwave();$('#battleNotice').textContent='보스 '+UNIT_NAMES[r.type]+' 등장!';game.noticeTime=3}
+  r.clock=Math.max(r.clock,-dt)+(r.delay?pickDelay(r.delay):1e9);
  }
 }
 function renderNewButtons(){for(const type of GENERIC_CD_TYPES){
