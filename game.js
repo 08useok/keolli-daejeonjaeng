@@ -176,7 +176,7 @@ function damage(v,amount,from){
  v.hp=Math.max(0,v.hp-amount);v.flashTime=.1;v.el.classList.add('damage-flash');
  v.el.querySelector('i').style.setProperty('width',Math.max(0,v.hp/v.max)*100+'%');
  if(v.hp===0){
-  if(!v.ally)game.money=Math.min(data.income[game.level].max,game.money+Math.round(data.units[v.type].reward*enemyMagnification()));
+  if(!v.ally)game.money=Math.min(walletMax(),game.money+Math.round(data.units[v.type].reward*enemyMagnification()));
   game.units.splice(game.units.indexOf(v),1);
   startHitback(v);v.el.classList.add('defeated');game.defeated.push(v);return;
  }
@@ -271,7 +271,7 @@ function attack(u,t){
 function update(dt){
  updateBoomerangs(dt);if(game.ended){render();return}updateJuice(dt);if(game.ended){render();return}
  for(const v of [...game.defeated]){tickHitback(v,dt);v.el.style.opacity=v.kbTime/HITBACK_DURATION;if(v.kbTime===0){v.el.remove();game.defeated.splice(game.defeated.indexOf(v),1)}}
- game.noticeTime=Math.max(0,(game.noticeTime||0)-dt);game.elapsed+=dt;game.money=Math.min(data.income[game.level].max,game.money+data.income[game.level].rate*dt);updateStageSpawns(dt);
+ game.noticeTime=Math.max(0,(game.noticeTime||0)-dt);game.elapsed+=dt;game.money=Math.min(walletMax(),game.money+incomeRate()*dt);updateStageSpawns(dt);
 game.spawnCd=Math.max(0,game.spawnCd-dt);game.orangeCd=Math.max(0,game.orangeCd-dt);game.yellowCd=Math.max(0,game.yellowCd-dt);game.greenCd=Math.max(0,game.greenCd-dt);for(const t of GENERIC_CD_TYPES)game[cooldownKey(t)]=Math.max(0,unitCooldown(t)-dt);
  for(const u of [...game.units]){
   if(game.ended)break;if(u.hp<=0)continue;
@@ -297,7 +297,7 @@ game.spawnCd=Math.max(0,game.spawnCd-dt);game.orangeCd=Math.max(0,game.orangeCd-
  }
  render()
 }
-function render(){renderDeckButtons();renderSpeedButton();renderNewButtons();renderGreenButton();renderOrangeButton();renderYellowButton();renderUnitLevels();$('#battleNotice').classList.toggle('hidden',!(game.noticeTime>0));$('#pauseBtn').disabled=!game.running||game.ended;$('#pauseBtn').textContent=game.paused?'계속하기':'일시정지';$('#pauseNotice').classList.toggle('hidden',!game.paused);$('#timer').textContent=`${STAGES[selectedStage].name}${chapterOf(selectedStage)===2?' (2장)':''} · ${Math.floor(game.elapsed)}초`;let l=data.income[game.level];$('#money').textContent=`${Math.floor(game.money)}원`;$('#enemyHp').textContent=data.bases.enemy.hp;$('#allyHp').textContent=data.bases.ally.hp;for(let [name,b] of Object.entries(data.bases))$(`#${name}Base span`).style.width=(b.hp/b.max*100)+'%';let sb=$('#spawnBtn'),ib=$('#incomeBtn'),canSpawn=!game.ended&&!game.paused&&(game.running||game.tutorial===2),canUpgrade=!game.ended&&!game.paused&&(game.running||game.tutorial===4);sb.disabled=game.money<data.units.red.cost||game.spawnCd>0||!canSpawn;sb.querySelector('small').textContent=data.units.red.cost+'원';sb.querySelector('em').style.display=game.spawnCd?'block':'none';sb.querySelector('em').style.transform=`scaleY(${game.spawnCd/data.units.red.cooldown})`;ib.disabled=!canUpgrade||game.level===5||game.money<(l.cost||0);ib.innerHTML=game.level===5?'수입 Lv.MAX':`수입 업그레이드<br><small>${l.cost}원</small>`}
+function render(){renderDeckButtons();renderSpeedButton();renderNewButtons();renderGreenButton();renderOrangeButton();renderYellowButton();renderUnitLevels();$('#battleNotice').classList.toggle('hidden',!(game.noticeTime>0));$('#pauseBtn').disabled=!game.running||game.ended;$('#pauseBtn').textContent=game.paused?'계속하기':'일시정지';$('#pauseNotice').classList.toggle('hidden',!game.paused);$('#timer').textContent=`${STAGES[selectedStage].name}${chapterOf(selectedStage)===2?' (2장)':''} · ${Math.floor(game.elapsed)}초`;let l=data.income[game.level];$('#money').textContent=`${Math.floor(game.money)} / ${walletMax()}원`;$('#enemyHp').textContent=data.bases.enemy.hp;$('#allyHp').textContent=data.bases.ally.hp;for(let [name,b] of Object.entries(data.bases))$(`#${name}Base span`).style.width=(b.hp/b.max*100)+'%';let sb=$('#spawnBtn'),ib=$('#incomeBtn'),canSpawn=!game.ended&&!game.paused&&(game.running||game.tutorial===2),canUpgrade=!game.ended&&!game.paused&&(game.running||game.tutorial===4);sb.disabled=game.money<data.units.red.cost||game.spawnCd>0||!canSpawn;sb.querySelector('small').textContent=data.units.red.cost+'원';sb.querySelector('em').style.display=game.spawnCd?'block':'none';sb.querySelector('em').style.transform=`scaleY(${game.spawnCd/data.units.red.cooldown})`;ib.disabled=!canUpgrade||game.level===5||game.money<(l.cost||0);ib.innerHTML=game.level===5?'수입 Lv.MAX':`수입 업그레이드<br><small>${l.cost}원</small>`}
 function renderOrangeButton(){
  const button=$('#orangeBtn'),d=data.units.orange,unlocked=orangeUnlocked();
  button.disabled=!unlocked||!game.running||game.paused||game.ended||game.money<unitCost("orange")||game.orangeCd>0;
@@ -312,7 +312,7 @@ function renderYellowButton(){
  button.querySelector('em').style.display=game.yellowCd>0?'block':'none';button.querySelector('em').style.transform=`scaleY(${game.yellowCd/d.cooldown})`;
  button.title='체력 900 · 공격력 45 · 공격 주기 1.8초 · 재출격 5초';
 }
-function loop(t){const raw=last?Math.min(.05,(t-last)/1000):0;last=t;const dt=raw*(game.speedMultiplier||1);if(game&&!game.ended&&!game.paused){if(game.running)update(dt);else if(game.tutorial===2||game.tutorial===4){game.money=Math.min(data.income[game.level].max,game.money+data.income[game.level].rate*dt);render()}}requestAnimationFrame(loop)}
+function loop(t){const raw=last?Math.min(.05,(t-last)/1000):0;last=t;const dt=raw*(game.speedMultiplier||1);if(game&&!game.ended&&!game.paused){if(game.running)update(dt);else if(game.tutorial===2||game.tutorial===4){game.money=Math.min(walletMax(),game.money+incomeRate()*dt);render()}}requestAnimationFrame(loop)}
 function highlight(sel){document.querySelectorAll('.tutorial-target').forEach(e=>e.classList.remove('tutorial-target'));if(sel)$(sel).classList.add('tutorial-target');$('#game').classList.toggle('guiding',!!sel)}
 function tutorial(){let text=$('#tutorialText'),next=$('#nextBtn'),box=$('#tutorial');let steps=[['오른쪽은 아군의 성입니다.','#allyBase'],['왼쪽의 적 성을 파괴하면 승리합니다!','#enemyBase'],['돈을 사용해서 레드를 생성해 보세요!','#spawnBtn'],['돈은 시간이 지나면 자동으로 모입니다. 적을 쓰러뜨려도 돈을 얻습니다!','#money'],['수입을 업그레이드하면 더 많은 돈을 더 빠르게 모을 수 있습니다!','#incomeBtn'],['캐릭터와 적은 자동으로 이동하고 공격합니다. 레드를 계속 생성해 적 성을 파괴하세요!','']];if(game.tutorial>=steps.length){box.classList.add('hidden');highlight();game.running=true;return}box.classList.remove('hidden');text.textContent=steps[game.tutorial][0];highlight(steps[game.tutorial][1]);next.style.display=(game.tutorial===2||game.tutorial===4)?'none':'inline-block'}
 $('#nextBtn').onclick=()=>{game.tutorial++;tutorial();render()};$('#spawnBtn').onclick=()=>addUnit('red');$('#orangeBtn').onclick=()=>addUnit('orange');$('#yellowBtn').onclick=()=>addUnit('yellow');$('#greenBtn').onclick=()=>addUnit('green');for(const t of GENERIC_CD_TYPES)$('#'+t+'Btn').onclick=()=>addUnit(t);$('#incomeBtn').onclick=()=>{let l=data.income[game.level];if(!game.ended&&!game.paused&&(game.running||game.tutorial===4)&&l.cost!==null&&game.money>=l.cost){game.money-=l.cost;game.level++;if(game.tutorial===4){game.tutorial++;tutorial()}render()}};function finish(win){if(game.ended)return;const xpReward=win?awardXP():0;const speedDropped=win&&selectedStage>=18&&Math.random()<0.1;if(speedDropped){speedTickets++;saveSpeedTickets();renderSpeedButton()}game.ended=true;game.running=false;highlight();$('#result').classList.remove('hidden');$('#resultTitle').textContent=win?STAGES[selectedStage].name+' 정복 완료!':'패배...';if(win&&!cleared.includes(selectedStage)){cleared.push(selectedStage);saveProgress()}$('#nextStageBtn').classList.toggle('hidden',!win||selectedStage===STAGES.length-1);$('#resultDetail').textContent=win?(selectedStage===STAGES.length-1?STAGES.length+'개 스테이지를 모두 정복했어요!':STAGES[selectedStage+1].name+' 스테이지가 열렸어요!'):'수입을 올리고 아군을 모아서 다시 도전하세요.';if(win&&selectedStage===2)$('#resultDetail').textContent+=' 오렌지가 해금됐어요!';if(win&&selectedStage===5)$('#resultDetail').textContent+=' 옐로우가 해금됐어요!';if(win&&selectedStage===6)$('#resultDetail').textContent+=' 그린이 해금됐어요!';if(win){for(const t of ['cyan','blue','purple',...NEW_ALLY_TYPES])if(selectedStage===UNLOCK_AT[t])$('#resultDetail').textContent+=' '+UNIT_NAMES[t]+' 해금!';$('#resultDetail').textContent+=` 보상 +${xpReward} XP`;}if(speedDropped)$('#resultDetail').textContent+=' 2배속권 획득!';renderNewButtons();renderOrangeButton();renderYellowButton();renderGreenButton()}$('#restartBtn').onclick=reset;
@@ -623,11 +623,12 @@ function profileMarkup(type,evolved){
  const c=PROFILE_CALIB[type][evolved?'evolved':'base'];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
 const LV_EVOLVE=10,LV_MAX=20;
 function levelCap(){return cleared.includes(STAGES.length-1)?LV_MAX:LV_EVOLVE}// Lv.11~20 unlocks after clearing the last chapter-2 stage
-let training={xp:0,baseLevel:1,levels:Object.fromEntries(ALLIES.map(t=>[t,1])),forms:{}},trainingSaveFailed=false;
+const ECON_COST=[1000,1150,1300,1450,1600,1750,1900,2000],WALLET_STEP=400,PROD_STEP=.08;// permanent XP upgrades: wallet cap +400/level, money rate +8%/level
+let training={xp:0,baseLevel:1,levels:Object.fromEntries(ALLIES.map(t=>[t,1])),forms:{},walletLevel:0,prodLevel:0},trainingSaveFailed=false;
 function stageXP(i){return 200+i*50}
 try{
  const raw=localStorage.getItem('red-battle-training-v1');
- if(raw){const saved=JSON.parse(raw);training.xp=Number.isSafeInteger(saved.xp)&&saved.xp>=0?saved.xp:0;training.baseLevel=Number.isInteger(saved.baseLevel)?Math.max(1,Math.min(10,saved.baseLevel)):1;for(const t of ALLIES){const n=saved.levels?.[t];training.levels[t]=Number.isInteger(n)?Math.max(1,Math.min(levelCap(),n)):1;if(saved.forms?.[t]===1)training.forms[t]=1}}
+ if(raw){const saved=JSON.parse(raw);training.xp=Number.isSafeInteger(saved.xp)&&saved.xp>=0?saved.xp:0;training.baseLevel=Number.isInteger(saved.baseLevel)?Math.max(1,Math.min(10,saved.baseLevel)):1;for(const t of ALLIES){const n=saved.levels?.[t];training.levels[t]=Number.isInteger(n)?Math.max(1,Math.min(levelCap(),n)):1;if(saved.forms?.[t]===1)training.forms[t]=1}for(const k of ['walletLevel','prodLevel']){const n=saved[k];training[k]=Number.isInteger(n)?Math.max(0,Math.min(ECON_COST.length,n)):0}}
  else{training.xp=cleared.reduce((sum,i)=>sum+stageXP(i),0);saveTraining()}
 }catch{trainingSaveFailed=true}
 function saveTraining(){try{localStorage.setItem('red-battle-training-v1',JSON.stringify(training));trainingSaveFailed=false}catch{trainingSaveFailed=true}}
@@ -707,6 +708,9 @@ $('#speedBtn').onclick=()=>{
 function setForm(t,f){if(!ALLIES.includes(t)||training.levels[t]<LV_EVOLVE)return false;if(f===1)training.forms[t]=1;else delete training.forms[t];saveTraining();renderTraining();render();return true}
 function upgradeCost(t){return training.levels[t]*100}
 function upgradeCharacter(t){if(!ALLIES.includes(t)||!allyUnlocked(t)||training.levels[t]>=levelCap()||training.xp<upgradeCost(t))return false;training.xp-=upgradeCost(t);training.levels[t]++;saveTraining();renderTraining();renderBaseUpgrade();render();return true}
+function walletMax(lv=game.level){return data.income[lv].max+WALLET_STEP*training.walletLevel}
+function incomeRate(lv=game.level){return data.income[lv].rate*(1+PROD_STEP*training.prodLevel)}
+function upgradeEcon(k){const l=training[k];if(l>=ECON_COST.length||training.xp<ECON_COST[l])return false;training.xp-=ECON_COST[l];training[k]++;saveTraining();renderBaseUpgrade();renderTraining();if(typeof render==='function')render();return true}
 function baseHpFor(level=training.baseLevel){return Math.round(2000*(1+.1*(level-1)))}
 function baseHpCost(){return training.baseLevel*150}
 function upgradeBase(){if(training.baseLevel>=10||training.xp<baseHpCost())return false;training.xp-=baseHpCost();training.baseLevel++;saveTraining();renderBaseUpgrade();renderTraining();return true}
@@ -716,6 +720,7 @@ function renderBaseUpgrade(){
  card.innerHTML=`<h3>아군 성 체력 <small>Lv.${l} / 10</small></h3><p>기지 방어력 강화<br>체력 ${hp}${l<10?' → '+next:''}</p>`;
  const b=document.createElement('button');b.textContent=l===10?'최대 레벨':baseHpCost()+' XP · 강화';b.disabled=l>=10||training.xp<baseHpCost();b.onclick=()=>upgradeBase();card.append(b);
  grid.append(card);
+ for(const[k,title,desc,fmt]of[['walletLevel','지갑 상한','전투 중 보유할 수 있는 돈의 상한',n=>'+'+WALLET_STEP*n+'원'],['prodLevel','돈 생산력','시간당 돈이 모이는 속도',n=>'+'+Math.round(PROD_STEP*n*100)+'%']]){const lv=training[k],max=ECON_COST.length,c=document.createElement('article');c.className='training-card';c.innerHTML=`<h3>${title} <small>Lv.${lv} / ${max}</small></h3><p>${desc}<br>${fmt(lv)}${lv<max?' → '+fmt(lv+1):''}</p>`;const eb=document.createElement('button');eb.textContent=lv>=max?'최대 레벨':ECON_COST[lv]+' XP · 강화';eb.disabled=lv>=max||training.xp<ECON_COST[lv];eb.onclick=()=>upgradeEcon(k);c.append(eb);grid.append(c)}
 }
 function awardXP(){const reward=cleared.includes(selectedStage)?Math.floor(stageXP(selectedStage)/2):stageXP(selectedStage);training.xp+=reward;saveTraining();return reward}
 function renderUnitLevels(){for(const t of ALLIES){const b=$(t==='red'?'#spawnBtn':'#'+t+'Btn'),d=unitStats(t),e=d.evolved;if(t==='red')b.querySelector('small').textContent=d.cost+'원';b.querySelector('strong').textContent=UNIT_NAMES[t]+(e?' 2진':'')+' Lv.'+training.levels[t];b.title=`${ROLES[t]} · 체력 ${d.hp} · 공격력 ${d.atk} · 사거리 ${Math.round(d.range)} · 공격 주기 ${d.interval.toFixed(2)}초 · 이동 ${d.speed} · ${d.cost}원${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'||t==='crystal'?' · 떠다니는 적에게 강함':''}${e?' · 스틱맨 2진':''}`}}
