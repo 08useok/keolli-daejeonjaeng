@@ -133,12 +133,7 @@ body { overflow:auto; }
 .unit.crit-hit .st-crit,.unit.pulled .st-pull{animation:statusPop .6s ease-out}
 @keyframes statusPop{0%{transform:scale(1.8)}35%{transform:scale(1)}}
 .title-icon{width:25px;height:25px;margin-left:7px;vertical-align:-6px}
-.purple-btn strong:after,.mint-btn strong:after,.ivory-btn strong:after,.lavender-btn strong:after,.crystal-btn strong:after,.salmon-btn strong:after{content:"";display:inline-block;width:17px;height:17px;margin-left:4px;vertical-align:-3px;background:url("assets/ability_icon.png") center/contain no-repeat}
-.mint-btn strong:after{background-image:url(assets/freeze_icon.png)}
-.ivory-btn strong:after{background-image:url(assets/slow_icon.svg?v=2)}
-.lavender-btn strong:after{background-image:url(assets/weaken_icon.svg?v=2)}
-.crystal-btn strong:after{background-image:url(assets/crit_icon.svg?v=2)}
-.salmon-btn strong:after{background-image:url(assets/pull_icon.svg?v=2)}
+.btn-icon{width:17px;height:17px;margin-left:4px;vertical-align:-3px}
 .training-card:nth-of-type(7) h3:after{content:"";display:inline-block;width:25px;height:25px;margin-left:7px;vertical-align:-6px;background:url("assets/ability_icon.png") center/contain no-repeat}
 
 .boss-wave{position:absolute;left:7%;bottom:13%;width:64px;height:64px;border:0;border-radius:50%;z-index:18;pointer-events:none;background:url(assets/boss_wave.png) center/contain no-repeat;animation:bossWave .8s ease-out forwards;mix-blend-mode:multiply}
