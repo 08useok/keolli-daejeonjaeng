@@ -622,11 +622,12 @@ function profileMarkup(type,evolved){
  if(idx>=0){const c=NEW_PROFILE_CALIB[type];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${NEW_PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
  const c=PROFILE_CALIB[type][evolved?'evolved':'base'];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
 const LV_EVOLVE=10,LV_MAX=20;
+function levelCap(){return cleared.includes(STAGES.length-1)?LV_MAX:LV_EVOLVE}// Lv.11~20 unlocks after clearing the last chapter-2 stage
 let training={xp:0,baseLevel:1,levels:Object.fromEntries(ALLIES.map(t=>[t,1])),forms:{}},trainingSaveFailed=false;
 function stageXP(i){return 200+i*50}
 try{
  const raw=localStorage.getItem('red-battle-training-v1');
- if(raw){const saved=JSON.parse(raw);training.xp=Number.isSafeInteger(saved.xp)&&saved.xp>=0?saved.xp:0;training.baseLevel=Number.isInteger(saved.baseLevel)?Math.max(1,Math.min(10,saved.baseLevel)):1;for(const t of ALLIES){const n=saved.levels?.[t];training.levels[t]=Number.isInteger(n)?Math.max(1,Math.min(LV_MAX,n)):1;if(saved.forms?.[t]===1)training.forms[t]=1}}
+ if(raw){const saved=JSON.parse(raw);training.xp=Number.isSafeInteger(saved.xp)&&saved.xp>=0?saved.xp:0;training.baseLevel=Number.isInteger(saved.baseLevel)?Math.max(1,Math.min(10,saved.baseLevel)):1;for(const t of ALLIES){const n=saved.levels?.[t];training.levels[t]=Number.isInteger(n)?Math.max(1,Math.min(levelCap(),n)):1;if(saved.forms?.[t]===1)training.forms[t]=1}}
  else{training.xp=cleared.reduce((sum,i)=>sum+stageXP(i),0);saveTraining()}
 }catch{trainingSaveFailed=true}
 function saveTraining(){try{localStorage.setItem('red-battle-training-v1',JSON.stringify(training));trainingSaveFailed=false}catch{trainingSaveFailed=true}}
@@ -690,7 +691,7 @@ $('#speedBtn').onclick=()=>{
 };
 function setForm(t,f){if(!ALLIES.includes(t)||training.levels[t]<LV_EVOLVE)return false;if(f===1)training.forms[t]=1;else delete training.forms[t];saveTraining();renderTraining();render();return true}
 function upgradeCost(t){return training.levels[t]*100}
-function upgradeCharacter(t){if(!ALLIES.includes(t)||!allyUnlocked(t)||training.levels[t]>=LV_MAX||training.xp<upgradeCost(t))return false;training.xp-=upgradeCost(t);training.levels[t]++;saveTraining();renderTraining();renderBaseUpgrade();render();return true}
+function upgradeCharacter(t){if(!ALLIES.includes(t)||!allyUnlocked(t)||training.levels[t]>=levelCap()||training.xp<upgradeCost(t))return false;training.xp-=upgradeCost(t);training.levels[t]++;saveTraining();renderTraining();renderBaseUpgrade();render();return true}
 function baseHpFor(level=training.baseLevel){return Math.round(2000*(1+.1*(level-1)))}
 function baseHpCost(){return training.baseLevel*150}
 function upgradeBase(){if(training.baseLevel>=10||training.xp<baseHpCost())return false;training.xp-=baseHpCost();training.baseLevel++;saveTraining();renderBaseUpgrade();renderTraining();return true}
@@ -706,7 +707,7 @@ function renderUnitLevels(){for(const t of ALLIES){const b=$(t==='red'?'#spawnBt
 function renderTraining(){
  $('#xpText').textContent=training.xp+' XP';$('#trainingGrid').innerHTML='';
  $('#deckText').textContent=`출전 덱 ${deck.length} / ${DECK_SIZE} · 전투에는 덱에 넣은 아군만 나옵니다`;
- for(const t of ALLIES){const l=training.levels[t],d=unitStats(t),next=unitStats(t,Math.min(LV_MAX,l+1)),unlocked=allyUnlocked(t),inDeck=deck.includes(t),evolved=l>=LV_EVOLVE&&training.forms[t]!==1,card=document.createElement('article');card.className='training-card';card.innerHTML=`${profileMarkup(t,evolved)}<h3 style="color:${COLORS[t]}">${UNIT_NAMES[t]}${evolved?' 2진':''} <small>Lv.${l} / ${LV_MAX}</small>${t==='mint'?'<span class="freeze-icon title-icon" aria-label="정지"></span>':''}</h3><p class="profile-copy"><strong>${ROLES[t]}</strong>${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'||t==='crystal'?' · 떠다니는 적에게 강함':''}<br>${evolved?PROFILE_TEXT_EVOLVED[t]:PROFILE_TEXT[t]}${evolved?'<br><strong>2진 효과: '+EVOLUTION_TEXT[t]+' · 사거리 20% 증가</strong>':''}</p><p>체력 ${d.hp}${l<LV_MAX?' → '+next.hp:''}<br>공격력 ${d.atk}${l<LV_MAX?' → '+next.atk:''}</p>`;const b=document.createElement('button');b.textContent=!unlocked?STAGES[UNLOCK_AT[t]].name+(STAGES[UNLOCK_AT[t]].chapter===2?' 2장':'')+' 클리어로 해금':l>=LV_MAX?'최대 레벨':upgradeCost(t)+' XP · 강화';b.disabled=!unlocked||l>=LV_MAX||training.xp<upgradeCost(t);b.onclick=()=>upgradeCharacter(t);card.append(b);
+ for(const t of ALLIES){const cap=levelCap(),l=training.levels[t],d=unitStats(t),next=unitStats(t,Math.min(cap,l+1)),unlocked=allyUnlocked(t),inDeck=deck.includes(t),evolved=l>=LV_EVOLVE&&training.forms[t]!==1,card=document.createElement('article');card.className='training-card';card.innerHTML=`${profileMarkup(t,evolved)}<h3 style="color:${COLORS[t]}">${UNIT_NAMES[t]}${evolved?' 2진':''} <small>Lv.${l} / ${LV_MAX}</small>${t==='mint'?'<span class="freeze-icon title-icon" aria-label="정지"></span>':''}</h3><p class="profile-copy"><strong>${ROLES[t]}</strong>${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'||t==='crystal'?' · 떠다니는 적에게 강함':''}<br>${evolved?PROFILE_TEXT_EVOLVED[t]:PROFILE_TEXT[t]}${evolved?'<br><strong>2진 효과: '+EVOLUTION_TEXT[t]+' · 사거리 20% 증가</strong>':''}</p><p>체력 ${d.hp}${l<cap?' → '+next.hp:''}<br>공격력 ${d.atk}${l<cap?' → '+next.atk:''}</p>`;const b=document.createElement('button');b.textContent=!unlocked?STAGES[UNLOCK_AT[t]].name+(STAGES[UNLOCK_AT[t]].chapter===2?' 2장':'')+' 클리어로 해금':l>=cap?(cap<LV_MAX?'최대 Lv.10 · 2장 클리어 시 Lv.20':'최대 레벨'):upgradeCost(t)+' XP · 강화';b.disabled=!unlocked||l>=cap||training.xp<upgradeCost(t);b.onclick=()=>upgradeCharacter(t);card.append(b);
   if(unlocked){const db=document.createElement('button');db.className='deck-btn';db.textContent=inDeck?'덱에서 제외':deck.length>=DECK_SIZE?'덱 가득참':'덱에 추가';db.disabled=!inDeck&&deck.length>=DECK_SIZE;db.classList.toggle('active',inDeck);db.onclick=()=>toggleDeck(t);card.append(db)}
   if(unlocked&&l>=LV_EVOLVE){const fb=document.createElement('button');fb.className='form-btn';fb.textContent=evolved?'1진으로 변경 (약함)':'2진으로 변경';fb.onclick=()=>setForm(t,evolved?1:2);card.append(fb)}
   $('#trainingGrid').append(card)}
