@@ -648,7 +648,7 @@ function profileMarkup(type,evolved){
  const c=PROFILE_CALIB[type][evolved?'evolved':'base'];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
 const LV_EVOLVE=10,LV_MAX=20,HP_CURVE=.6,HP_LV10_MULT=1.8*2/1.15;// HP: Lv.11~20 front-loaded; Lv.10 is a jump so the 2진 (+15% HP) has 2x the Lv.9 HP
 function levelCap(){return cleared.includes(STAGES.length-1)?LV_MAX:LV_EVOLVE}// Lv.11~20 unlocks after clearing the last chapter-2 stage
-const ECON_COST=[1000,2000,4000,8000,16000,32000],WALLET_STEP=400,PROD_STEP=.08;// permanent XP upgrades: wallet cap +400/level, money rate +8%/level
+const ECON_COST=[1000,2000,4000,8000,16000,32000],WALLET_STEP=400,PROD_STEP=.15;// permanent XP upgrades: wallet cap +400/level, money rate +15%/level
 let training={xp:0,baseLevel:1,levels:Object.fromEntries(ALLIES.map(t=>[t,1])),forms:{},walletLevel:0,prodLevel:0},trainingSaveFailed=false;
 function stageXP(i){return (200+i*50)*2}
 try{
