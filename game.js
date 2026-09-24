@@ -646,15 +646,29 @@ function profileMarkup(type,evolved){
  const idx=NEW_PROFILE_ORDER.indexOf(type);
  if(idx>=0){const c=NEW_PROFILE_CALIB[type];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${NEW_PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
  const c=PROFILE_CALIB[type][evolved?'evolved':'base'];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
+const LV_EVOLVE=10,LV_MAX=20;
 let training={xp:0,baseLevel:1,levels:Object.fromEntries(ALLIES.map(t=>[t,1]))},trainingSaveFailed=false;
 function stageXP(i){return 200+i*50}
 try{
  const raw=localStorage.getItem('red-battle-training-v1');
- if(raw){const saved=JSON.parse(raw);training.xp=Number.isSafeInteger(saved.xp)&&saved.xp>=0?saved.xp:0;training.baseLevel=Number.isInteger(saved.baseLevel)?Math.max(1,Math.min(10,saved.baseLevel)):1;for(const t of ALLIES){const n=saved.levels?.[t];training.levels[t]=Number.isInteger(n)?Math.max(1,Math.min(10,n)):1}}
+ if(raw){const saved=JSON.parse(raw);training.xp=Number.isSafeInteger(saved.xp)&&saved.xp>=0?saved.xp:0;training.baseLevel=Number.isInteger(saved.baseLevel)?Math.max(1,Math.min(10,saved.baseLevel)):1;for(const t of ALLIES){const n=saved.levels?.[t];training.levels[t]=Number.isInteger(n)?Math.max(1,Math.min(LV_MAX,n)):1}}
  else{training.xp=cleared.reduce((sum,i)=>sum+stageXP(i),0);saveTraining()}
 }catch{trainingSaveFailed=true}
 function saveTraining(){try{localStorage.setItem('red-battle-training-v1',JSON.stringify(training));trainingSaveFailed=false}catch{trainingSaveFailed=true}}
-function unitStats(type,level=training.levels[type]||1){const d=data.units[type],mag=ALLIES.includes(type)?1:enemyMagnification(),stats={...d,hp:Math.round(d.hp*(1+.1*(level-1))*mag),atk:Math.round(d.atk*(1+.1*(level-1))*mag)};if(level<10)return stats;stats.evolved=true;stats.range=type==='raspberry'?d.range*1.1:d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='yellow')stats.hp=Math.round(stats.hp*1.25);if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=3;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);
+// Lv.1~10 keeps the original +10%/level curve; Lv.11~20 grows geometrically toward these Lv.20 values (evolution bonuses apply on top).
+const LV20_TARGET={
+ red:{hp:12000,atk:600},orange:{hp:11000,atk:2200},yellow:{hp:24000,atk:1400},green:{hp:13000,atk:1800},
+ cyan:{hp:10000,atk:3000},blue:{hp:12000,atk:450},purple:{hp:22000,atk:2100},pink:{hp:20000,atk:2400},
+ crimson:{hp:30000,atk:4150},gold:{hp:22000,atk:1500},ivory:{hp:24000,atk:3900},chartreuse:{hp:22000,atk:850},
+ mint:{hp:24000,atk:3600},azure:{hp:27000,atk:4000},crystal:{hp:25000,atk:4200},lavender:{hp:20000,atk:3200},
+ salmon:{hp:18000,atk:4000},raspberry:{hp:17000,atk:1400}
+};
+function levelMult(base,target,level){
+ const lv=Math.min(level,LV_MAX),m10=1+.1*(LV_EVOLVE-1);
+ if(!target||lv<=LV_EVOLVE)return 1+.1*(lv-1);
+ return m10*Math.pow(Math.max(target/base,m10)/m10,(lv-LV_EVOLVE)/(LV_MAX-LV_EVOLVE));
+}
+function unitStats(type,level=training.levels[type]||1){const d=data.units[type],T=LV20_TARGET[type],hpM=levelMult(d.hp,T?.hp,level),atkM=levelMult(d.atk,T?.atk,level),mag=ALLIES.includes(type)?1:enemyMagnification(),stats={...d,hp:Math.round(d.hp*hpM*mag),atk:Math.round(d.atk*atkM*mag)};if(d.damageTiers)stats.damageTiers=d.damageTiers.map(t=>({...t,dmg:Math.round(t.dmg*atkM)}));if(level<LV_EVOLVE)return stats;stats.evolved=true;stats.range=type==='raspberry'?d.range*1.1:d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='yellow')stats.hp=Math.round(stats.hp*1.25);if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=3;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);
  if(type==='crimson')stats.atk=Math.round(stats.atk*1.2);
  if(type==='gold')stats.atk=Math.round(stats.atk*1.2);
  if(type==='ivory'){stats.slowPct=.45;stats.slowDuration=d.slowDuration+.5}
@@ -664,7 +678,7 @@ function unitStats(type,level=training.levels[type]||1){const d=data.units[type]
  if(type==='crystal'){stats.floatDamage=3;stats.floatResist=.4}
  if(type==='lavender')stats.atkDownPct=.45;
  if(type==='salmon')stats.pullDistance=5;
- if(type==='raspberry'){stats.condPierceDist=25;stats.condPierceCount=1;stats.damageTiers=d.damageTiers.map(t=>({...t}))}
+ if(type==='raspberry'){stats.condPierceDist=25;stats.condPierceCount=1}
  return stats}
 function allyUnlocked(t){return ALWAYS_UNLOCKED.has(t)||cleared.some(i=>i>=UNLOCK_AT[t])}
 const DECK_SIZE=10;
@@ -700,7 +714,7 @@ $('#speedBtn').onclick=()=>{
  renderSpeedButton();
 };
 function upgradeCost(t){return training.levels[t]*100}
-function upgradeCharacter(t){if(!ALLIES.includes(t)||!allyUnlocked(t)||training.levels[t]>=10||training.xp<upgradeCost(t))return false;training.xp-=upgradeCost(t);training.levels[t]++;saveTraining();renderTraining();renderBaseUpgrade();render();return true}
+function upgradeCharacter(t){if(!ALLIES.includes(t)||!allyUnlocked(t)||training.levels[t]>=LV_MAX||training.xp<upgradeCost(t))return false;training.xp-=upgradeCost(t);training.levels[t]++;saveTraining();renderTraining();renderBaseUpgrade();render();return true}
 function baseHpFor(level=training.baseLevel){return Math.round(2000*(1+.1*(level-1)))}
 function baseHpCost(){return training.baseLevel*150}
 function upgradeBase(){if(training.baseLevel>=10||training.xp<baseHpCost())return false;training.xp-=baseHpCost();training.baseLevel++;saveTraining();renderBaseUpgrade();renderTraining();return true}
@@ -716,7 +730,7 @@ function renderUnitLevels(){for(const t of ALLIES){const b=$(t==='red'?'#spawnBt
 function renderTraining(){
  $('#xpText').textContent=training.xp+' XP';$('#trainingGrid').innerHTML='';
  $('#deckText').textContent=`출전 덱 ${deck.length} / ${DECK_SIZE} · 전투에는 덱에 넣은 아군만 나옵니다`;
- for(const t of ALLIES){const l=training.levels[t],d=unitStats(t),next=unitStats(t,Math.min(10,l+1)),unlocked=allyUnlocked(t),inDeck=deck.includes(t),evolved=l===10,card=document.createElement('article');card.className='training-card';card.innerHTML=`${profileMarkup(t,evolved)}<h3 style="color:${COLORS[t]}">${UNIT_NAMES[t]}${evolved?' 2진':''} <small>Lv.${l} / 10</small>${t==='mint'?'<span class="freeze-icon title-icon" aria-label="정지"></span>':''}</h3><p class="profile-copy"><strong>${ROLES[t]}</strong>${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'||t==='crystal'?' · 떠다니는 적에게 강함':''}<br>${evolved?PROFILE_TEXT_EVOLVED[t]:PROFILE_TEXT[t]}${evolved?'<br><strong>2진 효과: '+EVOLUTION_TEXT[t]+' · 사거리 20% 증가</strong>':''}</p><p>체력 ${d.hp}${l<10?' → '+next.hp:''}<br>공격력 ${d.atk}${l<10?' → '+next.atk:''}</p>`;const b=document.createElement('button');b.textContent=!unlocked?STAGES[UNLOCK_AT[t]].name+(STAGES[UNLOCK_AT[t]].chapter===2?' 2장':'')+' 클리어로 해금':l===10?'2진 진화 완료':upgradeCost(t)+' XP · 강화';b.disabled=!unlocked||l>=10||training.xp<upgradeCost(t);b.onclick=()=>upgradeCharacter(t);card.append(b);
+ for(const t of ALLIES){const l=training.levels[t],d=unitStats(t),next=unitStats(t,Math.min(LV_MAX,l+1)),unlocked=allyUnlocked(t),inDeck=deck.includes(t),evolved=l>=LV_EVOLVE,card=document.createElement('article');card.className='training-card';card.innerHTML=`${profileMarkup(t,evolved)}<h3 style="color:${COLORS[t]}">${UNIT_NAMES[t]}${evolved?' 2진':''} <small>Lv.${l} / ${LV_MAX}</small>${t==='mint'?'<span class="freeze-icon title-icon" aria-label="정지"></span>':''}</h3><p class="profile-copy"><strong>${ROLES[t]}</strong>${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'||t==='crystal'?' · 떠다니는 적에게 강함':''}<br>${evolved?PROFILE_TEXT_EVOLVED[t]:PROFILE_TEXT[t]}${evolved?'<br><strong>2진 효과: '+EVOLUTION_TEXT[t]+' · 사거리 20% 증가</strong>':''}</p><p>체력 ${d.hp}${l<LV_MAX?' → '+next.hp:''}<br>공격력 ${d.atk}${l<LV_MAX?' → '+next.atk:''}</p>`;const b=document.createElement('button');b.textContent=!unlocked?STAGES[UNLOCK_AT[t]].name+(STAGES[UNLOCK_AT[t]].chapter===2?' 2장':'')+' 클리어로 해금':l>=LV_MAX?'최대 레벨':upgradeCost(t)+' XP · 강화';b.disabled=!unlocked||l>=LV_MAX||training.xp<upgradeCost(t);b.onclick=()=>upgradeCharacter(t);card.append(b);
   if(unlocked){const db=document.createElement('button');db.className='deck-btn';db.textContent=inDeck?'덱에서 제외':deck.length>=DECK_SIZE?'덱 가득참':'덱에 추가';db.disabled=!inDeck&&deck.length>=DECK_SIZE;db.classList.toggle('active',inDeck);db.onclick=()=>toggleDeck(t);card.append(db)}
   $('#trainingGrid').append(card)}
  $('#saveWarning').textContent=trainingSaveFailed?'브라우저 저장을 사용할 수 없습니다. 이번 플레이에서만 유지됩니다.':'';
