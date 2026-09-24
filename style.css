@@ -134,7 +134,7 @@ body { overflow:auto; }
 @keyframes statusPop{0%{transform:scale(1.8)}35%{transform:scale(1)}}
 .title-icon{width:25px;height:25px;margin-left:7px;vertical-align:-6px}
 .btn-icon{width:17px;height:17px;margin-left:4px;vertical-align:-3px}
-.training-card:nth-of-type(7) h3:after{content:"";display:inline-block;width:25px;height:25px;margin-left:7px;vertical-align:-6px;background:url("assets/ability_icon.png") center/contain no-repeat}
+#lockedNote{margin:12px 0 0;color:#9fb0c8;font-size:14px}
 
 .boss-wave{position:absolute;left:7%;bottom:13%;width:64px;height:64px;border:0;border-radius:50%;z-index:18;pointer-events:none;background:url(assets/boss_wave.png) center/contain no-repeat;animation:bossWave .8s ease-out forwards;mix-blend-mode:multiply}
 #field.boss-shake{animation:bossShake .42s linear}
