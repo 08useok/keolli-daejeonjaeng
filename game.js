@@ -623,9 +623,9 @@ function profileMarkup(type,evolved){
  const c=PROFILE_CALIB[type][evolved?'evolved':'base'];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
 const LV_EVOLVE=10,LV_MAX=20;
 function levelCap(){return cleared.includes(STAGES.length-1)?LV_MAX:LV_EVOLVE}// Lv.11~20 unlocks after clearing the last chapter-2 stage
-const ECON_COST=[1000,1150,1300,1450,1600,1750,1900,2000],WALLET_STEP=400,PROD_STEP=.08;// permanent XP upgrades: wallet cap +400/level, money rate +8%/level
+const ECON_COST=[1000,2000,4000,8000,16000,32000],WALLET_STEP=400,PROD_STEP=.08;// permanent XP upgrades: wallet cap +400/level, money rate +8%/level
 let training={xp:0,baseLevel:1,levels:Object.fromEntries(ALLIES.map(t=>[t,1])),forms:{},walletLevel:0,prodLevel:0},trainingSaveFailed=false;
-function stageXP(i){return 200+i*50}
+function stageXP(i){return (200+i*50)*2}
 try{
  const raw=localStorage.getItem('red-battle-training-v1');
  if(raw){const saved=JSON.parse(raw);training.xp=Number.isSafeInteger(saved.xp)&&saved.xp>=0?saved.xp:0;training.baseLevel=Number.isInteger(saved.baseLevel)?Math.max(1,Math.min(10,saved.baseLevel)):1;for(const t of ALLIES){const n=saved.levels?.[t];training.levels[t]=Number.isInteger(n)?Math.max(1,Math.min(levelCap(),n)):1;if(saved.forms?.[t]===1)training.forms[t]=1}for(const k of ['walletLevel','prodLevel']){const n=saved[k];training[k]=Number.isInteger(n)?Math.max(0,Math.min(ECON_COST.length,n)):0}}
