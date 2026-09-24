@@ -163,6 +163,7 @@ function tickBossKnockback(u,dt){
  if(u.bossKbTime===0){u.el.classList.remove('boss-knocked');u.el.style.translate='0 0'}
 }
 const BOSS_HP_THRESHOLD=2000;
+function baseDamage(n){return Math.round(n)}// castle HP stays an integer: x.5 and above rounds up (.999 -> +1), below rounds down (.001 -> +0)
 function damage(v,amount,from){
  if(game.ended||v.hp<=0||v.kbTime>0)return;
  if(from?.stats?.redStrong&&data.units[v.type].trait==='red')amount*=from.stats.redDamage||2;
@@ -205,7 +206,7 @@ function updateBoomerangs(dt){
    const leg=b.time<.6?0:1,next=Math.min(endTime,leg===0?.6:1.2),a=boomerangX(b,b.time),z=boomerangX(b,next),lo=Math.min(a,z)-.6,hi=Math.max(a,z)+.6;
    for(const v of [...game.units])if(!v.ally&&v.hp>0&&v.kbTime<=0&&!b.hits[leg].has(v)&&v.x>=lo&&v.x<=hi){b.hits[leg].add(v);damage(v,b.damage*(leg?b.returnMult:1),b.source)}
    const base=data.bases.enemy;
-   if(!b.baseHits[leg]&&base.frontX>=lo&&base.frontX<=hi){b.baseHits[leg]=true;base.hp=Math.max(0,base.hp-b.damage*(leg?b.returnMult:1));if(!base.hp){finish(true);return}}
+   if(!b.baseHits[leg]&&base.frontX>=lo&&base.frontX<=hi){b.baseHits[leg]=true;base.hp=Math.max(0,base.hp-baseDamage(b.damage*(leg?b.returnMult:1)));if(!base.hp){finish(true);return}}
    b.time=next;
   }
   positionBoomerang(b);if(b.time>=1.2){b.el.remove();game.boomerangs.splice(game.boomerangs.indexOf(b),1)}
@@ -229,7 +230,7 @@ function updateJuice(dt){
   p.el.remove();game.projectiles.splice(game.projectiles.indexOf(p),1);
   const effect=document.createElement('span');effect.className='juice-splash '+p.type+'-splash';effect.style.left=p.end+'%';effect.style.width=(p.radius*2)+'%';unitsEl.append(effect);game.effects.push({el:effect,time:.25});
   for(const v of [...game.units])if(!v.ally&&Math.abs(v.x-p.end)<=p.radius)damage(v,p.damage,p.source);
-  const base=data.bases.enemy;if(Math.abs(base.frontX-p.end)<=p.radius){base.hp=Math.max(0,base.hp-p.damage);if(!base.hp){finish(true);return}}
+  const base=data.bases.enemy;if(Math.abs(base.frontX-p.end)<=p.radius){base.hp=Math.max(0,base.hp-baseDamage(p.damage));if(!base.hp){finish(true);return}}
  }
 }
 function tierDamage(tiers,dist){for(const t of tiers)if(dist<=t.max)return t.dmg;return tiers[tiers.length-1].dmg}
@@ -260,7 +261,7 @@ function resolveAttack(u,t){
   }
  }
  const base=u.ally?data.bases.enemy:data.bases.ally;
- if(Math.abs(base.frontX-u.x)<=(d.engageRange??d.range)){base.hp=Math.max(0,base.hp-d.atk);if(!base.hp)finish(u.ally)}
+ if(Math.abs(base.frontX-u.x)<=(d.engageRange??d.range)){base.hp=Math.max(0,base.hp-baseDamage(d.atk));if(!base.hp)finish(u.ally)}
 }
 function attack(u,t){
  if(game.ended||u.hp<=0||u.kbTime>0)return;
