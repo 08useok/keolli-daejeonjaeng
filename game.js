@@ -694,8 +694,9 @@ try{
 }catch{trainingSaveFailed=true}
 function saveTraining(){try{localStorage.setItem('red-battle-training-v1',JSON.stringify(training));trainingSaveFailed=false}catch{trainingSaveFailed=true}}
 // Lv.1~10 keeps the original +10%/level curve; Lv.11~20 grows geometrically toward these Lv.20 values (evolution bonuses apply on top).
+const ATK_SLOPE={red:.55};// per-level ATK growth for Lv.1~10 (default .1); red's 15 ATK could not even kill a Doge at Lv.10
 const LV20_TARGET={
- red:{hp:10400,atk:600},
+ red:{hp:9000,atk:800},
  orange:{hp:9600,atk:2200},
  yellow:{hp:25000,atk:1400},
  green:{hp:11300,atk:1800},
@@ -714,9 +715,9 @@ const LV20_TARGET={
  salmon:{hp:15650,atk:4000},
  raspberry:{hp:14800,atk:1200}
 };
-function levelMult(base,target,level,curve=1,m10Hp=null){
- const lv=Math.min(level,LV_MAX),m10=m10Hp||1+.1*(LV_EVOLVE-1);
- if(!target||lv<LV_EVOLVE)return 1+.1*(lv-1);
+function levelMult(base,target,level,curve=1,m10Hp=null,slope=.1){
+ const lv=Math.min(level,LV_MAX),m10=m10Hp||1+slope*(LV_EVOLVE-1);
+ if(!target||lv<LV_EVOLVE)return 1+slope*(lv-1);
  if(lv===LV_EVOLVE)return m10;
  return m10*Math.pow(Math.max(target/base,m10)/m10,Math.pow((lv-LV_EVOLVE)/(LV_MAX-LV_EVOLVE),curve));
 }
@@ -743,7 +744,7 @@ const EVO_EXTRA={
 };
 const EVO_ATK_BONUS={red:1.2,pink:1.15,crimson:1.2,gold:1.2,chartreuse:1.2,azure:1.2};// 2진 with a dedicated atk bonus; everyone else gets the generic +15% (hp is always +15%, yellow +20%)
 function unitCost(t){return ALLIES.includes(t)?unitStats(t).cost:data.units[t].cost}
-function unitStats(type,level=training.levels[type]||1,form=training.forms?.[type]===1?1:2){const d=data.units[type],T=LV20_TARGET[type],hpM=levelMult(d.hp,T?.hp,level,HP_CURVE,HP_LV10_MULT),atkM=levelMult(d.atk,T?.atk,level),mag=ALLIES.includes(type)?1:enemyMagnification(),stats={...d,hp:Math.round(d.hp*hpM*mag),atk:Math.round(d.atk*atkM*mag)};if(d.damageTiers)stats.damageTiers=d.damageTiers.map(t=>({...t,dmg:Math.round(t.dmg*atkM)}));if(level<LV_EVOLVE||form===1)return stats;stats.evolved=true;stats.cost=d.cost*2;stats.hp=Math.round(stats.hp*(type==='yellow'?1.2:1.15));if(!EVO_ATK_BONUS[type]){const k=1.15;stats.atk=Math.round(stats.atk*k);if(stats.damageTiers)stats.damageTiers=stats.damageTiers.map(t=>({...t,dmg:Math.round(t.dmg*k)}))}stats.range=type==='raspberry'?d.range*1.1:d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=1.8;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);
+function unitStats(type,level=training.levels[type]||1,form=training.forms?.[type]===1?1:2){const d=data.units[type],T=LV20_TARGET[type],hpM=levelMult(d.hp,T?.hp,level,HP_CURVE,HP_LV10_MULT),atkM=levelMult(d.atk,T?.atk,level,1,null,ATK_SLOPE[type]),mag=ALLIES.includes(type)?1:enemyMagnification(),stats={...d,hp:Math.round(d.hp*hpM*mag),atk:Math.round(d.atk*atkM*mag)};if(d.damageTiers)stats.damageTiers=d.damageTiers.map(t=>({...t,dmg:Math.round(t.dmg*atkM)}));if(level<LV_EVOLVE||form===1)return stats;stats.evolved=true;stats.cost=d.cost*2;stats.hp=Math.round(stats.hp*(type==='yellow'?1.2:1.15));if(!EVO_ATK_BONUS[type]){const k=1.15;stats.atk=Math.round(stats.atk*k);if(stats.damageTiers)stats.damageTiers=stats.damageTiers.map(t=>({...t,dmg:Math.round(t.dmg*k)}))}stats.range=type==='raspberry'?d.range*1.1:d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=1.8;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);
  if(type==='crimson')stats.atk=Math.round(stats.atk*1.2);
  if(type==='gold')stats.atk=Math.round(stats.atk*1.2);
  if(type==='ivory'){stats.slowChance=.6;stats.slowDuration=d.slowDuration+.5}
