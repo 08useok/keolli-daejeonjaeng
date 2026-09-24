@@ -616,14 +616,14 @@ const PROFILE_TEXT={red:'가장 먼저 전선에 뛰어든 기본 전투원. 단
 const EVOLUTION_TEXT={red:'강타',orange:'과즙 범위 확대',yellow:'추가 체력',green:'귀환 부메랑 강화',cyan:'광역 범위 확대',blue:'공격 속도 증가',purple:'빨간 적 특화 강화',pink:'광역 공격력 증가',crimson:'강타 위력 증가',gold:'파편 피해 증가',ivory:'둔화 효과 강화',chartreuse:'연사 피해 증가',mint:'빙결 확률 증가',azure:'돌진 피해 증가',crystal:'플로팅 특화 강화',lavender:'약화 효과 강화',salmon:'끌어오기 강화',raspberry:'사거리 확장 및 관통'};
 const PROFILE_TEXT_EVOLVED={red:'수많은 전투를 거치며 맨몸으로도 강력한 일격을 날릴 수 있게 되었다. 이제는 단순한 몸빵이 아니라 한 방을 노리는 타격형 전투원.',orange:'더 많은 과즙을 담아 던지게 되면서 폭발 범위가 눈에 띄게 넓어졌다.',yellow:'두꺼워진 몸으로 더 오래 버티며 최전선을 든든하게 지킨다.',green:'부메랑을 던지는 손목 힘이 강해져 돌아올 때 더 강력한 일격을 남긴다.',cyan:'조준 실력이 늘어 폭발 범위가 한층 넓어진 저격수로 거듭났다.',blue:'손이 더 빨라져 눈 깜짝할 사이에 연타를 꽂아 넣는다.',purple:'빨간 적의 약점을 완벽히 파악해 압도적인 피해를 입히고, 받는 피해는 최소화한다.',pink:'리본을 휘두르는 힘이 강해져 광역 공격의 위력이 한층 강력해졌다.',crimson:'주먹에 실리는 힘이 늘어나 강타의 위력이 한층 강해졌다.',gold:'더 많은 금맥을 다뤄본 경험으로 파편 하나하나의 피해가 늘어났다.',ivory:'차가운 냉기가 짙어져 적을 더 오래, 더 강하게 둔화시킨다.',chartreuse:'손놀림이 빨라져 콩알탄 한 발 한 발의 위력이 늘어났다.',mint:'냉기가 응축되어 적을 얼릴 확률이 크게 늘어났다.',azure:'파도의 기세가 거세져 돌진 한 방의 위력이 늘어났다.',crystal:'결정 순도가 높아져 플로팅 적을 상대로 한층 압도적인 위력을 낸다.',lavender:'향이 짙어져 적의 공격력을 더 크게 떨어뜨린다.',salmon:'손맛이 늘어 적을 더 강하게 끌어당긴다.',raspberry:'조준 실력이 늘어 사거리가 늘고, 먼 거리에서는 뒤쪽 적까지 꿰뚫는다.'};
 const PROFILE_CALIB={
- red:{base:{size:541,x:1,y:-7},evolved:{size:486,x:7,y:-241}},
- orange:{base:{size:520,x:-136,y:-5},evolved:{size:486,x:-121,y:-241}},
- yellow:{base:{size:494,x:-246,y:-1},evolved:{size:486,x:-244,y:-241}},
- green:{base:{size:488,x:-364,y:0},evolved:{size:486,x:-362,y:-241}},
- cyan:{base:{size:494,x:1,y:-120},evolved:{size:488,x:2,y:-363}},
- blue:{base:{size:538,x:-133,y:-135},evolved:{size:492,x:-120,y:-367}},
- purple:{base:{size:504,x:-253,y:-124},evolved:{size:488,x:-242,y:-363}},
- pink:{base:{size:534,x:-407,y:-131},evolved:{size:492,x:-366,y:-367}}
+ red:{base:{size:629,x:-9,y:-19},evolved:{size:556,x:-8,y:-281}},
+ orange:{base:{size:592,x:-165,y:-15},evolved:{size:558,x:-148,y:-283}},
+ yellow:{base:{size:585,x:-304,y:-13},evolved:{size:554,x:-284,y:-280}},
+ green:{base:{size:581,x:-446,y:-12},evolved:{size:560,x:-427,y:-284}},
+ cyan:{base:{size:566,x:-11,y:-148},evolved:{size:554,x:-8,y:-419}},
+ blue:{base:{size:622,x:-163,y:-167},evolved:{size:556,x:-145,y:-420}},
+ purple:{base:{size:570,x:-296,y:-149},evolved:{size:556,x:-285,y:-420}},
+ pink:{base:{size:635,x:-496,y:-167},evolved:{size:552,x:-419,y:-415}}
 };
 const NEW_PROFILE_SHEET='assets/new_chars_profiles.png';
 const NEW_PROFILE_ORDER=['crimson','gold','ivory','chartreuse','mint','azure','crystal','lavender','salmon','raspberry'];
@@ -631,22 +631,22 @@ const NEW_PROFILE_ORDER=['crimson','gold','ivory','chartreuse','mint','azure','c
 // band with large blank margins above/below, so a naive 500%/200% percentage crop cuts
 // off each portrait. Calibrated per-character like PROFILE_CALIB below instead.
 const NEW_PROFILE_CALIB={
- crimson:{size:627,x:0,y:-156},
- gold:{size:454,x:-73,y:-84},
- ivory:{size:622,x:-248,y:-154},
- chartreuse:{size:630,x:-377,y:-157},
- mint:{size:624,x:-499,y:-156},
- azure:{size:557,x:7,y:-304},
- crystal:{size:561,x:-105,y:-308},
- lavender:{size:561,x:-217,y:-307},
- salmon:{size:568,x:-334,y:-312},
- raspberry:{size:566,x:-446,y:-311}
+ crimson:{size:693,x:-10,y:-179},
+ gold:{size:705,x:-151,y:-186},
+ ivory:{size:702,x:-288,y:-182},
+ chartreuse:{size:699,x:-425,y:-181},
+ mint:{size:696,x:-561,y:-180},
+ azure:{size:693,x:-10,y:-395},
+ crystal:{size:705,x:-151,y:-403},
+ lavender:{size:702,x:-288,y:-400},
+ salmon:{size:699,x:-425,y:-399},
+ raspberry:{size:696,x:-561,y:-397}
 };
 function profileMarkup(type,evolved){
  const idx=NEW_PROFILE_ORDER.indexOf(type);
  if(idx>=0){const c=NEW_PROFILE_CALIB[type];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${NEW_PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
  const c=PROFILE_CALIB[type][evolved?'evolved':'base'];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
-let training={xp:0,baseLevel:1,levels:{red:1,orange:1,yellow:1,green:1,cyan:1,blue:1,purple:1,pink:1}},trainingSaveFailed=false;
+let training={xp:0,baseLevel:1,levels:Object.fromEntries(ALLIES.map(t=>[t,1]))},trainingSaveFailed=false;
 function stageXP(i){return 200+i*50}
 try{
  const raw=localStorage.getItem('red-battle-training-v1');
