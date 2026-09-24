@@ -100,12 +100,12 @@ const RASPBERRY_SHEET='assets/unitraspberry_ally-sprite.png';
 const NEWCHAR_EVOLVED_SHEET='assets/new_chars_evolved_sheet.png?v=2';
 data.units.crimson={hp:900,atk:650,interval:2.8,speed:5,range:7,cost:300,cooldown:10,knockbacks:3,forceKnockback:true};
 data.units.gold={hp:600,atk:180,interval:3.6,speed:5,range:21,cost:425,cooldown:15,knockbacks:3,multiHit:3};
-data.units.ivory={hp:650,atk:380,interval:3,speed:5,range:20,cost:350,cooldown:13,knockbacks:3,area:true,slowPct:.3,slowDuration:2};
+data.units.ivory={hp:650,atk:380,interval:3,speed:5,range:20,cost:350,cooldown:13,knockbacks:3,area:true,slowChance:.4,slowDuration:2};
 data.units.chartreuse={hp:600,atk:95,interval:2.4,speed:5,range:16,cost:325,cooldown:12,knockbacks:3,multiHit:5};
 data.units.mint={hp:650,atk:340,interval:3.4,speed:5,range:17.5,cost:375,cooldown:14,knockbacks:3,area:true,freezeChance:.25,freezeDuration:1.5};
 data.units.azure={hp:800,atk:520,interval:3.2,speed:6.5,range:9,cost:400,cooldown:14,knockbacks:2,dash:true};
 data.units.crystal={hp:700,atk:460,interval:3.8,speed:5,range:22.5,cost:450,cooldown:16,knockbacks:3,pierce:3,critChance:.15,critMult:2,floatStrong:true};
-data.units.lavender={hp:500,atk:260,interval:4,speed:5,range:23.5,cost:400,cooldown:15,knockbacks:3,area:true,atkDownPct:.3,atkDownDuration:4};
+data.units.lavender={hp:500,atk:260,interval:4,speed:5,range:23.5,cost:400,cooldown:15,knockbacks:3,area:true,atkDownPct:.5,atkDownChance:.4,atkDownDuration:4};
 data.units.salmon={hp:450,atk:430,interval:4.2,speed:5,range:26,cost:475,cooldown:17,knockbacks:3,pull:true};
 data.units.raspberry={hp:400,atk:450,interval:4.5,speed:3,range:30,cost:500,cooldown:18,knockbacks:3,windup:.8,damageTiers:[{max:10,dmg:450},{max:17.5,dmg:750},{max:25,dmg:1200},{max:999,dmg:1600}]};
 const ALLIES=['red','orange','yellow','green','cyan','blue','purple','pink','crimson','gold','ivory','chartreuse','mint','azure','crystal','lavender','salmon','raspberry'];
@@ -173,12 +173,13 @@ function tickBossKnockback(u,dt){
  if(u.bossKbTime===0){u.el.classList.remove('boss-knocked');u.el.style.translate='0 0'}
 }
 const BOSS_HP_THRESHOLD=2000;
+const SLOW_SPEED=.5;// Battle Cats: a slowed enemy's speed drops to 0.5
 function baseDamage(n){return Math.round(n)}// castle HP stays an integer: x.5 and above rounds up (.999 -> +1), below rounds down (.001 -> +0)
 function damage(v,amount,from){
  if(game.ended||v.hp<=0||v.kbTime>0)return;
- if(from?.stats?.redStrong&&data.units[v.type].trait==='red')amount*=from.stats.redDamage||2;
+ if(from?.stats?.redStrong&&data.units[v.type].trait==='red')amount*=from.stats.redDamage||1.5;
  if(v.stats?.redStrong&&from&&data.units[from.type].trait==='red')amount*=v.stats.redResist||.5;
- if(from?.stats?.floatStrong&&data.units[v.type].trait==='floating')amount*=from.stats.floatDamage||2;
+ if(from?.stats?.floatStrong&&data.units[v.type].trait==='floating')amount*=from.stats.floatDamage||1.5;
  if(v.stats?.floatStrong&&from&&data.units[from.type].trait==='floating')amount*=v.stats.floatResist||.5;
  if(v.stats?.armor)amount*=v.stats.armor;
  if(from?.atkDownUntil>game.elapsed)amount*=from.atkDownMult;
@@ -193,9 +194,9 @@ function damage(v,amount,from){
   game.units.splice(game.units.indexOf(v),1);
   startHitback(v);v.el.classList.add('defeated');game.defeated.push(v);return;
  }
- if(from?.stats?.slowPct){v.slowUntil=game.elapsed+from.stats.slowDuration;v.slowPct=from.stats.slowPct}
+ if(from?.stats?.slowChance&&Math.random()<from.stats.slowChance)v.slowUntil=game.elapsed+from.stats.slowDuration;
  if(from?.stats?.freezeChance&&Math.random()<from.stats.freezeChance)v.freezeUntil=Math.max(v.freezeUntil||0,game.elapsed+from.stats.freezeDuration);
- if(from?.stats?.atkDownPct){v.atkDownUntil=game.elapsed+from.stats.atkDownDuration;v.atkDownMult=1-from.stats.atkDownPct}
+ if(from?.stats?.atkDownPct&&Math.random()<(from.stats.atkDownChance??1)){v.atkDownUntil=game.elapsed+from.stats.atkDownDuration;v.atkDownMult=1-from.stats.atkDownPct}
  if(from?.stats?.pull&&!isBoss){const dir=Math.sign(from.x-v.x)||(from.ally?-1:1);v.x=Math.max(0,Math.min(100,v.x+dir*(from.stats.pullDistance||3)));v.el.style.left=`calc(${v.x}% - 21px)`}
  if(from?.stats?.forceKnockback&&!isBoss){startHitback(v)}
  else{
@@ -295,7 +296,7 @@ game.spawnCd=Math.max(0,game.spawnCd-dt);game.orangeCd=Math.max(0,game.orangeCd-
   if(u.pendingAttack){u.pendingAttack.remaining-=dt;if(u.pendingAttack.remaining<=0){const p=u.pendingAttack,hits=(u.stats||data.units[u.type]).hits,h=hits?.[p.hit];u.pendingAttack=null;resolveAttack(u,undefined,h?h.share:1);if(game.ended)break;if(h&&hits[p.hit+1])u.pendingAttack={remaining:hits[p.hit+1].at-h.at+p.remaining,hit:p.hit+1}}}
   u.atkCd-=dt;u.animTime+=dt;u.attackTime=Math.max(0,u.attackTime-dt);u.hurtTime=Math.max(0,u.hurtTime-dt);
   let d=u.stats||data.units[u.type];
-  const spd=d.speed*(u.slowUntil>game.elapsed?(1-u.slowPct):1);
+  const spd=u.slowUntil>game.elapsed?Math.min(d.speed,SLOW_SPEED):d.speed;
   if(!u.ally&&(u.emerging||u.x<data.bases.enemy.frontX)){u.emerging=true;u.x=Math.min(data.bases.enemy.frontX,u.x+spd*dt);if(u.x>=data.bases.enemy.frontX)u.emerging=false;u.el.style.left=`calc(${u.x}% - 21px)`;animateDog(u);continue}
   if(u.ally&&(u.emerging||u.x>data.bases.ally.frontX)){u.emerging=true;u.x=Math.max(data.bases.ally.frontX,u.x-spd*dt);if(u.x<=data.bases.ally.frontX)u.emerging=false;u.el.style.left=`calc(${u.x}% - 21px)`;animateUnit(u);continue}
   let t=target(u),dist=t?Math.abs(t.x-u.x):Infinity;
@@ -642,8 +643,8 @@ function animateAlly(u){
 
 const PROFILE_SHEET='assets/profile_sheet.png';
 const PROFILE_TEXT={red:'가장 먼저 전선에 뛰어든 기본 전투원. 단순하지만 어떤 전투에서도 믿을 만하다.',orange:'멀리서 과즙을 던져 모여 있는 적을 한꺼번에 공격한다.',yellow:'튼튼한 몸으로 앞줄을 지키며 가까운 적에게 전기를 방출한다.',green:'왕복하는 부메랑으로 같은 적을 두 번 공격할 수 있다.',cyan:'아주 먼 거리에서 넓은 범위를 노리는 장거리 전투원.',blue:'빠른 이동과 연속 공격으로 빈틈을 놓치지 않는 속공 전투원.',purple:'빨간 적을 상대하도록 특별히 훈련된 색상 특화 전투원.',pink:'가까이 접근한 뒤 긴 광역 판정으로 뒤쪽의 적까지 휩쓴다.',crimson:'적 앞까지 달려가 강력한 펀치를 꽂는다. 맞은 적은 짧게 밀려난다.',gold:'금광석을 던져 비행 중 세 조각으로 퍼뜨린다. 조각들은 적중 시 금괴로 변해 각각 피해를 준다.',ivory:'아이스크림을 던져 범위 피해를 주고, 맞은 적의 이동 속도를 늦춘다.',chartreuse:'주머니를 열어 콩알탄 다섯 발을 빠르게 퍼붓는다.',mint:'민트 아이스크림을 터뜨려 주변을 공격하며, 확률적으로 적을 얼려 움직임을 멈춘다.',azure:'서핑보드를 타고 전방으로 돌진하며 경로의 모든 적을 휩쓴다.',crystal:'날카로운 크리스탈 조각으로 앞줄의 적을 꿰뚫는다. 가끔 강력한 치명타가 터진다.',lavender:'향수 구름을 퍼뜨려 범위 안의 적을 공격하고 공격력을 약화시킨다.',salmon:'낚싯바늘을 멀리 던져 적을 맞히고 아군 쪽으로 끌어당긴다.',raspberry:'아주 먼 거리에서 저격한다. 멀리 있는 적일수록 총알이 가속해 피해가 커진다.'};
-const EVOLUTION_TEXT={red:'강타 · 넉백 +1회 · 재사용 대기 -20%',orange:'과즙 범위 확대 · 처치 시 돈 +25%',yellow:'추가 체력 · 받는 피해 -15%',green:'귀환 부메랑 강화 · 재사용 대기 -15%',cyan:'광역 범위 확대 · 떠 있는 적에게 3배 피해(받는 피해 0.4배)',blue:'공격 속도 증가 · 이동 속도 +25%',purple:'빨간 적 특화 강화 · 보스 피해 +30%',pink:'광역 공격력 증가 · 적중 시 1.5초간 이동 속도 -20%',crimson:'강타 위력 증가 · 보스 피해 +30%',gold:'파편 피해 증가 · 처치 시 돈 +30%',ivory:'둔화 효과 강화 · 재사용 대기 -15%',chartreuse:'연사 피해 증가 · 연사 +1발',mint:'빙결 확률 증가 · 빙결 시간 +0.5초',azure:'돌진 피해 증가 · 20% 확률로 2배 치명타',crystal:'플로팅 특화 강화 · 관통 +1',lavender:'약화 효과 강화 · 약화 시간 +2초',salmon:'끌어오기 강화 · 재사용 대기 -15%',raspberry:'사거리 확장 및 관통 · 선딜 -25%'};
-const PROFILE_TEXT_EVOLVED={red:'수많은 전투를 거치며 맨몸으로도 강력한 일격을 날릴 수 있게 되었다. 이제는 단순한 몸빵이 아니라 한 방을 노리는 타격형 전투원.',orange:'더 많은 과즙을 담아 던지게 되면서 폭발 범위가 눈에 띄게 넓어졌다.',yellow:'두꺼워진 몸으로 더 오래 버티며 최전선을 든든하게 지킨다.',green:'부메랑을 던지는 손목 힘이 강해져 돌아올 때 더 강력한 일격을 남긴다.',cyan:'조준 실력이 늘어 폭발 범위가 한층 넓어진 저격수로 거듭났다.',blue:'손이 더 빨라져 눈 깜짝할 사이에 연타를 꽂아 넣는다.',purple:'빨간 적의 약점을 완벽히 파악해 압도적인 피해를 입히고, 받는 피해는 최소화한다.',pink:'리본을 휘두르는 힘이 강해져 광역 공격의 위력이 한층 강력해졌다.',crimson:'주먹에 실리는 힘이 늘어나 강타의 위력이 한층 강해졌다.',gold:'더 많은 금맥을 다뤄본 경험으로 파편 하나하나의 피해가 늘어났다.',ivory:'차가운 냉기가 짙어져 적을 더 오래, 더 강하게 둔화시킨다.',chartreuse:'손놀림이 빨라져 콩알탄 한 발 한 발의 위력이 늘어났다.',mint:'냉기가 응축되어 적을 얼릴 확률이 크게 늘어났다.',azure:'파도의 기세가 거세져 돌진 한 방의 위력이 늘어났다.',crystal:'결정 순도가 높아져 플로팅 적을 상대로 한층 압도적인 위력을 낸다.',lavender:'향이 짙어져 적의 공격력을 더 크게 떨어뜨린다.',salmon:'손맛이 늘어 적을 더 강하게 끌어당긴다.',raspberry:'조준 실력이 늘어 사거리가 늘고, 먼 거리에서는 뒤쪽 적까지 꿰뚫는다.'};
+const EVOLUTION_TEXT={red:'강타 · 넉백 +1회 · 재사용 대기 -20%',orange:'과즙 범위 확대 · 처치 시 돈 2배',yellow:'추가 체력 · 받는 피해 -15%',green:'귀환 부메랑 강화 · 재사용 대기 -15%',cyan:'광역 범위 확대 · 떠 있는 적에게 1.8배 피해(받는 피해 0.4배)',blue:'공격 속도 증가 · 이동 속도 +25%',purple:'빨간 적 특화 강화 · 보스 피해 +30%',pink:'광역 공격력 증가 · 30% 확률로 1.5초간 느리게',crimson:'강타 위력 증가 · 보스 피해 +30%',gold:'파편 피해 증가 · 처치 시 돈 2배',ivory:'둔화 확률 40%→60% · 재사용 대기 -15%',chartreuse:'연사 피해 증가 · 연사 +1발',mint:'빙결 확률 증가 · 빙결 시간 +0.5초',azure:'돌진 피해 증가 · 20% 확률로 2배 치명타',crystal:'플로팅 특화 강화 · 관통 +1',lavender:'약화 확률 40%→60% · 약화 시간 +2초',salmon:'끌어오기 강화 · 재사용 대기 -15%',raspberry:'사거리 확장 및 관통 · 선딜 -25%'};
+const PROFILE_TEXT_EVOLVED={red:'수많은 전투를 거치며 맨몸으로도 강력한 일격을 날릴 수 있게 되었다. 이제는 단순한 몸빵이 아니라 한 방을 노리는 타격형 전투원.',orange:'더 많은 과즙을 담아 던지게 되면서 폭발 범위가 눈에 띄게 넓어졌다.',yellow:'두꺼워진 몸으로 더 오래 버티며 최전선을 든든하게 지킨다.',green:'부메랑을 던지는 손목 힘이 강해져 돌아올 때 더 강력한 일격을 남긴다.',cyan:'조준 실력이 늘어 폭발 범위가 한층 넓어진 저격수로 거듭났다.',blue:'손이 더 빨라져 눈 깜짝할 사이에 연타를 꽂아 넣는다.',purple:'빨간 적의 약점을 완벽히 파악해 압도적인 피해를 입히고, 받는 피해는 최소화한다.',pink:'리본을 휘두르는 힘이 강해져 광역 공격의 위력이 한층 강력해졌다.',crimson:'주먹에 실리는 힘이 늘어나 강타의 위력이 한층 강해졌다.',gold:'더 많은 금맥을 다뤄본 경험으로 파편 하나하나의 피해가 늘어났다.',ivory:'차가운 냉기가 짙어져 적을 더 자주, 더 오래 둔화시킨다.',chartreuse:'손놀림이 빨라져 콩알탄 한 발 한 발의 위력이 늘어났다.',mint:'냉기가 응축되어 적을 얼릴 확률이 크게 늘어났다.',azure:'파도의 기세가 거세져 돌진 한 방의 위력이 늘어났다.',crystal:'결정 순도가 높아져 플로팅 적을 상대로 한층 압도적인 위력을 낸다.',lavender:'향이 짙어져 더 자주, 더 오래 적의 공격력을 떨어뜨린다.',salmon:'손맛이 늘어 적을 더 강하게 끌어당긴다.',raspberry:'조준 실력이 늘어 사거리가 늘고, 먼 거리에서는 뒤쪽 적까지 꿰뚫는다.'};
 const PROFILE_CALIB={
  red:{base:{size:629,x:-9,y:-19},evolved:{size:556,x:-8,y:-281}},
  orange:{base:{size:592,x:-165,y:-15},evolved:{size:558,x:-148,y:-283}},
@@ -716,15 +717,15 @@ function levelMult(base,target,level,curve=1,m10Hp=null){
 // Extra 2진 effects beyond the shared +15% HP/ATK and range: [stat overrides applied on top of the base stats].
 const EVO_EXTRA={
  red:d=>({knockbacks:d.knockbacks+1,cooldown:d.cooldown*.8}),
- orange:()=>({killGold:.25}),
+ orange:()=>({killGold:1}),
  yellow:()=>({armor:.85}),
  green:d=>({cooldown:d.cooldown*.85}),
- cyan:()=>({floatDamage:3,floatResist:.4}),
+ cyan:()=>({floatDamage:1.8,floatResist:.4}),
  blue:d=>({speed:d.speed*1.25}),
  purple:()=>({bossDamage:1.3}),
- pink:()=>({slowPct:.2,slowDuration:1.5}),
+ pink:()=>({slowChance:.3,slowDuration:1.5}),
  crimson:()=>({bossDamage:1.3}),
- gold:()=>({killGold:.3}),
+ gold:()=>({killGold:1}),
  ivory:d=>({cooldown:d.cooldown*.85}),
  chartreuse:d=>({multiHit:d.multiHit+1}),
  mint:d=>({freezeDuration:(d.freezeDuration||1.5)+.5}),
@@ -736,15 +737,15 @@ const EVO_EXTRA={
 };
 const EVO_ATK_BONUS={red:1.2,pink:1.15,crimson:1.2,gold:1.2,chartreuse:1.2,azure:1.2};// 2진 with a dedicated atk bonus; everyone else gets the generic +15% (hp is always +15%, yellow +20%)
 function unitCost(t){return ALLIES.includes(t)?unitStats(t).cost:data.units[t].cost}
-function unitStats(type,level=training.levels[type]||1,form=training.forms?.[type]===1?1:2){const d=data.units[type],T=LV20_TARGET[type],hpM=levelMult(d.hp,T?.hp,level,HP_CURVE,HP_LV10_MULT),atkM=levelMult(d.atk,T?.atk,level),mag=ALLIES.includes(type)?1:enemyMagnification(),stats={...d,hp:Math.round(d.hp*hpM*mag),atk:Math.round(d.atk*atkM*mag)};if(d.damageTiers)stats.damageTiers=d.damageTiers.map(t=>({...t,dmg:Math.round(t.dmg*atkM)}));if(level<LV_EVOLVE||form===1)return stats;stats.evolved=true;stats.cost=d.cost*2;stats.hp=Math.round(stats.hp*(type==='yellow'?1.2:1.15));if(!EVO_ATK_BONUS[type]){const k=1.15;stats.atk=Math.round(stats.atk*k);if(stats.damageTiers)stats.damageTiers=stats.damageTiers.map(t=>({...t,dmg:Math.round(t.dmg*k)}))}stats.range=type==='raspberry'?d.range*1.1:d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=3;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);
+function unitStats(type,level=training.levels[type]||1,form=training.forms?.[type]===1?1:2){const d=data.units[type],T=LV20_TARGET[type],hpM=levelMult(d.hp,T?.hp,level,HP_CURVE,HP_LV10_MULT),atkM=levelMult(d.atk,T?.atk,level),mag=ALLIES.includes(type)?1:enemyMagnification(),stats={...d,hp:Math.round(d.hp*hpM*mag),atk:Math.round(d.atk*atkM*mag)};if(d.damageTiers)stats.damageTiers=d.damageTiers.map(t=>({...t,dmg:Math.round(t.dmg*atkM)}));if(level<LV_EVOLVE||form===1)return stats;stats.evolved=true;stats.cost=d.cost*2;stats.hp=Math.round(stats.hp*(type==='yellow'?1.2:1.15));if(!EVO_ATK_BONUS[type]){const k=1.15;stats.atk=Math.round(stats.atk*k);if(stats.damageTiers)stats.damageTiers=stats.damageTiers.map(t=>({...t,dmg:Math.round(t.dmg*k)}))}stats.range=type==='raspberry'?d.range*1.1:d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=1.8;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);
  if(type==='crimson')stats.atk=Math.round(stats.atk*1.2);
  if(type==='gold')stats.atk=Math.round(stats.atk*1.2);
- if(type==='ivory'){stats.slowPct=.45;stats.slowDuration=d.slowDuration+.5}
+ if(type==='ivory'){stats.slowChance=.6;stats.slowDuration=d.slowDuration+.5}
  if(type==='chartreuse')stats.atk=Math.round(stats.atk*1.2);
  if(type==='mint')stats.freezeChance=.4;
  if(type==='azure')stats.atk=Math.round(stats.atk*1.2);
- if(type==='crystal'){stats.floatDamage=3;stats.floatResist=.4}
- if(type==='lavender')stats.atkDownPct=.45;
+ if(type==='crystal'){stats.floatDamage=1.8;stats.floatResist=.4}
+ if(type==='lavender')stats.atkDownChance=.6;
  if(type==='salmon')stats.pullDistance=5;
  if(type==='raspberry'){stats.condPierceDist=25;stats.condPierceCount=1}
  if(EVO_EXTRA[type])Object.assign(stats,EVO_EXTRA[type](d));
