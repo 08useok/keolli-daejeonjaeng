@@ -1,10 +1,10 @@
 const STAGES=[
  {name:'한국',flag:'🇰🇷',hp:500,gap:5,wave:0,sky:'#84cef3',land:'#8fca52',desc:'첫 출격 · 5초마다 멍뭉이'},
  {name:'몽골',flag:'🇲🇳',hp:500,gap:4.8,wave:0,sky:'#a3daf2',land:'#aac66d',desc:'신규 적 낼름이 · 빠른 접근에 주의하세요'},
- {name:'중국',flag:'🇨🇳',hp:500,gap:4.6,wave:24,sky:'#bdd5da',land:'#79ab71',desc:'24초마다 멍뭉이 2마리 증원 · 클리어 보상: 오렌지'},
+ {name:'중국',flag:'🇨🇳',hp:500,gap:4.6,wave:24,sky:'#bdd5da',land:'#79ab71',desc:'멍뭉이가 더 자주 몰려옵니다 · 클리어 보상: 오렌지'},
  {name:'태국',flag:'🇹🇭',hp:500,gap:4.4,wave:22,sky:'#9bdfdb',land:'#68b084',desc:'신규 적 놈놈놈 · 세 명이 함께 달려옵니다'},
- {name:'캄보디아',flag:'🇰🇭',hp:750,gap:4.2,wave:20,sky:'#c3d8bd',land:'#76985e',desc:'20초마다 증원 · 수입 업그레이드를 활용하세요'},
- {name:'필리핀',flag:'🇵🇭',hp:750,gap:4,wave:18,sky:'#77d9e8',land:'#d5cd8b',desc:'18초마다 증원 · 클리어 보상: 옐로우'},
+ {name:'캄보디아',flag:'🇰🇭',hp:750,gap:4.2,wave:20,sky:'#c3d8bd',land:'#76985e',desc:'놈놈놈 합류 · 수입 업그레이드를 활용하세요'},
+ {name:'필리핀',flag:'🇵🇭',hp:750,gap:4,wave:18,sky:'#77d9e8',land:'#d5cd8b',desc:'멍뭉이 · 낼름이 · 놈놈놈 혼성 · 클리어 보상: 옐로우'},
  {name:'일본',flag:'🇯🇵',hp:2400,gap:3.8,wave:16,sky:'#f1d8e5',land:'#a0b57a',desc:'신규 적 하마양 · 적 성 체력 50%에서 보스 출현 · 보상: 그린'},
  {name:'호주',flag:'🇦🇺',hp:1500,gap:3.6,wave:15,sky:'#b3ddf2',land:'#d5ae72',desc:'멍뭉이 · 낼름이 · 놈놈놈의 혼성 전투'},
  {name:'싱가포르',flag:'🇸🇬',hp:3000,gap:3.5,wave:15,sky:'#a1dbed',land:'#85b87d',desc:'몰디브로 향하는 전선'},
@@ -69,10 +69,11 @@ const KANG_ROO_SHEET='assets/kang_roo_sheet.png?v=2';
 const data={bases:{ally:{hp:2000,max:2000,x:90},enemy:{hp:1000,max:1000,x:10}},units:{cyan:{"hp": 180, "atk": 200, "interval": 3.4, "speed": 4.3, "range": 30, "cost": 260, "cooldown": 9, "knockbacks": 3, "projectile": true, "splash": 0.5, "flight": 0.6, "floatStrong": true},blue:{"hp": 240, "atk": 38, "interval": 0.4, "speed": 13, "range": 4, "cost": 140, "cooldown": 3, "knockbacks": 3, "attackDuration": 0.3},purple:{"hp": 600, "atk": 90, "interval": 1.6, "speed": 5, "range": 6, "cost": 180, "cooldown": 6, "knockbacks": 3, "projectile": true, "splash": 1.5, "redStrong": true},peng:{"hp": 1300, "atk": 80, "interval": 0.8, "speed": 7, "range": 5, "reward": 180, "knockbacks": 3, "attackDuration": 0.55, "windup": 0.26666666666666666},gory:{"hp": 1000, "atk": 80, "interval": 0.5333333333333333, "speed": 8, "range": 5, "reward": 220, "knockbacks": 3, "attackDuration": 0.5, "windup": 0.26666666666666666, "area": true},baa:{"hp": 800, "atk": 50, "interval": 1.1, "speed": 4.5, "range": 3.7, "reward": 100, "knockbacks": 3, "attackDuration": 0.8, "windup": 0.4666666666666667},seal:{"hp": 2500, "atk": 150, "interval": 0.7666666666666667, "speed": 5, "range": 5.7, "reward": 450, "knockbacks": 1, "attackDuration": 0.6, "windup": 0.26666666666666666, "area": true, "trait": "red"},croco:{"hp": 70, "atk": 30, "interval": 0.6, "speed": 7.5, "range": 3.7, "reward": 30, "knockbacks": 1, "attackDuration": 0.5, "windup": 0.26666666666666666},red:{hp:450,atk:15,interval:1.2,speed:6,range:4.5,cost:30,cooldown:1,knockbacks:3},orange:{hp:220,atk:100,interval:2.4,speed:4.5,range:16,cost:150,cooldown:6.5,knockbacks:3,projectile:true,splash:3.5},yellow:{hp:900,atk:45,interval:1.8,speed:5,range:4,cost:125,cooldown:5,knockbacks:1},green:{hp:280,atk:65,interval:2.8,speed:5.5,range:12,cost:175,cooldown:7,knockbacks:3,boomerang:true},dog:{hp:200,atk:50,interval:1.4,speed:5,range:4,reward:40,knockbacks:3},snache:{hp:220,atk:85,interval:1.1,speed:7,range:4,reward:70,knockbacks:3},guys:{hp:420,atk:120,interval:1,speed:4.8,range:4.2,reward:110,knockbacks:1,attackDuration:.9},pigge:{trait:"red",hp:2400,atk:130,interval:1.8,speed:2.5,range:5,reward:400,knockbacks:2,attackDuration:28/30,windup:14/30,area:true},hippo:{hp:1600,atk:150,interval:2.2,speed:2.8,range:5,reward:200,knockbacks:1,attackDuration:.8,area:true}},income:[{max:1000,rate:20,cost:100},{max:1300,rate:28,cost:150},{max:1700,rate:38,cost:220},{max:2200,rate:50,cost:320},{max:2800,rate:65,cost:450},{max:3600,rate:85,cost:null}]};
 data.units.leboin={hp:4000,atk:654,interval:187/30,speed:2.5,range:13.5,reward:650,knockbacks:1,attackDuration:.9,windup:8/30,area:true};
 const MOOTH_SHEET='assets/mooth_sheet.png';
-data.units.rabbit={trait:"red",hp:320,atk:60,interval:.9,speed:9,range:4,reward:70,knockbacks:3,attackDuration:.45,windup:.2};
-data.units.squirrel={hp:300,atk:45,interval:1.05,speed:8.5,range:4.2,reward:85,knockbacks:3,attackDuration:.55,windup:.25};
-data.units.kangaroo={hp:4000,atk:250,interval:1.2,speed:10,range:5.5,reward:700,knockbacks:1,attackDuration:.85,windup:.53};
-data.units.mooth={trait:"floating",hp:5000,atk:300,interval:2.8,speed:3.2,range:12,reward:850,knockbacks:1,attackDuration:1.1,windup:.55,area:true};
+data.units.rabbit={trait:"red",hp:320,atk:60,interval:41/30,speed:9,range:4,reward:70,knockbacks:3,attackDuration:16/30,windup:12/30};
+data.units.squirrel={hp:300,atk:45,interval:16/30,speed:8.5,range:4.2,reward:85,knockbacks:3,attackDuration:16/30,windup:8/30};
+// Kang Roo's 250 is split 213/12/25 over three punches at 2f/8f/16f (share of atk, so Chapter 2's x1.5 still applies).
+data.units.kangaroo={hp:4000,atk:250,interval:36/30,speed:10,range:5.5,reward:700,knockbacks:1,attackDuration:.85,windup:2/30,hits:[{at:2/30,share:213/250},{at:8/30,share:12/250},{at:16/30,share:25/250}]};
+data.units.mooth={trait:"floating",hp:5000,atk:300,interval:88/30,speed:3.2,range:12,reward:850,knockbacks:1,attackDuration:1.6,windup:34/30,area:true};
 data.units.pink={hp:520,atk:125,interval:1.9,speed:6,range:23,engageRange:4.5,cost:225,cooldown:7,knockbacks:3,attackDuration:.7,windup:.3,area:true};
 data.units.rhino={hp:5200,atk:420,interval:2.1,speed:5.5,range:5.2,reward:900,knockbacks:2,attackDuration:.9,windup:.45,area:true};
 data.units.bear={hp:6500,atk:520,interval:2.4,speed:4.5,range:8.5,reward:1050,knockbacks:2,attackDuration:1,windup:.5,area:true};
@@ -120,11 +121,11 @@ function greenUnlocked(){return cleared.some(i=>i>=6)}
 function cooldownKey(type){return type==='red'?'spawnCd':type+'Cd'}
 function unitCooldown(type){return game[cooldownKey(type)]||0}
 function reset(){syncBasePositions();last=0;game={money:0,level:0,units:[],defeated:[],spawnCd:0,orangeCd:0,yellowCd:0,greenCd:0,cyanCd:0,blueCd:0,purpleCd:0,pinkCd:0,boomerangs:[],projectiles:[],effects:[],running:false,ended:false,tutorial:0,paused:false,elapsed:0,speedMultiplier:1,speedUnlocked:false};game.spawnRules=(STAGE_SPAWNS[selectedStage]||[]).map(r=>({...r,triggered:false,clock:0,spawned:0}));data.bases.ally.hp=data.bases.ally.max=baseHpFor();data.bases.enemy.hp=data.bases.enemy.max=STAGES[selectedStage].hp;game.tutorial=selectedStage===0?0:6;$('#field').style.background=`linear-gradient(${STAGES[selectedStage].sky} 0 32%,${STAGES[selectedStage].land} 32% 100%)`;$('#field').setAttribute('aria-label',STAGES[selectedStage].name+' 전장');$('#stageMenu').classList.add('hidden');unitsEl.innerHTML='';$('#result').classList.add('hidden');tutorial();render()}
-function addUnit(type){
+function addUnit(type,boss=false){
  if(game.ended)return;
  const d=data.units[type],ally=ALLIES.includes(type);
  if(ally&&(!(game.running||(type==='red'&&game.tutorial===2))||game.paused||unitCooldown(type)>0||game.money<unitCost(type)||!allyUnlocked(type)))return;
- const stats=unitStats(type);const u={type,ally,stats,hp:stats.hp,max:stats.hp,x:ally?data.bases.ally.x:data.bases.enemy.x,emerging:true,atkCd:0,kb:0,animTime:0,attackTime:0,hurtTime:0,kbTime:0,flashTime:0};
+ const stats=unitStats(type);const u={type,ally,boss,stats,hp:stats.hp,max:stats.hp,x:ally?data.bases.ally.x:data.bases.enemy.x,emerging:true,atkCd:0,kb:0,animTime:0,attackTime:0,hurtTime:0,kbTime:0,flashTime:0};
  game.units.push(u);drawUnit(u);u.el.style.left=`calc(${u.x}% - 21px)`;
  if(ally){game.money-=unitCost(type);game[cooldownKey(type)]=stats.cooldown;if(game.tutorial===2){game.tutorial=3;tutorial()}}render();
 }
@@ -173,7 +174,7 @@ function damage(v,amount,from){
  if(v.stats?.armor)amount*=v.stats.armor;
  if(from?.atkDownUntil>game.elapsed)amount*=from.atkDownMult;
  if(from?.stats?.critChance&&Math.random()<from.stats.critChance)amount*=from.stats.critMult||2;
- const isBoss=v.max>=BOSS_HP_THRESHOLD;
+ const isBoss=v.boss||data.units[v.type].hp>=BOSS_HP_THRESHOLD;// base HP, so Chapter 2's x1.5 doesn't change who counts as a boss
  if(from?.stats?.pull&&isBoss)amount*=1.3;
  if(from?.stats?.bossDamage&&isBoss)amount*=from.stats.bossDamage;
  v.hp=Math.max(0,v.hp-amount);v.flashTime=.1;v.el.classList.add('damage-flash');
@@ -236,7 +237,7 @@ function updateJuice(dt){
  }
 }
 function tierDamage(tiers,dist){for(const t of tiers)if(dist<=t.max)return t.dmg;return tiers[tiers.length-1].dmg}
-function resolveAttack(u,t){
+function resolveAttack(u,t,share=1){
  const d=u.stats||data.units[u.type],dir=u.ally?-1:1;
  const inRange=v=>v&&v.hp>0&&v.kbTime<=0&&v.ally!==u.ally&&dir*(v.x-u.x)>=-1&&Math.abs(v.x-u.x)<=d.range;
  if(d.dash){
@@ -253,7 +254,7 @@ function resolveAttack(u,t){
  }else{
   const victim=inRange(t)?t:target(u);
   if(inRange(victim)){
-   const distV=Math.abs(victim.x-u.x),atk=d.damageTiers?tierDamage(d.damageTiers,distV):d.atk;
+   const distV=Math.abs(victim.x-u.x),atk=(d.damageTiers?tierDamage(d.damageTiers,distV):d.atk)*share;
    damage(victim,atk,u);
    if(d.condPierceDist&&distV>=d.condPierceDist){
     const behind=game.units.filter(v=>v!==victim&&inRange(v)&&Math.abs(v.x-u.x)>distV).sort((a,b)=>Math.abs(a.x-u.x)-Math.abs(b.x-u.x))[0];
@@ -263,13 +264,13 @@ function resolveAttack(u,t){
   }
  }
  const base=u.ally?data.bases.enemy:data.bases.ally;
- if(Math.abs(base.frontX-u.x)<=(d.engageRange??d.range)){base.hp=Math.max(0,base.hp-baseDamage(d.atk));if(!base.hp)finish(u.ally)}
+ if(Math.abs(base.frontX-u.x)<=(d.engageRange??d.range)){base.hp=Math.max(0,base.hp-baseDamage(d.atk*share));if(!base.hp)finish(u.ally)}
 }
 function attack(u,t){
  if(game.ended||u.hp<=0||u.kbTime>0)return;
  const d=u.stats||data.units[u.type];u.atkCd=d.interval;
  u.attackTime=d.attackDuration||.56;
- if(u.type==='yellow'){const bolt=document.createElement('span');bolt.className='electric-bolt';bolt.textContent='ϟ';bolt.style.left=((u.x+(t?t.x:data.bases.enemy.frontX))/2)+'%';unitsEl.append(bolt);game.effects.push({el:bolt,time:.25})}if(d.boomerang){launchBoomerang(u);return}if(d.projectile){launchJuice(u,t);return}if(d.windup)u.pendingAttack={remaining:d.windup};else resolveAttack(u,t);
+ if(u.type==='yellow'){const bolt=document.createElement('span');bolt.className='electric-bolt';bolt.textContent='ϟ';bolt.style.left=((u.x+(t?t.x:data.bases.enemy.frontX))/2)+'%';unitsEl.append(bolt);game.effects.push({el:bolt,time:.25})}if(d.boomerang){launchBoomerang(u);return}if(d.projectile){launchJuice(u,t);return}if(d.hits)u.pendingAttack={remaining:d.hits[0].at,hit:0};else if(d.windup)u.pendingAttack={remaining:d.windup};else resolveAttack(u,t);
 }
 function update(dt){
  updateBoomerangs(dt);if(game.ended){render();return}updateJuice(dt);if(game.ended){render();return}
@@ -282,7 +283,7 @@ game.spawnCd=Math.max(0,game.spawnCd-dt);game.orangeCd=Math.max(0,game.orangeCd-
   if(u.bossKbTime>0){tickBossKnockback(u,dt);continue}
   if(u.kbTime>0){tickHitback(u,dt);continue}
   if(u.freezeUntil>game.elapsed){animateUnit(u);continue}
-  if(u.pendingAttack){u.pendingAttack.remaining-=dt;if(u.pendingAttack.remaining<=0){u.pendingAttack=null;resolveAttack(u);if(game.ended)break}}
+  if(u.pendingAttack){u.pendingAttack.remaining-=dt;if(u.pendingAttack.remaining<=0){const p=u.pendingAttack,hits=(u.stats||data.units[u.type]).hits,h=hits?.[p.hit];u.pendingAttack=null;resolveAttack(u,undefined,h?h.share:1);if(game.ended)break;if(h&&hits[p.hit+1])u.pendingAttack={remaining:hits[p.hit+1].at-h.at+p.remaining,hit:p.hit+1}}}
   u.atkCd-=dt;u.animTime+=dt;u.attackTime=Math.max(0,u.attackTime-dt);u.hurtTime=Math.max(0,u.hurtTime-dt);
   let d=u.stats||data.units[u.type];
   const spd=d.speed*(u.slowUntil>game.elapsed?(1-u.slowPct):1);
@@ -465,10 +466,14 @@ const STAGE_SPAWNS={
 // Mirror the same spawn composition/timing onto the Chapter 2 stage indices; only the
 // unitStats() magnification differs at spawn time.
 for(let i=0;i<CHAPTER1_LEN-1;i++){STAGE_SPAWNS[CHAPTER1_LEN+i]=STAGE_SPAWNS[i].map(r=>({...r}))}
+// Max enemies alive at once, per Battle Cats wiki (EoC Korea~Moon). Chapter 2 reuses the same caps.
+const STAGE_MAX_ENEMIES=[3,4,30,5,6,7,6,5,10,5,6,7,12,3,4,6,10,10,10,10,10,4,5,3,5,20,8,8,10,10,10,8,6,10,10,10,4,8,5,10,10,5,10,4,2,10,3,4];
+function maxEnemies(i){return STAGE_MAX_ENEMIES[i<CHAPTER1_LEN?i:i-CHAPTER1_LEN]??Infinity}
 function stageEnemies(i){return [...new Set((STAGE_SPAWNS[i]||[]).map(r=>r.type))]}
 function pickDelay(range){return range[0]+Math.random()*(range[1]-range[0])}
 function updateStageSpawns(dt){
- const hpPct=data.bases.enemy.hp/data.bases.enemy.max*100;
+ const hpPct=data.bases.enemy.hp/data.bases.enemy.max*100,cap=maxEnemies(selectedStage);
+ let alive=game.units.filter(u=>!u.ally&&u.hp>0).length;
  for(const r of game.spawnRules){
   if(r.count!==undefined&&r.spawned>=r.count)continue;
   if(!r.triggered){
@@ -478,7 +483,8 @@ function updateStageSpawns(dt){
   }
   r.clock-=dt;
   if(r.clock<=0){
-   addUnit(r.type);r.spawned++;
+   if(alive>=cap&&!r.boss){r.clock=0;continue}
+   addUnit(r.type,r.boss);r.spawned++;alive++;
    if(r.boss){triggerBossShockwave();$('#battleNotice').textContent='보스 '+UNIT_NAMES[r.type]+' 등장!';game.noticeTime=3}
    r.clock+=r.delay?pickDelay(r.delay):1e9;
   }
@@ -545,7 +551,8 @@ function animateAtlas(u){
   // Play all seven attack drawings across the complete animation. Damage still lands at windup.
   const elapsed=Math.max(0,duration-u.attackTime);
   index=Math.min(frames.length-1,Math.floor(elapsed/duration*frames.length));
- }else if(visualState==='attack'&&data.units[u.type].windup){const elapsed=duration-u.attackTime,windup=data.units[u.type].windup,strike={gory:2,baa:2,seal:4,croco:3}[u.type];if(strike!==undefined)index=elapsed<windup?Math.min(strike-1,Math.floor(elapsed/windup*strike)):Math.min(frames.length-1,strike+Math.floor((elapsed-windup)/Math.max(.01,duration-windup)*(frames.length-strike)));}
+ }else if(visualState==='attack'&&data.units[u.type].windup){const elapsed=duration-u.attackTime,windup=data.units[u.type].windup,strike={gory:2,baa:2,seal:4,croco:3,rabbit:3,squirrel:2,mooth:3}[u.type];if(strike!==undefined)index=elapsed<windup?Math.min(strike-1,Math.floor(elapsed/windup*strike)):Math.min(frames.length-1,strike+Math.floor((elapsed-windup)/Math.max(.01,duration-windup)*(frames.length-strike)));}
+ if(visualState==='attack'&&data.units[u.type].hits){const elapsed=duration-u.attackTime;index=Math.min(frames.length-1,Math.max(0,data.units[u.type].hits.filter(h=>h.at<=elapsed).length-1))}
  if(state==='hurt'&&u.type==='gory')index=0;
  // Optional 5th value: how far (sheet px) the body sits right of the crop's left edge
  // compared to walk frame 0, so wide impact crops don't shove the body backwards.
