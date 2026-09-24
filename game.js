@@ -52,8 +52,17 @@ const STAGES=[
 // 150% enemy strength magnification. Moon (the chapter-1 finale) is not repeated.
 const CHAPTER1_LEN=STAGES.length;
 for(let i=0;i<CHAPTER1_LEN-1;i++){const base=STAGES[i];STAGES.push({...base,chapter:2,hp:Math.round(base.hp*1.5),desc:'세계편 2장 재도전 · 모든 적 능력치 150% 강화'});}
+const MAIN_STAGE_COUNT=STAGES.length;// chapter 1 + chapter 2; everything after this index is a special stage
+// Tuesday special stage "광속 전사": pre-15.4 Speed Up source (drop chance 20/50/100/100% (x2 on the hardest)).
+const TUESDAY_STAGES=[
+ {name:'광속 전사 초급',flag:'⚡',hp:10000,chance:.2,count:1,boss:'hippo',desc:'하마양 · 스피드업 20%'},
+ {name:'광속 전사 중급',flag:'⚡',hp:20000,chance:.5,count:1,boss:'rhino',desc:'투뿔소 · 스피드업 50%'},
+ {name:'광속 전사 상급',flag:'⚡',hp:30000,chance:1,count:1,boss:'bear',desc:'곰선생 · 스피드업 100%'},
+ {name:'광속 전사 초상급',flag:'⚡',hp:50000,chance:1,count:2,boss:'leboin',desc:'빠옹 · 스피드업 2개 100%'}
+];
+TUESDAY_STAGES.forEach(t=>STAGES.push({name:t.name,flag:t.flag,hp:t.hp,gap:4,wave:0,sky:'#f6e39a',land:'#c9a24e',desc:t.desc,chapter:3,special:{chance:t.chance,count:t.count},maxEnemies:10}));
 let selectedStage=0,cleared=[];
-try{const saved=JSON.parse(localStorage.getItem('red-battle-progress-v1')||'[]');if(Array.isArray(saved))cleared=[...new Set(saved.filter(x=>Number.isInteger(x)&&x>=0&&x<STAGES.length))]}catch{}
+try{const saved=JSON.parse(localStorage.getItem('red-battle-progress-v1')||'[]');if(Array.isArray(saved))cleared=[...new Set(saved.filter(x=>Number.isInteger(x)&&x>=0&&x<MAIN_STAGE_COUNT))]}catch{}
 function saveProgress(){try{localStorage.setItem('red-battle-progress-v1',JSON.stringify(cleared))}catch{}}
 function isUnlocked(i){return i===0||cleared.includes(i-1)||cleared.includes(i)}
 function chapterOf(i){return STAGES[i]?.chapter||1}
@@ -319,7 +328,7 @@ function renderYellowButton(){
 function loop(t){const raw=last?Math.min(.05,(t-last)/1000):0;last=t;const dt=raw*(game.speedMultiplier||1);if(game&&!game.ended&&!game.paused){if(game.running)update(dt);else if(game.tutorial===2||game.tutorial===4){game.money=Math.min(walletMax(),game.money+incomeRate()*dt);render()}}requestAnimationFrame(loop)}
 function highlight(sel){document.querySelectorAll('.tutorial-target').forEach(e=>e.classList.remove('tutorial-target'));if(sel)$(sel).classList.add('tutorial-target');$('#game').classList.toggle('guiding',!!sel)}
 function tutorial(){let text=$('#tutorialText'),next=$('#nextBtn'),box=$('#tutorial');let steps=[['오른쪽은 아군의 성입니다.','#allyBase'],['왼쪽의 적 성을 파괴하면 승리합니다!','#enemyBase'],['돈을 사용해서 레드를 생성해 보세요!','#spawnBtn'],['돈은 시간이 지나면 자동으로 모입니다. 적을 쓰러뜨려도 돈을 얻습니다!','#money'],['수입을 업그레이드하면 더 많은 돈을 더 빠르게 모을 수 있습니다!','#incomeBtn'],['캐릭터와 적은 자동으로 이동하고 공격합니다. 레드를 계속 생성해 적 성을 파괴하세요!','']];if(game.tutorial>=steps.length){box.classList.add('hidden');highlight();game.running=true;return}box.classList.remove('hidden');text.textContent=steps[game.tutorial][0];highlight(steps[game.tutorial][1]);next.style.display=(game.tutorial===2||game.tutorial===4)?'none':'inline-block'}
-$('#nextBtn').onclick=()=>{game.tutorial++;tutorial();render()};$('#spawnBtn').onclick=()=>addUnit('red');$('#orangeBtn').onclick=()=>addUnit('orange');$('#yellowBtn').onclick=()=>addUnit('yellow');$('#greenBtn').onclick=()=>addUnit('green');for(const t of GENERIC_CD_TYPES)$('#'+t+'Btn').onclick=()=>addUnit(t);$('#incomeBtn').onclick=()=>{let l=data.income[game.level];if(!game.ended&&!game.paused&&(game.running||game.tutorial===4)&&l.cost!==null&&game.money>=l.cost){game.money-=l.cost;game.level++;if(game.tutorial===4){game.tutorial++;tutorial()}render()}};function finish(win){if(game.ended)return;const xpReward=win?awardXP():0;const speedDropped=win&&selectedStage>=18&&Math.random()<0.3;if(speedDropped){speedTickets++;saveSpeedTickets();renderSpeedButton()}game.ended=true;game.running=false;highlight();$('#result').classList.remove('hidden');$('#resultTitle').textContent=win?STAGES[selectedStage].name+' 정복 완료!':'패배...';if(win&&!cleared.includes(selectedStage)){cleared.push(selectedStage);saveProgress()}$('#nextStageBtn').classList.toggle('hidden',!win||selectedStage===STAGES.length-1);$('#resultDetail').textContent=win?(selectedStage===STAGES.length-1?STAGES.length+'개 스테이지를 모두 정복했어요!':STAGES[selectedStage+1].name+' 스테이지가 열렸어요!'):'수입을 올리고 아군을 모아서 다시 도전하세요.';if(win&&selectedStage===2)$('#resultDetail').textContent+=' 오렌지가 해금됐어요!';if(win&&selectedStage===5)$('#resultDetail').textContent+=' 옐로우가 해금됐어요!';if(win&&selectedStage===6)$('#resultDetail').textContent+=' 그린이 해금됐어요!';if(win){for(const t of ['cyan','blue','purple',...NEW_ALLY_TYPES])if(selectedStage===UNLOCK_AT[t])$('#resultDetail').textContent+=' '+UNIT_NAMES[t]+' 해금!';$('#resultDetail').textContent+=` 보상 +${xpReward} XP`;}if(speedDropped)$('#resultDetail').textContent+=' 2배속권 획득!';renderNewButtons();renderOrangeButton();renderYellowButton();renderGreenButton()}$('#restartBtn').onclick=reset;
+$('#nextBtn').onclick=()=>{game.tutorial++;tutorial();render()};$('#spawnBtn').onclick=()=>addUnit('red');$('#orangeBtn').onclick=()=>addUnit('orange');$('#yellowBtn').onclick=()=>addUnit('yellow');$('#greenBtn').onclick=()=>addUnit('green');for(const t of GENERIC_CD_TYPES)$('#'+t+'Btn').onclick=()=>addUnit(t);$('#incomeBtn').onclick=()=>{let l=data.income[game.level];if(!game.ended&&!game.paused&&(game.running||game.tutorial===4)&&l.cost!==null&&game.money>=l.cost){game.money-=l.cost;game.level++;if(game.tutorial===4){game.tutorial++;tutorial()}render()}};function finish(win){if(game.ended)return;const sp=STAGES[selectedStage].special,xpReward=win&&!sp?awardXP():0;const speedDropped=win&&!sp&&selectedStage>=18&&Math.random()<0.3;let specialDrop=0;if(win&&sp&&Math.random()<sp.chance){specialDrop=sp.count;speedTickets+=specialDrop;saveSpeedTickets();renderSpeedButton()}if(speedDropped){speedTickets++;saveSpeedTickets();renderSpeedButton()}game.ended=true;game.running=false;highlight();$('#result').classList.remove('hidden');$('#resultTitle').textContent=win?STAGES[selectedStage].name+' 정복 완료!':'패배...';if(win&&!sp&&!cleared.includes(selectedStage)){cleared.push(selectedStage);saveProgress()}$('#nextStageBtn').classList.toggle('hidden',!win||!!sp||selectedStage===MAIN_STAGE_COUNT-1);$('#resultDetail').textContent=win?(sp?'':selectedStage===MAIN_STAGE_COUNT-1?MAIN_STAGE_COUNT+'개 스테이지를 모두 정복했어요!':(STAGES[selectedStage+1]||{}).name+' 스테이지가 열렸어요!'):'수입을 올리고 아군을 모아서 다시 도전하세요.';if(win&&selectedStage===2)$('#resultDetail').textContent+=' 오렌지가 해금됐어요!';if(win&&selectedStage===5)$('#resultDetail').textContent+=' 옐로우가 해금됐어요!';if(win&&selectedStage===6)$('#resultDetail').textContent+=' 그린이 해금됐어요!';if(win){for(const t of ['cyan','blue','purple',...NEW_ALLY_TYPES])if(selectedStage===UNLOCK_AT[t])$('#resultDetail').textContent+=' '+UNIT_NAMES[t]+' 해금!';$('#resultDetail').textContent+=` 보상 +${xpReward} XP`;}if(speedDropped)$('#resultDetail').textContent+=' 2배속권 획득!';if(sp)$('#resultDetail').textContent=win?(specialDrop?`스피드업 ${specialDrop}개 획득! (보유 ${speedTickets}개)`:'이번에는 스피드업을 얻지 못했어요. 다시 도전해 보세요!'):'전력을 올리고 다시 도전하세요.';renderNewButtons();renderOrangeButton();renderYellowButton();renderGreenButton()}$('#restartBtn').onclick=reset;
 $('#skipBtn').onclick=()=>{game.tutorial=6;tutorial();render()};
 $('#pauseBtn').onclick=()=>{if(game.running&&!game.ended){game.paused=!game.paused;render()}};
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&game.running&&!game.ended){game.paused=true;render()}});
@@ -466,9 +475,10 @@ const STAGE_SPAWNS={
 // Mirror the same spawn composition/timing onto the Chapter 2 stage indices; only the
 // unitStats() magnification differs at spawn time.
 for(let i=0;i<CHAPTER1_LEN-1;i++){STAGE_SPAWNS[CHAPTER1_LEN+i]=STAGE_SPAWNS[i].map(r=>({...r}))}
+TUESDAY_STAGES.forEach((t,k)=>{const boss=t.boss,rules=[{type:'dog',at:{t:0},delay:[4,8]},{type:'snache',at:{t:5},delay:[8,20]},{type:'guys',at:{t:15},delay:[10,26]},{type:boss,at:{hp:90},count:1,boss:true}];if(k>=1)rules.push({type:boss,at:{hp:50},count:k>=3?2:1,delay:[6,10]});STAGE_SPAWNS[MAIN_STAGE_COUNT+k]=rules});
 // Max enemies alive at once, per Battle Cats wiki (EoC Korea~Moon). Chapter 2 reuses the same caps.
 const STAGE_MAX_ENEMIES=[3,4,30,5,6,7,6,5,10,5,6,7,12,3,4,6,10,10,10,10,10,4,5,3,5,20,8,8,10,10,10,8,6,10,10,10,4,8,5,10,10,5,10,4,2,10,3,4];
-function maxEnemies(i){return STAGE_MAX_ENEMIES[i<CHAPTER1_LEN?i:i-CHAPTER1_LEN]??Infinity}
+function maxEnemies(i){return STAGES[i]?.maxEnemies??STAGE_MAX_ENEMIES[i<CHAPTER1_LEN?i:i-CHAPTER1_LEN]??Infinity}
 function stageEnemies(i){return [...new Set((STAGE_SPAWNS[i]||[]).map(r=>r.type))]}
 function pickDelay(range){return range[0]+Math.random()*(range[1]-range[0])}
 function updateStageSpawns(dt){
@@ -570,7 +580,7 @@ function animateAtlas(u){
 }
 
 let stageChapterView=1;
-function renderStageMenu(){renderTraining();renderBaseUpgrade();
+function renderStageMenu(){renderTraining();renderBaseUpgrade();renderSpecialStages();
  $('#stageGrid').innerHTML='';
  const viewStages=STAGES.map((stage,i)=>({stage,i})).filter(o=>chapterOf(o.i)===stageChapterView);
  viewStages.forEach(({stage,i})=>{const button=document.createElement('button');button.className='stage-card'+(cleared.includes(i)?' cleared':'');button.disabled=!isUnlocked(i);button.title=`등장 적: ${stageEnemies(i).map(type=>UNIT_NAMES[type]).join(' · ')} · 적 성 체력 ${stage.hp}`;button.innerHTML=`<strong>${stage.name}</strong>${cleared.includes(i)?'<small>✓</small>':''}`;button.onclick=()=>{selectedStage=i;reset()};$('#stageGrid').append(button)});
@@ -579,13 +589,24 @@ function renderStageMenu(){renderTraining();renderBaseUpgrade();
  $('#chapterNote').textContent=stageChapterView===2?'한국 ~ 하와이 재도전 · 모든 적 체력·공격력 150% 강화':'';
  $('#progressText').textContent=`${viewStages.filter(o=>cleared.includes(o.i)).length} / ${viewStages.length} 스테이지 클리어 · 세계편 ${stageChapterView}장`;
 }
+const SPEED_PACK={count:9,xp:1000};// pre-15.4: bought in packs of 9 (50 cat food in the original) - paid in XP here
+function isTuesday(){try{return new Date().getDay()===2||new URLSearchParams(location.search).has('tuesday')}catch{return false}}
+function buySpeedPack(){if(training.xp<SPEED_PACK.xp)return false;training.xp-=SPEED_PACK.xp;speedTickets+=SPEED_PACK.count;saveTraining();saveSpeedTickets();renderStageMenu();render();return true}
+function renderSpecialStages(){
+ const grid=$('#specialGrid');grid.innerHTML='';
+ const open=cleared.includes(CHAPTER1_LEN-1),tue=isTuesday();
+ $('#speedText').textContent=`스피드업 ${speedTickets}개`;
+ $('#specialNote').textContent=!open?'세계편 1장 마지막 스테이지(달)를 클리어하면 열립니다.':tue?'오늘은 화요일! 스피드업을 얻을 수 있는 스테이지가 열려 있습니다. (초상급은 세계편 2장 클리어 후)':'화요일에만 열립니다. 스피드업은 아래에서 XP로 구매할 수도 있습니다.';
+ TUESDAY_STAGES.forEach((t,k)=>{const i=MAIN_STAGE_COUNT+k,b=document.createElement('button');b.className='stage-card';const locked=!open||!tue||(k===3&&!cleared.includes(MAIN_STAGE_COUNT-1));b.disabled=locked;b.title=t.desc+' · 적 성 체력 '+t.hp;b.innerHTML=`<strong>${t.name.replace('광속 전사 ','')}</strong><small>${Math.round(t.chance*100)}%${t.count>1?' ×'+t.count:''}</small>`;b.onclick=()=>{selectedStage=i;reset()};grid.append(b)});
+ const buy=document.createElement('button');buy.className='stage-card';buy.disabled=training.xp<SPEED_PACK.xp;buy.innerHTML=`<strong>스피드업 ${SPEED_PACK.count}개 구매</strong><small>${SPEED_PACK.xp} XP</small>`;buy.onclick=buySpeedPack;grid.append(buy);
+}
 $('#chapter1Tab').onclick=()=>{stageChapterView=1;renderStageMenu()};
 $('#chapter2Tab').onclick=()=>{stageChapterView=2;renderStageMenu()};
 function openStages(){if(game.running&&!game.ended)game.paused=true;highlight();render();renderStageMenu();$('#stageMenu').classList.remove('hidden');$('#resumeBtn').textContent=game.ended?'결과로 돌아가기':'전투로 돌아가기'}
 $('#stagesBtn').onclick=openStages;
 $('#resultStagesBtn').onclick=openStages;
 $('#resumeBtn').onclick=()=>{$('#stageMenu').classList.add('hidden');if(!game.ended){game.paused=false;tutorial()}render()};
-$('#nextStageBtn').onclick=()=>{if(game.ended&&selectedStage<STAGES.length-1&&isUnlocked(selectedStage+1)){selectedStage++;reset()}};
+$('#nextStageBtn').onclick=()=>{if(game.ended&&selectedStage<MAIN_STAGE_COUNT-1&&!STAGES[selectedStage].special&&isUnlocked(selectedStage+1)){selectedStage++;reset()}};
 window.addEventListener('resize',syncBasePositions);
 
 
@@ -653,7 +674,7 @@ function profileMarkup(type,evolved){
  if(idx>=0){const c=NEW_PROFILE_CALIB[type];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${NEW_PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
  const c=PROFILE_CALIB[type][evolved?'evolved':'base'];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
 const LV_EVOLVE=10,LV_MAX=20,HP_CURVE=.6,HP_LV10_MULT=1.8*2/1.15;// HP: Lv.11~20 front-loaded; Lv.10 is a jump so the 2진 (+15% HP) has 2x the Lv.9 HP
-function levelCap(){return cleared.includes(STAGES.length-1)?LV_MAX:LV_EVOLVE}// Lv.11~20 unlocks after clearing the last chapter-2 stage
+function levelCap(){return cleared.includes(MAIN_STAGE_COUNT-1)?LV_MAX:LV_EVOLVE}// Lv.11~20 unlocks after clearing the last chapter-2 stage
 const ECON_COST=[1000,2000,4000,8000,16000,32000],WALLET_STEP=400,PROD_STEP=.15;// permanent XP upgrades: wallet cap +400/level, money rate +15%/level
 let training={xp:0,baseLevel:1,levels:Object.fromEntries(ALLIES.map(t=>[t,1])),forms:{},walletLevel:0,prodLevel:0},trainingSaveFailed=false;
 function stageXP(i){return (200+i*50)*2}
