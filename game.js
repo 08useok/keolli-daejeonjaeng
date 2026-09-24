@@ -508,7 +508,7 @@ function renderNewButtons(){for(const type of GENERIC_CD_TYPES){
 }}
 
 const NEW_ATLASES={
-rhino:{scale:.55,left:-27,walk:[[3,1,106,81,0],[111,2,108,80,2],[225,4,104,78,-1],[331,1,106,78,0],[2,88,107,77,2],[111,84,108,81,2],[224,85,105,80,0],[331,81,106,78,1]],attack:[[1,170,108,78,10],[113,171,106,77,1],[223,167,106,86,-16]],hurt:[[2,88,107,77,2]]},
+rhino:{scale:.55,left:-27,walk:[[3,1,106,81,0],[111,2,108,80,2],[225,4,104,78,-1],[331,1,106,78,0],[2,88,107,77,2],[111,84,108,81,2],[224,85,105,80,0],[331,81,106,78,1]],attack:[[1,170,108,78,4,0,-10],[113,171,106,77,6,0,-24],[223,167,106,86,-16],[1,170,108,78,-4]],hurt:[[2,88,107,77,2]]},
 face:{scale:.62,left:-25,lift:34,walk:[[1,1,118,127,0,0]],attack:[[121,1,121,138,2,-11],[244,1,125,157,2,-28],[371,1,126,163,3,-34]],hurt:[[1,134,155,121,9,5]]},
 rabbit:{scale:.72,left:-10,walk:[[6,11,56,76,0],[79,26,56,61,-1],[153,28,55,59,-1],[220,5,61,82,2],[293,1,71,71,14],[375,10,60,77,7]],attack:[[1,107,79,64,20],[105,89,74,71,18],[235,96,52,58,-6],[325,102,90,66,33]],hurt:[[13,188,90,56,6]]},
 squirrel:{scale:.68,left:-12,walk:[[20,51,54,41,0],[99,52,59,40,3],[177,49,68,43,15],[259,46,75,46,13],[345,45,72,47,16]],attack:[[5,102,69,83,13],[90,98,70,87,15],[181,94,76,91,18],[269,123,70,62,12]],hurt:[[357,145,59,44,4]]},
@@ -566,7 +566,7 @@ function animateAtlas(u){
  if(state==='hurt'&&u.type==='gory')index=0;
  // Optional 5th value: how far (sheet px) the body sits right of the crop's left edge
  // compared to walk frame 0, so wide impact crops don't shove the body backwards.
- const [x,y,w,h,ox=0,oy=0]=frames[index];const sprite=u.el.querySelector('.dog-sprite');
+ const [x,y,w,h,ox=0,oy=0,rot=0]=frames[index];const sprite=u.el.querySelector('.dog-sprite');
  const scale=atlas.scale??baseAtlas.scale,left=(atlas.left??baseAtlas.left)-ox*scale;
  sprite.style.backgroundPosition=`-${x}px -${y}px`;
  sprite.style.width=w+'px';sprite.style.height=h+'px';sprite.style.left=left+'px';
@@ -574,7 +574,9 @@ function animateAtlas(u){
  // skull still while the jaw drops, floating high enough that the open jaw clears the ground.
  sprite.style.bottom=(((atlas.lift??baseAtlas.lift??0)+oy)*scale)+'px';
  // flip: the sheet faces right while allies march left; mirror inside the same box.
- sprite.style.transform=atlas.flip?`translateX(${w*scale}px) scale(${-scale},${scale})`:`scale(${scale})`;sprite.style.transformOrigin='left bottom';
+ // Optional 7th value: rotation (deg) about the rear-bottom pivot, e.g. the rhino rears its
+ // head up before slamming down (the sheet's own rearing drawings are cropped through the face).
+ sprite.style.transform=atlas.flip?`translateX(${w*scale}px) scale(${-scale},${scale})`:`scale(${scale})`+(rot?` rotate(${rot}deg)`:'');sprite.style.transformOrigin='left bottom';
  sprite.style.filter=state==='hurt'&&!atlas.hurt?'brightness(1.8)':'none';
  u.el.dataset.animation=state;
 }
