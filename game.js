@@ -87,10 +87,14 @@ data.units.pink={hp:520,atk:125,interval:1.9,speed:6,range:23,engageRange:4.5,co
 data.units.rhino={hp:5200,atk:420,interval:2.1,speed:5.5,range:5.2,reward:900,knockbacks:2,attackDuration:.9,windup:.45,area:true};
 data.units.bear={hp:6500,atk:520,interval:2.4,speed:4.5,range:8.5,reward:1050,knockbacks:10,attackDuration:1,windup:.5,area:true};
 data.units.face={trait:"floating",hp:18000,atk:850,interval:3.4,speed:1.8,range:14,reward:2500,knockbacks:3,attackDuration:1.2,windup:.65,area:true};
-const CRIMSON_SHEET='assets/crimson_body.webp';
-const GOLD_SHEET='assets/gold_body.webp';
-const IVORY_SHEET='assets/ivory_body.webp';
-const CHARTREUSE_SHEET='assets/chartreuse_body.webp';
+const CRIMSON_SHEET='assets/unitcrimson_ally-sprite.png';
+const CRIMSON_EVOLVED_SHEET='assets/crimson_evolved.webp';
+const GOLD_SHEET='assets/unitgold_ally-sprite.png';
+const GOLD_EVOLVED_SHEET='assets/gold_evolved.webp';
+const IVORY_SHEET='assets/unitivory_ally-sprite.png';
+const IVORY_EVOLVED_SHEET='assets/ivory_evolved.webp';
+const CHARTREUSE_SHEET='assets/unitchartreuse_ally-sprite.png';
+const CHARTREUSE_EVOLVED_SHEET='assets/chartreuse_evolved.webp';
 const MINT_SHEET='assets/unitmint_ally-sprite.png';
 const AZURE_SHEET='assets/unitazure_ally-sprite.png';
 const CRYSTAL_SHEET='assets/unitcrystal_ally-sprite.png';
@@ -528,10 +532,10 @@ seal:{scale:0.78,left:-22,walk:[[2,7,112,72,0],[116,1,111,78,1],[1,88,111,71,1]]
 croco:{scale:0.72,left:-10,walk:[[2,29,85,39,0],[89,29,86,39,1],[177,28,86,40,1],[265,28,86,40,1],[354,29,85,39,0]],attack:[[2,98,85,39,0],[90,73,85,64,0],[178,70,84,67,0],[266,73,85,64,0],[354,104,85,33,0]],hurt:[[90,142,85,64,0]]},
 
  pigge:{scale:.8,left:-20,walk:[[4,1,103,77],[4,79,103,76],[4,157,103,76],[115,5,104,73],[112,80,109,76],[115,158,104,75]],attack:[[225,1,126,104],[225,107,126,67],[225,177,126,67]],hurt:[[355,3,124,65],[368,72,103,65]]},
- crimson:{scale:0.278,left:-25,sheet:CRIMSON_SHEET,walk:[[32,216,187,279,0],[272,216,200,279,3],[522,216,215,279,2]],attack:[[779,216,265,279,3],[1053,216,410,279,168],[1464,216,212,279,-5]],hurt:[[1741,216,234,279,6]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,flip:true,scale:0.7,left:-26,walk:[[55,3,76,94,0],[236,3,74,94,-5],[414,3,84,94,-5]],attack:[[605,3,108,94,34],[772,3,134,94,60],[1158,3,90,94,11]],hurt:[[1333,5,113,92,18]]}},
- gold:{scale:0.269,left:-26,sheet:GOLD_SHEET,walk:[[30,206,197,313,0],[282,206,192,313,-5],[545,206,180,313,-17]],attack:[[773,206,255,313,30],[1020,206,445,313,215],[1497,206,181,313,-16]],hurt:[[1705,206,282,313,40]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,flip:true,scale:0.7,left:-25,walk:[[56,102,71,93,0],[240,102,71,93,-1],[419,102,79,93,0]],attack:[[601,102,106,93,34],[773,102,152,93,81],[1161,102,131,93,58]],hurt:[[1333,104,114,91,22]]}},
- ivory:{scale:0.296,left:-30,sheet:IVORY_SHEET,walk:[[34,211,206,290,0],[269,211,198,290,1],[506,211,200,290,0]],attack:[[758,211,251,290,32],[1018,211,433,290,148],[1475,211,179,290,2]],hurt:[[1697,211,289,290,47]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,flip:true,scale:0.7,left:-28,walk:[[40,203,83,92,0],[233,203,74,92,-1],[413,203,82,92,0]],attack:[[583,202,131,93,45],[761,203,164,92,82],[1150,202,82,93,2]],hurt:[[1333,204,115,90,26]]}},
- chartreuse:{scale:0.259,left:-24,sheet:CHARTREUSE_SHEET,walk:[[31,219,187,302,0],[276,219,187,302,-3],[524,219,197,302,-4]],attack:[[773,219,223,302,-4],[1017,219,413,302,167],[1483,219,192,302,-4]],hurt:[[1741,219,250,302,20]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,flip:true,scale:0.7,left:-23,walk:[[52,300,71,94,0],[237,300,71,94,1],[417,301,78,93,0]],attack:[[599,301,131,93,60],[780,301,132,93,67],[1162,301,87,93,18]],hurt:[[1334,301,114,93,25]]}},
+ crimson:{scale:0.45,left:-30,sheet:CRIMSON_SHEET,walk:[[10,36,136,144,0],[234,36,136,143,0],[462,36,141,145,4]],attack:[[685,36,185,143,10],[900,36,220,143,86],[1186,36,138,143,3]],hurt:[[1401,36,167,150,27]],evolved:{sheet:CRIMSON_EVOLVED_SHEET,scale:0.278,left:-25,walk:[[32,216,187,279,0],[272,216,200,279,3],[522,216,215,279,2]],attack:[[779,216,265,279,3],[1053,216,410,279,168],[1464,216,212,279,-5]],hurt:[[1741,216,234,279,6]]}},
+ gold:{scale:0.36,left:-30,sheet:GOLD_SHEET,walk:[[15,267,168,177,0],[278,266,167,176,0],[544,266,172,178,3]],attack:[[798,257,239,187,7],[1054,266,333,175,165],[1457,266,169,178,1]],hurt:[[1706,266,263,187,30]],evolved:{sheet:GOLD_EVOLVED_SHEET,scale:0.269,left:-26,walk:[[30,206,197,313,0],[282,206,192,313,-5],[545,206,180,313,-17]],attack:[[773,206,255,313,30],[1020,206,445,313,215],[1497,206,181,313,-16]],hurt:[[1705,206,282,313,40]]}},
+ ivory:{scale:0.36,left:-30,sheet:IVORY_SHEET,walk:[[11,284,171,179,0],[270,284,171,178,-1],[535,284,175,180,2]],attack:[[753,246,248,216,8],[1035,283,354,180,183],[1458,284,171,179,0]],hurt:[[1710,281,265,188,29]],evolved:{sheet:IVORY_EVOLVED_SHEET,scale:0.296,left:-30,walk:[[34,211,206,290,0],[269,211,198,290,1],[506,211,200,290,0]],attack:[[758,211,251,290,32],[1018,211,433,290,148],[1475,211,179,290,2]],hurt:[[1697,211,289,290,47]]}},
+ chartreuse:{scale:0.45,left:-30,sheet:CHARTREUSE_SHEET,walk:[[45,35,142,153,0],[260,39,140,146,0],[471,33,148,155,3]],attack:[[681,35,163,153,-3],[859,39,286,150,145],[1202,35,137,151,-4]],hurt:[[1413,37,191,152,7]],evolved:{sheet:CHARTREUSE_EVOLVED_SHEET,scale:0.259,left:-24,walk:[[31,219,187,302,0],[276,219,187,302,-3],[524,219,197,302,-4]],attack:[[773,219,223,302,-4],[1017,219,413,302,167],[1483,219,192,302,-4]],hurt:[[1741,219,250,302,20]]}},
  mint:{scale:0.45,left:-30,sheet:MINT_SHEET,walk:[[51,43,132,142,0],[266,44,131,142,-1],[473,43,137,143,4]],attack:[[668,33,176,153,37],[878,46,266,141,134],[1198,44,129,141,-2]],hurt:[[1407,45,170,143,9]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,flip:true,scale:0.7,left:-26,walk:[[49,400,74,93,0],[235,401,73,92,0],[414,401,81,92,1]],attack:[[593,400,124,93,47],[767,401,152,92,75],[1154,401,82,92,5]],hurt:[[1333,402,116,91,28]]}},
  azure:{scale:0.45,left:-30,sheet:AZURE_SHEET,walk:[[46,47,144,157,0],[252,51,143,151,-1],[452,46,148,158,3]],attack:[[665,5,182,195,17],[861,7,322,210,38],[1226,44,141,157,-3]],hurt:[[1411,46,199,156,11]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,flip:true,scale:0.7,left:-47,walk:[[19,498,142,110,0],[203,498,143,110,2],[387,498,141,108,-3]],attack:[[568,498,159,108,19],[753,498,172,111,21],[1127,498,146,109,3]],hurt:[[1310,500,156,109,1]]}},
  crystal:{scale:0.45,left:-30,sheet:CRYSTAL_SHEET,walk:[[47,35,144,155,0],[256,38,143,151,0],[463,35,146,155,2]],attack:[[678,35,165,154,-1],[857,35,274,154,132],[1186,35,143,155,0]],hurt:[[1399,33,191,157,8]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,flip:true,scale:0.7,left:-22,walk:[[57,615,70,95,0],[239,616,67,94,-5],[423,616,75,94,0]],attack:[[603,616,104,94,34],[782,616,124,94,54],[1162,617,102,93,29]],hurt:[[1334,619,113,90,18]]}},
