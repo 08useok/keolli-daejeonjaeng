@@ -121,6 +121,7 @@ body { overflow:auto; }
 .unit.leboin .bar{top:-24px;width:76px;left:-9px}
 .ability-icon{width:25px;height:25px;vertical-align:middle;margin-right:6px;border-radius:5px}
 .ability-label{display:inline-flex;align-items:center;color:#ffe98e;font-weight:800}
+.strong-icon{display:inline-block;background:url("assets/ability_icon.png") center/contain no-repeat}
 .freeze-icon,.slow-icon,.weaken-icon,.crit-icon,.pull-icon{display:inline-block;background:url(assets/freeze_icon.png) center/contain no-repeat}
 .slow-icon{background-image:url(assets/slow_icon.svg?v=2)}
 .weaken-icon{background-image:url(assets/weaken_icon.svg?v=2)}
