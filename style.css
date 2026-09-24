@@ -122,10 +122,10 @@ body { overflow:auto; }
 .ability-icon{width:25px;height:25px;vertical-align:middle;margin-right:6px;border-radius:5px}
 .ability-label{display:inline-flex;align-items:center;color:#ffe98e;font-weight:800}
 .freeze-icon,.slow-icon,.weaken-icon,.crit-icon,.pull-icon{display:inline-block;background:url(assets/freeze_icon.png) center/contain no-repeat}
-.slow-icon{background-image:url(assets/slow_icon.svg)}
-.weaken-icon{background-image:url(assets/weaken_icon.svg)}
-.crit-icon{background-image:url(assets/crit_icon.svg)}
-.pull-icon{background-image:url(assets/pull_icon.svg)}
+.slow-icon{background-image:url(assets/slow_icon.svg?v=2)}
+.weaken-icon{background-image:url(assets/weaken_icon.svg?v=2)}
+.crit-icon{background-image:url(assets/crit_icon.svg?v=2)}
+.pull-icon{background-image:url(assets/pull_icon.svg?v=2)}
 .status-badges{position:absolute;display:flex;gap:2px;top:-30px;left:50%;transform:translateX(-50%);z-index:5;pointer-events:none}
 .status-badges>span{display:none;width:16px;height:16px}
 .unit.frozen .st-freeze,.unit.slowed .st-slow,.unit.weakened .st-weaken,.unit.crit-hit .st-crit,.unit.pulled .st-pull{display:inline-block}
