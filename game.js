@@ -60,12 +60,12 @@ function chapterOf(i){return STAGES[i]?.chapter||1}
 function enemyMagnification(){return chapterOf(selectedStage)===2?1.5:1}
 const RHINO_SHEET='assets/rhino_sheet.png';
 const BEAR_SHEET='assets/bear_sheet.png';
-const FACE_SHEET='assets/face_sheet.png';
+const FACE_SHEET='assets/face_sheet.png?v=2';
 // Reserved for the Norway expansion: user-supplied Elite Rabbit spritesheet.
 const ELITE_RABBIT_SHEET='assets/elite_rabbit_sheet.png';
 // Reserved user-supplied enemy sheets for the next Empire of Cats expansion.
 const SQUIRREL_G_SHEET='assets/squirrel_g_sheet.png';
-const KANG_ROO_SHEET='assets/kang_roo_sheet.png';
+const KANG_ROO_SHEET='assets/kang_roo_sheet.png?v=2';
 const data={bases:{ally:{hp:2000,max:2000,x:90},enemy:{hp:1000,max:1000,x:10}},units:{cyan:{"hp": 180, "atk": 200, "interval": 3.4, "speed": 4.3, "range": 30, "cost": 260, "cooldown": 9, "knockbacks": 3, "projectile": true, "splash": 0.5, "flight": 0.6, "floatStrong": true},blue:{"hp": 240, "atk": 38, "interval": 0.4, "speed": 13, "range": 4, "cost": 140, "cooldown": 3, "knockbacks": 3, "attackDuration": 0.3},purple:{"hp": 600, "atk": 90, "interval": 1.6, "speed": 5, "range": 6, "cost": 180, "cooldown": 6, "knockbacks": 3, "projectile": true, "splash": 1.5, "redStrong": true},peng:{"hp": 1300, "atk": 80, "interval": 0.8, "speed": 7, "range": 5, "reward": 180, "knockbacks": 3, "attackDuration": 0.55, "windup": 0.26666666666666666},gory:{"hp": 1000, "atk": 80, "interval": 0.5333333333333333, "speed": 8, "range": 5, "reward": 220, "knockbacks": 3, "attackDuration": 0.5, "windup": 0.26666666666666666, "area": true},baa:{"hp": 800, "atk": 50, "interval": 1.1, "speed": 4.5, "range": 3.7, "reward": 100, "knockbacks": 3, "attackDuration": 0.8, "windup": 0.4666666666666667},seal:{"hp": 2500, "atk": 150, "interval": 0.7666666666666667, "speed": 5, "range": 5.7, "reward": 450, "knockbacks": 1, "attackDuration": 0.6, "windup": 0.26666666666666666, "area": true, "trait": "red"},croco:{"hp": 70, "atk": 30, "interval": 0.6, "speed": 7.5, "range": 3.7, "reward": 30, "knockbacks": 1, "attackDuration": 0.5, "windup": 0.26666666666666666},red:{hp:450,atk:15,interval:1.2,speed:6,range:4.5,cost:30,cooldown:1,knockbacks:3},orange:{hp:220,atk:100,interval:2.4,speed:4.5,range:16,cost:150,cooldown:6.5,knockbacks:3,projectile:true,splash:3.5},yellow:{hp:900,atk:45,interval:1.8,speed:5,range:4,cost:125,cooldown:5,knockbacks:1},green:{hp:280,atk:65,interval:2.8,speed:5.5,range:12,cost:175,cooldown:7,knockbacks:3,boomerang:true},dog:{hp:200,atk:50,interval:1.4,speed:5,range:4,reward:40,knockbacks:3},snache:{hp:220,atk:85,interval:1.1,speed:7,range:4,reward:70,knockbacks:3},guys:{hp:420,atk:120,interval:1,speed:4.8,range:4.2,reward:110,knockbacks:1,attackDuration:.9},pigge:{trait:"red",hp:2400,atk:130,interval:1.8,speed:2.5,range:5,reward:400,knockbacks:2,attackDuration:28/30,windup:14/30,area:true},hippo:{hp:1600,atk:150,interval:2.2,speed:2.8,range:5,reward:200,knockbacks:1,attackDuration:.8,area:true}},income:[{max:1000,rate:20,cost:100},{max:1300,rate:28,cost:150},{max:1700,rate:38,cost:220},{max:2200,rate:50,cost:320},{max:2800,rate:65,cost:450},{max:3600,rate:85,cost:null}]};
 data.units.leboin={hp:4000,atk:654,interval:187/30,speed:2.5,range:13.5,reward:650,knockbacks:1,attackDuration:.9,windup:8/30,area:true};
 const MOOTH_SHEET='assets/mooth_sheet.png';
@@ -87,7 +87,7 @@ const CRYSTAL_SHEET='assets/unitcrystal_ally-sprite.png';
 const LAVENDER_SHEET='assets/unitlavender_ally-sprite.png';
 const SALMON_SHEET='assets/unitsalmon_ally-sprite.png';
 const RASPBERRY_SHEET='assets/unitraspberry_ally-sprite.png';
-const NEWCHAR_EVOLVED_SHEET='assets/new_chars_evolved_sheet.png';
+const NEWCHAR_EVOLVED_SHEET='assets/new_chars_evolved_sheet.png?v=2';
 data.units.crimson={hp:900,atk:650,interval:2.8,speed:5,range:7,cost:300,cooldown:10,knockbacks:3,forceKnockback:true};
 data.units.gold={hp:600,atk:180,interval:3.6,speed:5,range:21,cost:425,cooldown:15,knockbacks:3,multiHit:3};
 data.units.ivory={hp:650,atk:380,interval:3,speed:5,range:20,cost:350,cooldown:13,knockbacks:3,area:true,slowPct:.3,slowDuration:2};
@@ -128,7 +128,7 @@ function addUnit(type){
  game.units.push(u);drawUnit(u);u.el.style.left=`calc(${u.x}% - 21px)`;
  if(ally){game.money-=unitCost(type);game[cooldownKey(type)]=d.cooldown;if(game.tutorial===2){game.tutorial=3;tutorial()}}render();
 }
-function drawUnit(u){let e=document.createElement('div'),evolved=u.ally&&u.stats?.evolved,legacyAlly=u.ally&&!NEW_ATLASES[u.type];e.className='unit '+u.type+(u.ally?' ally-art':'')+(evolved?' evolved':'');e.style.setProperty('--unit-color',COLORS?.[u.type]||'#fff');e.innerHTML='<div class="bar"><i style="width:100%"></i></div><span class="freeze-badge"><span class="freeze-icon"></span></span>'+(legacyAlly?'<span class="ally-shadow"></span><span class="ally-sprite"></span>'+(evolved?'<span class="evolved-sprite"></span>':'')+(u.type==='pink'&&!evolved?'<span class="pink-ribbon"><i></i></span>':''):'<span class="dog-shadow"></span><span class="dog-sprite"></span>'+(u.type==='leboin'||u.type==='bear'?'<span class="dog-sprite-legs"></span>':''));e.setAttribute('aria-label',UNIT_NAMES[u.type]+(evolved?' 2진':''));u.el=e;unitsEl.append(e);const newAtlas=NEW_ATLASES[u.type];const sheet={rabbit:ELITE_RABBIT_SHEET,squirrel:SQUIRREL_G_SHEET,kangaroo:KANG_ROO_SHEET,mooth:MOOTH_SHEET,rhino:RHINO_SHEET,bear:BEAR_SHEET,face:FACE_SHEET}[u.type]||(evolved&&newAtlas?.evolved?newAtlas.evolved.sheet:newAtlas?.sheet);if(sheet)e.querySelector('.dog-sprite').style.backgroundImage=`url(${sheet})`;if(legacyAlly)animateAlly(u);else animateDog(u)}
+function drawUnit(u){let e=document.createElement('div'),evolved=u.ally&&u.stats?.evolved,legacyAlly=u.ally&&!NEW_ATLASES[u.type];e.className='unit '+u.type+(u.ally?' ally-art':'')+(evolved?' evolved':'');e.style.setProperty('--unit-color',COLORS?.[u.type]||'#fff');e.innerHTML='<div class="bar"><i style="width:100%"></i></div><span class="freeze-badge"><span class="freeze-icon"></span></span>'+(legacyAlly?'<span class="ally-shadow"></span><span class="ally-sprite"></span>'+(evolved?'<span class="evolved-sprite"></span>':'')+(u.type==='pink'&&!evolved?'<span class="pink-ribbon"><i></i></span>':''):'<span class="dog-shadow"></span><span class="dog-sprite"></span>'+(u.type==='leboin'||u.type==='bear'?'<span class="dog-sprite-legs"></span>':'')+(u.type==='leboin'?'<span class="dog-sprite-body"></span>':''));e.setAttribute('aria-label',UNIT_NAMES[u.type]+(evolved?' 2진':''));u.el=e;unitsEl.append(e);const newAtlas=NEW_ATLASES[u.type];const sheet={rabbit:ELITE_RABBIT_SHEET,squirrel:SQUIRREL_G_SHEET,kangaroo:KANG_ROO_SHEET,mooth:MOOTH_SHEET,rhino:RHINO_SHEET,bear:BEAR_SHEET,face:FACE_SHEET}[u.type]||(evolved&&newAtlas?.evolved?newAtlas.evolved.sheet:newAtlas?.sheet);if(sheet)e.querySelector('.dog-sprite').style.backgroundImage=`url(${sheet})`;if(legacyAlly)animateAlly(u);else animateDog(u)}
 function target(u){let foes=game.units.filter(v=>v.hp>0&&v.kbTime<=0&&!v.emerging&&v.ally!==u.ally);let dir=u.ally?-1:1;return foes.filter(v=>dir*(v.x-u.x)>=-1).sort((a,b)=>Math.abs(a.x-u.x)-Math.abs(b.x-u.x))[0]}
 // Canonical knockback counts include death. Red keeps its original two live hitbacks.
 const HITBACK_DURATION=20/30;
@@ -355,13 +355,6 @@ function animateSnache(u){
  u.el.dataset.animation=u.hurtTime>0?'hurt':attacking?'attack':'walk';
 }
 
-// leboin_dog-sprite.png draws this character's head/trunk and its 3-frame walk-cycle
-// legs as separate, disconnected pieces (a head-fixed/legs-cycling rig), not one
-// self-contained pose per frame like the other enemies. Composite them as two layered
-// sprites instead of cropping a single rectangle that can only grab one or the other.
-const LEBOIN_HEAD={x:159,y:0,w:133,h:142,left:-25};
-const LEBOIN_LEGS={x:164,w:140,h:32,left:-27,y:[153,189,223]};
-const LEBOIN_SPRAY={x:1,y:10,w:156,h:147};
 // bear_sheet.png is the same kind of rig: a legless torso (its belly is cut flat at y=110)
 // plus separate 4-frame leg pieces whose 40px-wide top fits that gap exactly. The attack
 // poses are full-body drawings: [x,y,w,h,ox], ox re-anchoring the body onto the walk spot.
@@ -386,31 +379,32 @@ function animateBear(u){
  }
  u.el.dataset.animation=state;
 }
+// leboin_dog-sprite.png is a three-piece rig: a body block (with a tail and stubby legs),
+// 3 walking leg slices that replace the body's lower 32px (their right end carries the ear
+// lobe), and separate heads (trunk up / trunk up windup / trunk-down spray). Offsets are in
+// sheet px relative to the body block's top-left, found by matching the pieces' outlines
+// and the eye position (so the spray head lands exactly where the walking head was).
+const LEBOIN_BODY={x:306,y:150,w:124,h:97,cut:67};
+const LEBOIN_LEGS=[[164,153,140],[166,189,138],[167,223,137]];
+const LEBOIN_HEADS={walk:[159,1,133,141,79,-58],windup:[294,1,133,144,79,-61],spray:[1,3,156,154,77,-67]};
 function animateLeboin(u){
- const scale=.55;
- const head=u.el.querySelector('.dog-sprite'),legs=u.el.querySelector('.dog-sprite-legs');
+ const scale=.55,L=-65,G=99,d=data.units.leboin;
+ const head=u.el.querySelector('.dog-sprite'),legs=u.el.querySelector('.dog-sprite-legs'),body=u.el.querySelector('.dog-sprite-body');
  const state=u.hurtTime>0?'hurt':u.attackTime>0?'attack':'walk';
- const duration=data.units.leboin.attackDuration;
- const spraying=state==='attack'&&(duration-u.attackTime)>=data.units.leboin.windup;
- if(spraying){
-  legs.style.display='none';
-  head.style.left='-16px';head.style.bottom='0px';
-  head.style.width=LEBOIN_SPRAY.w+'px';head.style.height=LEBOIN_SPRAY.h+'px';
-  head.style.backgroundPosition=`-${LEBOIN_SPRAY.x}px -${LEBOIN_SPRAY.y}px`;
-  head.style.transform=`scale(${scale})`;head.style.transformOrigin='left bottom';
+ const place=(el,x,y,w,h,px,py)=>{el.style.display='block';el.style.width=w+'px';el.style.height=h+'px';el.style.backgroundPosition=`-${x}px -${y}px`;el.style.left=(L+px*scale)+'px';el.style.bottom=((G-py-h)*scale)+'px';el.style.transform=`scale(${scale})`;el.style.transformOrigin='left bottom'};
+ const B=LEBOIN_BODY;let h;
+ if(state==='attack'){
+  place(body,B.x,B.y,B.w,B.h,0,0);legs.style.display='none';
+  h=LEBOIN_HEADS[(d.attackDuration-u.attackTime)>=d.windup?'spray':'windup'];
  }else{
-  const legIndex=state==='walk'?Math.floor(u.animTime/.16)%3:0;
-  legs.style.display='block';
-  legs.style.width=LEBOIN_LEGS.w+'px';legs.style.height=LEBOIN_LEGS.h+'px';
-  legs.style.left=LEBOIN_LEGS.left+'px';legs.style.bottom='0px';
-  legs.style.backgroundPosition=`-${LEBOIN_LEGS.x}px -${LEBOIN_LEGS.y[legIndex]}px`;
-  legs.style.transform=`scale(${scale})`;legs.style.transformOrigin='left bottom';
-  head.style.width=LEBOIN_HEAD.w+'px';head.style.height=LEBOIN_HEAD.h+'px';
-  head.style.left=LEBOIN_HEAD.left+'px';head.style.bottom=(LEBOIN_LEGS.h*scale)+'px';
-  head.style.backgroundPosition=`-${LEBOIN_HEAD.x}px -${LEBOIN_HEAD.y}px`;
-  head.style.transform=`scale(${scale})`;head.style.transformOrigin='left bottom';
-  head.style.filter=u.hurtTime>0?'brightness(1.8)':'none';
+  place(body,B.x,B.y,B.w,B.cut,0,0);
+  const [lx,ly,lw]=LEBOIN_LEGS[state==='walk'?Math.floor(u.animTime/.16)%3:0];
+  place(legs,lx,ly,lw,32,143-lw,B.cut);
+  h=LEBOIN_HEADS.walk;
  }
+ place(head,h[0],h[1],h[2],h[3],h[4],h[5]);
+ body.style.zIndex=1;legs.style.zIndex=1;head.style.zIndex=2;
+ head.style.filter=body.style.filter=legs.style.filter=u.hurtTime>0?'brightness(1.8)':'none';
  u.el.dataset.animation=state;
 }
 
@@ -496,8 +490,8 @@ function renderNewButtons(){for(const type of GENERIC_CD_TYPES){
 }}
 
 const NEW_ATLASES={
-rhino:{scale:.55,left:-27,walk:[[3,1,106,81,0],[111,2,108,80,2],[225,4,104,78,-1],[331,1,106,78,0],[2,88,107,77,2],[111,84,108,81,2],[224,85,105,80,0],[331,81,106,78,1]],attack:[[1,170,108,78,2],[113,171,106,77,1],[223,166,183,89,-2]],hurt:[[2,88,107,77,2]]},
-face:{scale:.62,left:-25,walk:[[1,1,118,127,0],[121,1,121,138,3]],attack:[[244,1,125,157,10],[371,1,126,163,11]],hurt:[[1,134,155,121,12]]},
+rhino:{scale:.55,left:-27,walk:[[3,1,106,81,0],[111,2,108,80,2],[225,4,104,78,-1],[331,1,106,78,0],[2,88,107,77,2],[111,84,108,81,2],[224,85,105,80,0],[331,81,106,78,1]],attack:[[1,170,108,78,10],[113,171,106,77,1],[223,167,106,86,-16]],hurt:[[2,88,107,77,2]]},
+face:{scale:.62,left:-25,lift:34,walk:[[1,1,118,127,0,0]],attack:[[121,1,121,138,2,-11],[244,1,125,157,2,-28],[371,1,126,163,3,-34]],hurt:[[1,134,155,121,9,5]]},
 rabbit:{scale:.72,left:-10,walk:[[6,11,56,76,0],[79,26,56,61,-1],[153,28,55,59,-1],[220,5,61,82,2],[293,1,71,71,14],[375,10,60,77,7]],attack:[[1,107,79,64,20],[105,89,74,71,18],[235,96,52,58,-6],[325,102,90,66,33]],hurt:[[13,188,90,56,6]]},
 squirrel:{scale:.68,left:-12,walk:[[20,51,54,41,0],[99,52,59,40,3],[177,49,68,43,15],[259,46,75,46,13],[345,45,72,47,16]],attack:[[5,102,69,83,13],[90,98,70,87,15],[181,94,76,91,18],[269,123,70,62,12]],hurt:[[357,145,59,44,4]]},
 kangaroo:{scale:.58,left:-24,walk:[[1,1,93,122,0],[96,1,100,112,9],[1,126,90,129,-5],[96,115,89,126,-3]],attack:[[200,1,110,121,-8],[191,131,133,124,7],[333,97,100,158,-11]],hurt:[[96,1,100,112,9]]},
@@ -553,10 +547,13 @@ function animateAtlas(u){
  if(state==='hurt'&&u.type==='gory')index=0;
  // Optional 5th value: how far (sheet px) the body sits right of the crop's left edge
  // compared to walk frame 0, so wide impact crops don't shove the body backwards.
- const [x,y,w,h,ox=0]=frames[index];const sprite=u.el.querySelector('.dog-sprite');
+ const [x,y,w,h,ox=0,oy=0]=frames[index];const sprite=u.el.querySelector('.dog-sprite');
  const scale=atlas.scale??baseAtlas.scale,left=(atlas.left??baseAtlas.left)-ox*scale;
  sprite.style.backgroundPosition=`-${x}px -${y}px`;
  sprite.style.width=w+'px';sprite.style.height=h+'px';sprite.style.left=left+'px';
+ // Optional 6th value / atlas.lift (sheet px): vertical re-anchoring, e.g. the face keeps its
+ // skull still while the jaw drops, floating high enough that the open jaw clears the ground.
+ sprite.style.bottom=(((atlas.lift??baseAtlas.lift??0)+oy)*scale)+'px';
  // flip: the sheet faces right while allies march left; mirror inside the same box.
  sprite.style.transform=atlas.flip?`translateX(${w*scale}px) scale(${-scale},${scale})`:`scale(${scale})`;sprite.style.transformOrigin='left bottom';
  sprite.style.filter=state==='hurt'&&!atlas.hurt?'brightness(1.8)':'none';
@@ -802,7 +799,7 @@ function fitCodexUnit(){
  // Fit the union of every walk/attack frame, not just the pre-animation box: wide
  // impact frames (thrown objects, waves, raised weapons) otherwise run off the stage.
  const u=codexUnit,box={l:1e9,r:-1e9,t:1e9,b:-1e9},d=data.units[u.type],dur=d.attackDuration||.56;
- const measure=()=>{animateUnit(u);for(const e of unit.querySelectorAll('.evolved-sprite,.ally-sprite,.dog-sprite,.dog-sprite-legs')){if(getComputedStyle(e).display==='none')continue;const r=e.getBoundingClientRect();if(!r.width||!r.height)continue;box.l=Math.min(box.l,r.left);box.r=Math.max(box.r,r.right);box.t=Math.min(box.t,r.top);box.b=Math.max(box.b,r.bottom)}};
+ const measure=()=>{animateUnit(u);for(const e of unit.querySelectorAll('.evolved-sprite,.ally-sprite,.dog-sprite,.dog-sprite-legs,.dog-sprite-body')){if(getComputedStyle(e).display==='none')continue;const r=e.getBoundingClientRect();if(!r.width||!r.height)continue;box.l=Math.min(box.l,r.left);box.r=Math.max(box.r,r.right);box.t=Math.min(box.t,r.top);box.b=Math.max(box.b,r.bottom)}};
  for(let i=0;i<8;i++){u.attackTime=0;u.animTime=i*.075;measure()}
  for(let i=0;i<24;i++){u.animTime=0;u.attackTime=dur*(1-(i+.5)/24);measure()}
  u.animTime=0;u.attackTime=0;animateUnit(u);
