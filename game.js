@@ -559,7 +559,12 @@ window.addEventListener('resize',syncBasePositions);
 
 
 const EVOLVED_CELL_W=1536/7*.75,EVOLVED_CELL_H=1024/8*.75;
-const WIDE_THROW_TYPES=new Set(['orange','yellow','purple']);
+// Windup (col 3) / impact (col 4) crops in source px of the 1774px-wide ally sheets:
+// [x0,x1,dx]. The thrown object starts inside col 3, right after the windup body, so
+// plain cell crops either cut it or (showing cols 3+4 together) draw the windup body
+// and the impact body at once. dx re-anchors the impact body onto the walk position.
+const LEGACY_THROW_CROPS={orange:{3:[665,858],4:[862,1109,66]},yellow:{3:[665,870],4:[871,1109,64]},green:{3:[665,876],4:[879,1109,55]}};
+LEGACY_THROW_CROPS.purple=LEGACY_THROW_CROPS.cyan=LEGACY_THROW_CROPS.orange;
 function animateAlly(u){
  const state=u.hurtTime>0?'hurt':u.attackTime>0?'attack':'walk';
  if(u.stats?.evolved){
@@ -570,44 +575,14 @@ function animateAlly(u){
   u.el.dataset.animation=state;
   return;
  }
- const sprite=u.el.querySelector('.ally-sprite');
- // The source art draws the thrown-projectile pose spanning cols 3+4 as one wide
- // picture (it splits the object down the middle at the col boundary). Reveal both
- // cells together at the impact instant instead of cropping it in half.
- if(u.type==='cyan'||u.type==='blue'){
-  const cell=77.6125;
-  const duration=data.units[u.type].attackDuration||.56;
-  const col=u.hurtTime>0?6:u.attackTime>0?3+Math.min(2,Math.max(0,Math.floor((duration-u.attackTime)/duration*3))):Math.floor(u.animTime/(u.type==='blue'?.075:.16))%3;
-  if(u.type==='cyan'&&col===3){
-   sprite.style.width=cell+'px';sprite.style.backgroundPosition=`${-2*cell}px 0px`;
-  }else if(u.type==='cyan'&&col===4){
-   sprite.style.width=(cell*2)+'px';sprite.style.backgroundPosition=`${-3*cell}px 0px`;
-  }else{
-   sprite.style.width=cell+'px';sprite.style.backgroundPosition=`${-col*cell}px 0px`;
-  }
-  u.el.querySelector('.ally-shadow').style.backgroundPosition='-543.2875px -77.6125px';
- }else{
-  const row={red:0,orange:1,yellow:2,green:3,purple:1,pink:0}[u.type],cell=77.6125;
-  const duration=data.units[u.type].attackDuration||.56;
-  const col=u.hurtTime>0?6:u.attackTime>0?3+Math.min(2,Math.max(0,Math.floor((duration-u.attackTime)/duration*3))):Math.floor(u.animTime/.16)%3;
-  if(WIDE_THROW_TYPES.has(u.type)&&col===3){
-   sprite.style.width=cell+'px';sprite.style.backgroundPosition=`${-2*cell}px ${-row*cell}px`;
-  }else if(WIDE_THROW_TYPES.has(u.type)&&col===4){
-   sprite.style.width=(cell*2)+'px';sprite.style.backgroundPosition=`${-3*cell}px ${-row*cell}px`;
-  }else if(u.type==='green'&&col===3){
-   // The raised-boomerang windup frame has a stray sliver of the next (thrown) frame's
-   // boomerang bleeding in at its right edge; crop a bit narrower to exclude it.
-   sprite.style.left='-18px';sprite.style.width='68px';sprite.style.backgroundPosition=`${-3*cell}px ${-row*cell}px`;
-  }else if(u.type==='green'&&col===4){
-   // The thrown boomerang's sharp left tip starts a few px before this cell in the source
-   // art; widen the crop leftward so the point isn't sliced into a flat straight edge.
-   const extra=17*.35;
-   sprite.style.left=(-18-extra)+'px';sprite.style.width=(cell+extra)+'px';sprite.style.backgroundPosition=`${-(4*cell-extra)}px ${-row*cell}px`;
-  }else{
-   sprite.style.left='-18px';sprite.style.width=cell+'px';sprite.style.backgroundPosition=`${-col*cell}px ${-row*cell}px`;
-  }
-  u.el.querySelector('.ally-shadow').style.backgroundPosition=`${-7*cell}px ${-row*cell}px`;
- }
+ const sprite=u.el.querySelector('.ally-sprite'),cell=77.6125,k=cell/221.75;
+ const ownSheet=u.type==='cyan'||u.type==='blue',row=ownSheet?0:{red:0,orange:1,yellow:2,green:3,purple:1,pink:0}[u.type];
+ const duration=data.units[u.type].attackDuration||.56;
+ const col=u.hurtTime>0?6:u.attackTime>0?3+Math.min(2,Math.max(0,Math.floor((duration-u.attackTime)/duration*3))):Math.floor(u.animTime/(u.type==='blue'?.075:.16))%3;
+ const crop=LEGACY_THROW_CROPS[u.type]?.[col];
+ if(crop){const [x0,x1,dx=0]=crop;sprite.style.left=(-18-dx*k)+'px';sprite.style.width=((x1-x0)*k)+'px';sprite.style.backgroundPosition=`${-x0*k}px ${-row*cell}px`}
+ else{sprite.style.left='-18px';sprite.style.width=cell+'px';sprite.style.backgroundPosition=`${-col*cell}px ${-row*cell}px`}
+ u.el.querySelector('.ally-shadow').style.backgroundPosition=ownSheet?'-543.2875px -77.6125px':`${-7*cell}px ${-row*cell}px`;
  u.el.dataset.animation=state;
 }
 
@@ -647,11 +622,11 @@ function profileMarkup(type,evolved){
  if(idx>=0){const c=NEW_PROFILE_CALIB[type];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${NEW_PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
  const c=PROFILE_CALIB[type][evolved?'evolved':'base'];return `<div class="generated-profile" role="img" aria-label="${UNIT_NAMES[type]}${evolved?' 2진':''} 프로필" style="background-image:url(${PROFILE_SHEET});background-size:${c.size}px ${c.size}px;background-position:${c.x}px ${c.y}px"></div>`}
 const LV_EVOLVE=10,LV_MAX=20;
-let training={xp:0,baseLevel:1,levels:Object.fromEntries(ALLIES.map(t=>[t,1]))},trainingSaveFailed=false;
+let training={xp:0,baseLevel:1,levels:Object.fromEntries(ALLIES.map(t=>[t,1])),forms:{}},trainingSaveFailed=false;
 function stageXP(i){return 200+i*50}
 try{
  const raw=localStorage.getItem('red-battle-training-v1');
- if(raw){const saved=JSON.parse(raw);training.xp=Number.isSafeInteger(saved.xp)&&saved.xp>=0?saved.xp:0;training.baseLevel=Number.isInteger(saved.baseLevel)?Math.max(1,Math.min(10,saved.baseLevel)):1;for(const t of ALLIES){const n=saved.levels?.[t];training.levels[t]=Number.isInteger(n)?Math.max(1,Math.min(LV_MAX,n)):1}}
+ if(raw){const saved=JSON.parse(raw);training.xp=Number.isSafeInteger(saved.xp)&&saved.xp>=0?saved.xp:0;training.baseLevel=Number.isInteger(saved.baseLevel)?Math.max(1,Math.min(10,saved.baseLevel)):1;for(const t of ALLIES){const n=saved.levels?.[t];training.levels[t]=Number.isInteger(n)?Math.max(1,Math.min(LV_MAX,n)):1;if(saved.forms?.[t]===1)training.forms[t]=1}}
  else{training.xp=cleared.reduce((sum,i)=>sum+stageXP(i),0);saveTraining()}
 }catch{trainingSaveFailed=true}
 function saveTraining(){try{localStorage.setItem('red-battle-training-v1',JSON.stringify(training));trainingSaveFailed=false}catch{trainingSaveFailed=true}}
@@ -668,7 +643,7 @@ function levelMult(base,target,level){
  if(!target||lv<=LV_EVOLVE)return 1+.1*(lv-1);
  return m10*Math.pow(Math.max(target/base,m10)/m10,(lv-LV_EVOLVE)/(LV_MAX-LV_EVOLVE));
 }
-function unitStats(type,level=training.levels[type]||1){const d=data.units[type],T=LV20_TARGET[type],hpM=levelMult(d.hp,T?.hp,level),atkM=levelMult(d.atk,T?.atk,level),mag=ALLIES.includes(type)?1:enemyMagnification(),stats={...d,hp:Math.round(d.hp*hpM*mag),atk:Math.round(d.atk*atkM*mag)};if(d.damageTiers)stats.damageTiers=d.damageTiers.map(t=>({...t,dmg:Math.round(t.dmg*atkM)}));if(level<LV_EVOLVE)return stats;stats.evolved=true;stats.range=type==='raspberry'?d.range*1.1:d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='yellow')stats.hp=Math.round(stats.hp*1.25);if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=3;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);
+function unitStats(type,level=training.levels[type]||1,form=training.forms?.[type]===1?1:2){const d=data.units[type],T=LV20_TARGET[type],hpM=levelMult(d.hp,T?.hp,level),atkM=levelMult(d.atk,T?.atk,level),mag=ALLIES.includes(type)?1:enemyMagnification(),stats={...d,hp:Math.round(d.hp*hpM*mag),atk:Math.round(d.atk*atkM*mag)};if(d.damageTiers)stats.damageTiers=d.damageTiers.map(t=>({...t,dmg:Math.round(t.dmg*atkM)}));if(level<LV_EVOLVE||form===1)return stats;stats.evolved=true;stats.range=type==='raspberry'?d.range*1.1:d.range*1.2;if(d.engageRange)stats.engageRange=d.engageRange*1.2;if(type==='red')stats.atk=Math.round(stats.atk*1.2);if(type==='orange')stats.splash=d.splash*1.35;if(type==='yellow')stats.hp=Math.round(stats.hp*1.25);if(type==='green')stats.returnMult=1.35;if(type==='cyan')stats.splash=d.splash*1.3;if(type==='blue')stats.interval=d.interval*.8;if(type==='purple'){stats.redDamage=3;stats.redResist=.4}if(type==='pink')stats.atk=Math.round(stats.atk*1.15);
  if(type==='crimson')stats.atk=Math.round(stats.atk*1.2);
  if(type==='gold')stats.atk=Math.round(stats.atk*1.2);
  if(type==='ivory'){stats.slowPct=.45;stats.slowDuration=d.slowDuration+.5}
@@ -713,6 +688,7 @@ $('#speedBtn').onclick=()=>{
  }
  renderSpeedButton();
 };
+function setForm(t,f){if(!ALLIES.includes(t)||training.levels[t]<LV_EVOLVE)return false;if(f===1)training.forms[t]=1;else delete training.forms[t];saveTraining();renderTraining();render();return true}
 function upgradeCost(t){return training.levels[t]*100}
 function upgradeCharacter(t){if(!ALLIES.includes(t)||!allyUnlocked(t)||training.levels[t]>=LV_MAX||training.xp<upgradeCost(t))return false;training.xp-=upgradeCost(t);training.levels[t]++;saveTraining();renderTraining();renderBaseUpgrade();render();return true}
 function baseHpFor(level=training.baseLevel){return Math.round(2000*(1+.1*(level-1)))}
@@ -730,8 +706,9 @@ function renderUnitLevels(){for(const t of ALLIES){const b=$(t==='red'?'#spawnBt
 function renderTraining(){
  $('#xpText').textContent=training.xp+' XP';$('#trainingGrid').innerHTML='';
  $('#deckText').textContent=`출전 덱 ${deck.length} / ${DECK_SIZE} · 전투에는 덱에 넣은 아군만 나옵니다`;
- for(const t of ALLIES){const l=training.levels[t],d=unitStats(t),next=unitStats(t,Math.min(LV_MAX,l+1)),unlocked=allyUnlocked(t),inDeck=deck.includes(t),evolved=l>=LV_EVOLVE,card=document.createElement('article');card.className='training-card';card.innerHTML=`${profileMarkup(t,evolved)}<h3 style="color:${COLORS[t]}">${UNIT_NAMES[t]}${evolved?' 2진':''} <small>Lv.${l} / ${LV_MAX}</small>${t==='mint'?'<span class="freeze-icon title-icon" aria-label="정지"></span>':''}</h3><p class="profile-copy"><strong>${ROLES[t]}</strong>${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'||t==='crystal'?' · 떠다니는 적에게 강함':''}<br>${evolved?PROFILE_TEXT_EVOLVED[t]:PROFILE_TEXT[t]}${evolved?'<br><strong>2진 효과: '+EVOLUTION_TEXT[t]+' · 사거리 20% 증가</strong>':''}</p><p>체력 ${d.hp}${l<LV_MAX?' → '+next.hp:''}<br>공격력 ${d.atk}${l<LV_MAX?' → '+next.atk:''}</p>`;const b=document.createElement('button');b.textContent=!unlocked?STAGES[UNLOCK_AT[t]].name+(STAGES[UNLOCK_AT[t]].chapter===2?' 2장':'')+' 클리어로 해금':l>=LV_MAX?'최대 레벨':upgradeCost(t)+' XP · 강화';b.disabled=!unlocked||l>=LV_MAX||training.xp<upgradeCost(t);b.onclick=()=>upgradeCharacter(t);card.append(b);
+ for(const t of ALLIES){const l=training.levels[t],d=unitStats(t),next=unitStats(t,Math.min(LV_MAX,l+1)),unlocked=allyUnlocked(t),inDeck=deck.includes(t),evolved=l>=LV_EVOLVE&&training.forms[t]!==1,card=document.createElement('article');card.className='training-card';card.innerHTML=`${profileMarkup(t,evolved)}<h3 style="color:${COLORS[t]}">${UNIT_NAMES[t]}${evolved?' 2진':''} <small>Lv.${l} / ${LV_MAX}</small>${t==='mint'?'<span class="freeze-icon title-icon" aria-label="정지"></span>':''}</h3><p class="profile-copy"><strong>${ROLES[t]}</strong>${t==='purple'?' · 빨간 적에게 강함':''}${t==='cyan'||t==='crystal'?' · 떠다니는 적에게 강함':''}<br>${evolved?PROFILE_TEXT_EVOLVED[t]:PROFILE_TEXT[t]}${evolved?'<br><strong>2진 효과: '+EVOLUTION_TEXT[t]+' · 사거리 20% 증가</strong>':''}</p><p>체력 ${d.hp}${l<LV_MAX?' → '+next.hp:''}<br>공격력 ${d.atk}${l<LV_MAX?' → '+next.atk:''}</p>`;const b=document.createElement('button');b.textContent=!unlocked?STAGES[UNLOCK_AT[t]].name+(STAGES[UNLOCK_AT[t]].chapter===2?' 2장':'')+' 클리어로 해금':l>=LV_MAX?'최대 레벨':upgradeCost(t)+' XP · 강화';b.disabled=!unlocked||l>=LV_MAX||training.xp<upgradeCost(t);b.onclick=()=>upgradeCharacter(t);card.append(b);
   if(unlocked){const db=document.createElement('button');db.className='deck-btn';db.textContent=inDeck?'덱에서 제외':deck.length>=DECK_SIZE?'덱 가득참':'덱에 추가';db.disabled=!inDeck&&deck.length>=DECK_SIZE;db.classList.toggle('active',inDeck);db.onclick=()=>toggleDeck(t);card.append(db)}
+  if(unlocked&&l>=LV_EVOLVE){const fb=document.createElement('button');fb.className='form-btn';fb.textContent=evolved?'1진으로 변경 (약함)':'2진으로 변경';fb.onclick=()=>setForm(t,evolved?1:2);card.append(fb)}
   $('#trainingGrid').append(card)}
  $('#saveWarning').textContent=trainingSaveFailed?'브라우저 저장을 사용할 수 없습니다. 이번 플레이에서만 유지됩니다.':'';
 }
@@ -766,7 +743,7 @@ function codexTraitBadges(d){const b=[];if(d.trait==='red')b.push('빨간 적');
 let codexTab='ally',codexType='red',codexEvolved=false,codexUnit=null,codexRAF=0,codexLast=0,codexAutoPaused=false;
 function codexEntries(){return codexTab==='ally'?ALLIES:ENEMY_ORDER}
 function buildCodexPreviewUnit(type,ally,evolved){
- const stats=ally?unitStats(type,evolved?10:1):{...data.units[type]};
+ const stats=ally?unitStats(type,evolved?10:1,2):{...data.units[type]};
  const u={type,ally,stats,x:50,animTime:0,attackTime:0,attackCd:1.4,hurtTime:0,kbTime:0};
  drawUnit(u);
  return u;
@@ -775,10 +752,15 @@ function fitCodexUnit(){
  const stage=$('#codexPreviewStage'),unit=codexUnit.el,base=2.6;
  unit.style.transform=`translateX(-50%) scale(${base})`;
  const stageRect=stage.getBoundingClientRect();
- const spriteEl=unit.querySelector('.evolved-sprite')||unit.querySelector('.ally-sprite')||unit.querySelector('.dog-sprite');
- if(!spriteEl)return;
- const spriteRect=spriteEl.getBoundingClientRect();
- if(!spriteRect.width||!spriteRect.height)return;
+ // Fit the union of every walk/attack frame, not just the pre-animation box: wide
+ // impact frames (thrown objects, waves, raised weapons) otherwise run off the stage.
+ const u=codexUnit,box={l:1e9,r:-1e9,t:1e9,b:-1e9},d=data.units[u.type],dur=d.attackDuration||.56;
+ const measure=()=>{animateUnit(u);for(const e of unit.querySelectorAll('.evolved-sprite,.ally-sprite,.dog-sprite,.dog-sprite-legs')){if(getComputedStyle(e).display==='none')continue;const r=e.getBoundingClientRect();if(!r.width||!r.height)continue;box.l=Math.min(box.l,r.left);box.r=Math.max(box.r,r.right);box.t=Math.min(box.t,r.top);box.b=Math.max(box.b,r.bottom)}};
+ for(let i=0;i<8;i++){u.attackTime=0;u.animTime=i*.075;measure()}
+ for(let i=0;i<24;i++){u.animTime=0;u.attackTime=dur*(1-(i+.5)/24);measure()}
+ u.animTime=0;u.attackTime=0;animateUnit(u);
+ const spriteRect={left:box.l,top:box.t,width:box.r-box.l,height:box.b-box.t};
+ if(!(spriteRect.width>0&&spriteRect.height>0))return;
  const maxH=stageRect.height*.8,maxW=stageRect.width*.85;
  const scale=Math.min(base,base*maxH/spriteRect.height,base*maxW/spriteRect.width);
  const xShiftPerScale=(stageRect.left+stageRect.width/2-(spriteRect.left+spriteRect.width/2))/base;
@@ -792,7 +774,7 @@ function renderCodexPreview(){
  fitCodexUnit();
  $('#codexEvolveToggle').classList.toggle('hidden',!ally);
  $('#codexEvolveToggle').textContent=codexEvolved?'기본 형태 보기':'2진 진화 보기';
- const d=data.units[codexType],s=ally?unitStats(codexType,codexEvolved?10:1):d;
+ const d=data.units[codexType],s=ally?unitStats(codexType,codexEvolved?10:1,2):d;
  $('#codexName').textContent=UNIT_NAMES[codexType]+(ally&&codexEvolved?' 2진':'');
  $('#codexRole').textContent=ally?ROLES[codexType]:(codexTraitBadges(d).join(' · ')||'근접형');
  $('#codexDesc').innerHTML=ally?(codexEvolved?PROFILE_TEXT_EVOLVED[codexType]+`<br><strong>2진 효과: ${EVOLUTION_TEXT[codexType]} · 사거리 20% 증가</strong>`:PROFILE_TEXT[codexType]):ENEMY_TEXT[codexType];

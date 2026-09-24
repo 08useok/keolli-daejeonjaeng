@@ -176,3 +176,5 @@ body { overflow:auto; }
 .codex-card.active{border-color:#ffce80;background:#33465f;}
 @media(max-width:700px){.codex-body{flex-direction:column;}.codex-preview{flex-basis:auto;}}
 .stage-heading-actions{display:flex;gap:10px;flex-wrap:wrap;}
+
+.form-btn{background:#2f4a6b;border:1px solid #6fa3d8}
