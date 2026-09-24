@@ -128,7 +128,7 @@ function addUnit(type){
  game.units.push(u);drawUnit(u);u.el.style.left=`calc(${u.x}% - 21px)`;
  if(ally){game.money-=unitCost(type);game[cooldownKey(type)]=d.cooldown;if(game.tutorial===2){game.tutorial=3;tutorial()}}render();
 }
-function drawUnit(u){let e=document.createElement('div'),evolved=u.ally&&u.stats?.evolved,legacyAlly=u.ally&&!NEW_ATLASES[u.type];e.className='unit '+u.type+(u.ally?' ally-art':'')+(evolved?' evolved':'');e.style.setProperty('--unit-color',COLORS?.[u.type]||'#fff');e.innerHTML='<div class="bar"><i style="width:100%"></i></div><span class="freeze-badge"><span class="freeze-icon"></span></span>'+(legacyAlly?'<span class="ally-shadow"></span><span class="ally-sprite"></span>'+(evolved?'<span class="evolved-sprite"></span>':'')+(u.type==='pink'&&!evolved?'<span class="pink-ribbon"><i></i></span>':''):'<span class="dog-shadow"></span><span class="dog-sprite"></span>'+(u.type==='leboin'?'<span class="dog-sprite-legs"></span>':''));e.setAttribute('aria-label',UNIT_NAMES[u.type]+(evolved?' 2진':''));u.el=e;unitsEl.append(e);const newAtlas=NEW_ATLASES[u.type];const sheet={rabbit:ELITE_RABBIT_SHEET,squirrel:SQUIRREL_G_SHEET,kangaroo:KANG_ROO_SHEET,mooth:MOOTH_SHEET,rhino:RHINO_SHEET,bear:BEAR_SHEET,face:FACE_SHEET}[u.type]||(evolved&&newAtlas?.evolved?newAtlas.evolved.sheet:newAtlas?.sheet);if(sheet)e.querySelector('.dog-sprite').style.backgroundImage=`url(${sheet})`;if(legacyAlly)animateAlly(u);else animateDog(u)}
+function drawUnit(u){let e=document.createElement('div'),evolved=u.ally&&u.stats?.evolved,legacyAlly=u.ally&&!NEW_ATLASES[u.type];e.className='unit '+u.type+(u.ally?' ally-art':'')+(evolved?' evolved':'');e.style.setProperty('--unit-color',COLORS?.[u.type]||'#fff');e.innerHTML='<div class="bar"><i style="width:100%"></i></div><span class="freeze-badge"><span class="freeze-icon"></span></span>'+(legacyAlly?'<span class="ally-shadow"></span><span class="ally-sprite"></span>'+(evolved?'<span class="evolved-sprite"></span>':'')+(u.type==='pink'&&!evolved?'<span class="pink-ribbon"><i></i></span>':''):'<span class="dog-shadow"></span><span class="dog-sprite"></span>'+(u.type==='leboin'||u.type==='bear'?'<span class="dog-sprite-legs"></span>':''));e.setAttribute('aria-label',UNIT_NAMES[u.type]+(evolved?' 2진':''));u.el=e;unitsEl.append(e);const newAtlas=NEW_ATLASES[u.type];const sheet={rabbit:ELITE_RABBIT_SHEET,squirrel:SQUIRREL_G_SHEET,kangaroo:KANG_ROO_SHEET,mooth:MOOTH_SHEET,rhino:RHINO_SHEET,bear:BEAR_SHEET,face:FACE_SHEET}[u.type]||(evolved&&newAtlas?.evolved?newAtlas.evolved.sheet:newAtlas?.sheet);if(sheet)e.querySelector('.dog-sprite').style.backgroundImage=`url(${sheet})`;if(legacyAlly)animateAlly(u);else animateDog(u)}
 function target(u){let foes=game.units.filter(v=>v.hp>0&&v.kbTime<=0&&!v.emerging&&v.ally!==u.ally);let dir=u.ally?-1:1;return foes.filter(v=>dir*(v.x-u.x)>=-1).sort((a,b)=>Math.abs(a.x-u.x)-Math.abs(b.x-u.x))[0]}
 // Canonical knockback counts include death. Red keeps its original two live hitbacks.
 const HITBACK_DURATION=20/30;
@@ -328,6 +328,7 @@ function animateDog(u){
  if(u.type==='pigge'){animatePigge(u);return}
  if(u.type==='snache'){animateSnache(u);return}
  if(u.type==='leboin'){animateLeboin(u);return}
+ if(u.type==='bear'){animateBear(u);return}
  if(NEW_ATLASES[u.type]){animateAtlas(u);return}
  const state=u.hurtTime>0?'hurt':u.attackTime>0?'attack':'walk';
  const frames=DOG_FRAMES[state];
@@ -360,6 +361,30 @@ function animateSnache(u){
 const LEBOIN_HEAD={x:159,y:0,w:133,h:142,left:-25};
 const LEBOIN_LEGS={x:164,w:140,h:32,left:-27,y:[153,189,223]};
 const LEBOIN_SPRAY={x:1,y:10,w:156,h:147};
+// bear_sheet.png is the same kind of rig: a legless torso (its belly is cut flat at y=110)
+// plus separate 4-frame leg pieces whose 40px-wide top fits that gap exactly. The attack
+// poses are full-body drawings: [x,y,w,h,ox], ox re-anchoring the body onto the walk spot.
+const BEAR_TORSO={x:1,y:1,w:88,h:129},BEAR_LEGS=[[105,3],[195,2],[285,1],[375,2]],BEAR_ATTACK=[[91,56,91,199,6],[184,60,100,195,17],[294,74,146,181,42]];
+function animateBear(u){
+ const scale=.58,left=-22,d=data.units.bear;
+ const body=u.el.querySelector('.dog-sprite'),legs=u.el.querySelector('.dog-sprite-legs');
+ const state=u.hurtTime>0?'hurt':u.attackTime>0?'attack':'walk';
+ body.style.transform=legs.style.transform=`scale(${scale})`;body.style.transformOrigin=legs.style.transformOrigin='left bottom';
+ if(state==='attack'){
+  const elapsed=d.attackDuration-u.attackTime,[x,y,w,h,ox]=BEAR_ATTACK[elapsed<d.windup?(elapsed<d.windup/2?0:1):2];
+  legs.style.display='none';
+  body.style.width=w+'px';body.style.height=h+'px';body.style.left=(left-ox*scale)+'px';body.style.bottom='0px';
+  body.style.backgroundPosition=`-${x}px -${y}px`;body.style.filter='none';
+ }else{
+  const [lx,ly]=BEAR_LEGS[state==='walk'?Math.floor(u.animTime/.16)%4:0],lh=39-ly;
+  legs.style.display='block';legs.style.width='62px';legs.style.height=lh+'px';
+  legs.style.left=(left+15*scale)+'px';legs.style.bottom='0px';legs.style.backgroundPosition=`-${lx}px -${ly}px`;
+  body.style.width=BEAR_TORSO.w+'px';body.style.height=BEAR_TORSO.h+'px';body.style.left=left+'px';
+  body.style.bottom=((lh-20)*scale)+'px';body.style.backgroundPosition=`-${BEAR_TORSO.x}px -${BEAR_TORSO.y}px`;
+  body.style.filter=legs.style.filter=u.hurtTime>0?'brightness(1.8)':'none';
+ }
+ u.el.dataset.animation=state;
+}
 function animateLeboin(u){
  const scale=.55;
  const head=u.el.querySelector('.dog-sprite'),legs=u.el.querySelector('.dog-sprite-legs');
@@ -470,18 +495,17 @@ function renderNewButtons(){for(const type of GENERIC_CD_TYPES){
 }}
 
 const NEW_ATLASES={
-rhino:{scale:.55,left:-27,walk:[[0,0,126,84],[128,0,126,84],[256,0,126,84],[384,0,128,84],[0,85,126,84],[128,85,126,84],[256,85,126,84]],attack:[[384,85,128,84],[0,170,126,86],[128,170,126,86],[256,170,126,86]],hurt:[[0,85,126,84]]},
-bear:{scale:.58,left:-22,walk:[[0,0,88,130],[94,67,97,183],[190,67,100,183],[443,0,69,128],[0,0,88,130]],attack:[[190,67,100,183],[290,67,126,160],[0,0,88,130]]},
-face:{scale:.62,left:-25,walk:[[0,0,118,130],[121,0,120,130]],attack:[[244,0,125,130],[371,0,126,130]],hurt:[[0,134,155,118]]},
-rabbit:{scale:.72,left:-10,walk:[[7,7,52,68],[79,25,56,50],[153,27,55,48],[235,2,57,75],[292,2,72,75],[376,8,65,69]],attack:[[7,105,72,68],[104,87,64,74],[236,94,58,61],[324,100,116,70]],hurt:[[13,186,92,59]]},
-squirrel:{scale:.68,left:-12,walk:[[18,49,58,45],[97,50,63,44],[175,47,92,50],[257,44,79,50],[343,43,76,51]],attack:[[2,100,74,87],[88,96,74,91],[179,92,80,95],[253,119,88,68]],hurt:[[355,143,63,48]]},
-kangaroo:{scale:.58,left:-24,walk:[[5,1,115,124],[126,1,70,124],[4,129,115,124],[124,129,72,124]],attack:[[199,1,110,124],[202,129,108,124],[312,1,105,124],[313,129,104,124]],hurt:[[126,1,70,124]]},
-mooth:{scale:.7,left:-28,walk:[[7,0,99,128],[126,0,100,128],[247,0,76,128]],attack:[[0,132,123,124],[124,132,121,124],[247,132,119,124],[376,0,136,153]],hurt:[[247,0,76,128]]},
-peng:{"scale": 0.72, "left": 0, "walk": [[1, 1, 63, 87], [68, 1, 61, 87], [136, 1, 61, 87], [204, 1, 64, 87], [272, 1, 62, 87], [340, 1, 61, 87], [405, 1, 62, 87]], "attack": [[1, 91, 64, 88], [71, 92, 61, 87], [137, 92, 62, 87], [204, 92, 63, 87], [271, 92, 60, 87], [329, 92, 61, 87], [391, 91, 113, 135]], "hurt": [[1, 185, 86, 63]]},
-gory:{"scale": 0.7, "left": -5, "walk": [[2, 3, 72, 84], [77, 3, 70, 84], [152, 3, 72, 84], [228, 3, 73, 84], [304, 3, 72, 84], [378, 3, 72, 84]], "attack": [[2, 90, 74, 101], [80, 90, 75, 101], [158, 89, 100, 90], [261, 91, 99, 77], [364, 91, 91, 77]], "hurt": [[261, 169, 98, 77]]},
-baa:{"scale": 0.68, "left": -7, "walk": [[6, 1, 86, 75], [99, 1, 85, 75], [190, 1, 87, 75], [280, 1, 85, 75], [371, 1, 85, 75]], "attack": [[1, 79, 86, 75], [92, 79, 85, 75], [180, 77, 118, 77], [301, 78, 88, 76]], "hurt": [[91, 157, 86, 70]]},
-seal:{"scale": 0.78, "left": -22, "walk": [[1, 2, 112, 79], [116, 1, 111, 80], [1, 85, 112, 74]], "attack": [[116, 88, 111, 71], [116, 162, 111, 77], [231, 3, 115, 110], [349, 1, 117, 112], [349, 115, 117, 108]], "hurt": [[116, 162, 111, 77]]},
-croco:{"scale": 0.72, "left": -10, "walk": [[1, 28, 85, 42], [89, 28, 85, 42], [178, 28, 85, 42], [266, 28, 85, 42], [354, 28, 86, 42]], "attack": [[1, 98, 86, 40], [89, 70, 86, 69], [178, 70, 86, 69], [266, 70, 86, 69], [353, 102, 88, 37]], "hurt": [[89, 141, 86, 114]]},
+rhino:{scale:.55,left:-27,walk:[[3,1,106,81,0],[111,2,108,80,2],[225,4,104,78,-1],[331,1,106,78,0],[2,88,107,77,2],[111,84,108,81,2],[224,85,105,80,0],[331,81,106,78,1]],attack:[[1,170,108,78,2],[113,171,106,77,1],[223,166,183,89,-2]],hurt:[[2,88,107,77,2]]},
+face:{scale:.62,left:-25,walk:[[1,1,118,127,0],[121,1,121,138,3]],attack:[[244,1,125,157,10],[371,1,126,163,11]],hurt:[[1,134,155,121,12]]},
+rabbit:{scale:.72,left:-10,walk:[[6,11,56,76,0],[79,26,56,61,-1],[153,28,55,59,-1],[220,5,61,82,2],[293,1,71,71,14],[375,10,60,77,7]],attack:[[1,107,79,64,20],[105,89,74,71,18],[235,96,52,58,-6],[325,102,90,66,33]],hurt:[[13,188,90,56,6]]},
+squirrel:{scale:.68,left:-12,walk:[[20,51,54,41,0],[99,52,59,40,3],[177,49,68,43,15],[259,46,75,46,13],[345,45,72,47,16]],attack:[[5,102,69,83,13],[90,98,70,87,15],[181,94,76,91,18],[269,123,70,62,12]],hurt:[[357,145,59,44,4]]},
+kangaroo:{scale:.58,left:-24,walk:[[1,1,93,122,0],[96,1,100,112,9],[1,126,90,129,-5],[96,115,89,126,-3]],attack:[[200,1,110,121,-8],[191,131,133,124,7],[333,97,100,158,-11]],hurt:[[96,1,100,112,9]]},
+mooth:{scale:.7,left:-28,walk:[[7,1,99,126,0],[111,3,103,125,4],[217,1,106,128,3]],attack:[[1,163,121,85,12],[124,162,120,81,10],[248,131,119,90,19],[378,1,131,164,23]],hurt:[[217,1,106,128,3]]},
+peng:{scale:0.72,left:0,walk:[[1,1,58,87,0],[69,1,56,87,0],[138,1,56,87,-1],[208,1,59,88,-1],[273,1,56,86,-2],[340,1,58,87,-2],[408,2,58,86,-2]],attack:[[6,91,57,88,-2],[73,91,56,87,-2],[137,92,57,87,-3],[205,93,54,86,-3],[269,91,58,85,-1],[330,93,59,83,-2],[391,91,112,129,49]],hurt:[[4,181,84,59,11]]},
+gory:{scale:0.7,left:-5,walk:[[2,4,72,83,0],[76,5,73,82,1],[152,2,72,85,-1],[227,1,72,86,-1],[303,1,71,86,-2],[377,4,72,83,0]],attack:[[3,90,70,100,-4],[79,89,70,101,-3],[157,89,101,90,9],[260,94,100,72,6],[363,96,90,70,6]],hurt:[[260,169,93,76,6]]},
+baa:{scale:0.68,left:-7,walk:[[8,2,82,73,0],[99,2,82,73,0],[190,2,82,73,0],[280,2,82,73,0],[366,2,82,73,1]],attack:[[2,81,83,70,4],[92,81,83,70,3],[183,77,118,77,34],[304,77,83,75,-2]],hurt:[[92,157,83,69,3]]},
+seal:{scale:0.78,left:-22,walk:[[2,7,112,72,0],[116,1,111,78,1],[1,88,111,71,1]],attack:[[116,95,112,62,1],[116,160,111,75,1],[232,11,113,99,1],[350,2,115,109,1],[349,113,116,110,3]],hurt:[[116,160,111,75,1]]},
+croco:{scale:0.72,left:-10,walk:[[2,29,85,39,0],[89,29,86,39,1],[177,28,86,40,1],[265,28,86,40,1],[354,29,85,39,0]],attack:[[2,98,85,39,0],[90,73,85,64,0],[178,70,84,67,0],[266,73,85,64,0],[354,104,85,33,0]],hurt:[[90,142,85,64,0]]},
 
  pigge:{scale:.8,left:-20,walk:[[4,1,103,77],[4,79,103,76],[4,157,103,76],[115,5,104,73],[112,80,109,76],[115,158,104,75]],attack:[[225,1,126,104],[225,107,126,67],[225,177,126,67]],hurt:[[355,3,124,65],[368,72,103,65]]},
  crimson:{scale:0.45,left:-30,sheet:CRIMSON_SHEET,walk:[[10,36,136,144,0],[234,36,136,143,0],[462,36,141,145,4]],attack:[[685,36,185,143,10],[900,36,220,143,86],[1186,36,138,143,3]],hurt:[[1401,36,167,150,27]],evolved:{sheet:NEWCHAR_EVOLVED_SHEET,flip:true,scale:0.7,left:-26,walk:[[55,3,76,94,0],[236,3,74,94,-5],[414,3,84,94,-5]],attack:[[605,3,108,94,34],[772,3,134,94,60],[1158,3,90,94,11]],hurt:[[1333,5,113,92,18]]}},
